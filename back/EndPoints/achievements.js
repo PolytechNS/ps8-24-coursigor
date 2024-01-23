@@ -1,0 +1,3 @@
+const getAchievements = async (idClient) => {
+
+}
