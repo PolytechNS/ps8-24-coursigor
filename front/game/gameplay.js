@@ -321,24 +321,36 @@ function validMove(i, j) {
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
-            if(checkPresenceWall(i, j)){
+            if(checkPresenceWall(i, j,activePlayer)){
                 visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
                 positionPlayer1[0] = i;
                 positionPlayer1[1] = j;
-                console.log("player1", positionPlayer1);
                 updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
                 updateGrid();
                 activePlayer = PLAYER2;
             }
         }
+        else {
+            let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
+            let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
+            if(iP2MinusP1===0){
+                if(positionPlayer2[1]+jP2MinusP1===j){
+                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                    positionPlayer1[0] = i;
+                    positionPlayer1[1] = j;
+                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                    updateGrid();
+                    activePlayer = PLAYER2;
+                }
+            }
+        }
     }
     else if(activePlayer === PLAYER2 ) {
         if (positionPlayer2[0] === i-1 && positionPlayer2[1] === j || positionPlayer2[0] === i+1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j-1 || positionPlayer2[0] === i && positionPlayer2[1] === j+1) {
-            if(checkPresenceWall(i, j)) {
+            if(checkPresenceWall(i, j, activePlayer)) {
                 visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
                 positionPlayer2[0] = i;
                 positionPlayer2[1] = j;
-                console.log("player2", positionPlayer2);
                 updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
                 updateGrid();
                 activePlayer = PLAYER1;
@@ -346,31 +358,32 @@ function validMove(i, j) {
         }
     }
 }
-function checkPresenceWall(i,j){
-    let iSub = i - positionPlayer1[0];
-    let jSub = j - positionPlayer1[1];
-    console.log("iSub", iSub);
-    console.log("jSub", jSub);
+function checkPresenceWall(i,j, player){
+    let iSub;
+    let jSub;
+    if(player === PLAYER1) {
+        iSub = i - positionPlayer1[0];
+        jSub = j - positionPlayer1[1];
+    }
+    else if(player === PLAYER2) {
+        iSub = i - positionPlayer2[0];
+        jSub = j - positionPlayer2[1];
+    }
+    console.log("jSub",jSub);
     if(jSub===0){
-        console.log("jSub===0");
-        switch (iSub) {
 
+        switch (iSub) {
             case -1:
-                console.log(visionBoard[j][i] & WALL_RIGHT);
                 if(visionBoard[j][i] & WALL_RIGHT){
                     return false;
             }
                 break;
             case 1:
                 if(visionBoard[j][i] & WALL_LEFT){
-                    console.log("wall bottom");
                     return false;
                 }
                 break;
             default:
-                console.log("default");
-
-
         }
         return true;
 
@@ -378,25 +391,21 @@ function checkPresenceWall(i,j){
     if(iSub===0){
         switch (jSub) {
             case -1:
-                console.log(visionBoard[j][i] & WALL_BOTTOM);
                 if(visionBoard[j][i] & WALL_BOTTOM){
                     return false;
                 }
                 break;
             case 1:
                 if(visionBoard[j][i] & WALL_TOP){
-                    console.log("wall bottom");
                     return false;
                 }
                 break;
             default:
-                console.log("default");
-
-
         }
         return true;
 
     }
+
 
 }
 function updatePiecePosition(player, i, j) {
