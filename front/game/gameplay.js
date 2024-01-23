@@ -330,11 +330,22 @@ function validMove(i, j) {
                 activePlayer = PLAYER2;
             }
         }
+        //partie pour bouger ton pion au dessus du pion de l'adversaire
         else {
             let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
             let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
             if(iP2MinusP1===0){
                 if(positionPlayer2[1]+jP2MinusP1===j){
+                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                    positionPlayer1[0] = i;
+                    positionPlayer1[1] = j;
+                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                    updateGrid();
+                    activePlayer = PLAYER2;
+                }
+            }
+            else if(jP2MinusP1===0){
+                if(positionPlayer2[0]+iP2MinusP1===i){
                     visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
                     positionPlayer1[0] = i;
                     positionPlayer1[1] = j;
@@ -354,6 +365,30 @@ function validMove(i, j) {
                 updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
                 updateGrid();
                 activePlayer = PLAYER1;
+            }
+        }
+        else {
+            let iP1MinusP2=positionPlayer1[0]-positionPlayer2[0];
+            let jP1MinusP2=positionPlayer1[1]-positionPlayer2[1];
+            if(iP1MinusP2===0){
+                if(positionPlayer1[1]+jP1MinusP2===j){
+                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                    positionPlayer2[0] = i;
+                    positionPlayer2[1] = j;
+                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                    updateGrid();
+                    activePlayer = PLAYER1;
+                }
+            }
+            else if(jP1MinusP2===0){
+                if(positionPlayer1[0]+iP1MinusP2===i){
+                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                    positionPlayer2[0] = i;
+                    positionPlayer2[1] = j;
+                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                    updateGrid();
+                    activePlayer = PLAYER1;
+                }
             }
         }
     }
