@@ -96,7 +96,7 @@ function createGrid() {
             const y = j * 5;
 
             if (wallsNotToPlace.some(wall => wall[0] === "vertical" && wall[1] === i && wall[2] === j)) {
-                console.log("skipping vertical wall", i, j);
+                //console.log("skipping vertical wall", i, j);
             } else {
                 const verticalWall = createWall(x + 4, y, 1, 4, "verticalWall");
                 verticalWall.setAttribute("data-i", i.toString());
@@ -105,7 +105,7 @@ function createGrid() {
 
             }
             if (wallsNotToPlace.some(wall => wall[0] === "horizontal" && wall[1] === i && wall[2] === j)) {
-                console.log("skipping horizontal wall", i, j);
+                //console.log("skipping horizontal wall", i, j);
             } else {
                 const horizontalWall = createWall(x, y + 4, 4, 1, "horizontalWall");
                 horizontalWall.setAttribute("data-i", i.toString());
@@ -305,19 +305,16 @@ function calculateVision(board,i,j,value){
 }
 
 function handlePlayerClick(i, j) {
-    console.log("click cell", i, j);
     validMove(i, j);
 
 }
 
 function handlePlayerClickWallHorizontal(i, j) {
-    console.log("clickwallhorizontal", i, j);
     wall.setAttribute("fill", isHover ? "#000000" : "#ffffffff");
 
 }
 
 function validMove(i, j) {
-    console.log(activePlayer);
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
@@ -336,22 +333,28 @@ function validMove(i, j) {
             let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
             if(iP2MinusP1===0){
                 if(positionPlayer2[1]+jP2MinusP1===j){
-                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                    positionPlayer1[0] = i;
-                    positionPlayer1[1] = j;
-                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                    updateGrid();
-                    activePlayer = PLAYER2;
+                    if(checkPresenceWall(i, j,activePlayer))
+                    {
+                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                        positionPlayer1[0] = i;
+                        positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                        updateGrid();
+                        activePlayer = PLAYER2;
+                    }
                 }
             }
             else if(jP2MinusP1===0){
                 if(positionPlayer2[0]+iP2MinusP1===i){
-                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                    positionPlayer1[0] = i;
-                    positionPlayer1[1] = j;
-                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                    updateGrid();
-                    activePlayer = PLAYER2;
+                    if(checkPresenceWall(i, j,activePlayer))
+                    {
+                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                        positionPlayer1[0] = i;
+                        positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                        updateGrid();
+                        activePlayer = PLAYER2;
+                    }
                 }
             }
         }
@@ -372,22 +375,28 @@ function validMove(i, j) {
             let jP1MinusP2=positionPlayer1[1]-positionPlayer2[1];
             if(iP1MinusP2===0){
                 if(positionPlayer1[1]+jP1MinusP2===j){
-                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                    positionPlayer2[0] = i;
-                    positionPlayer2[1] = j;
-                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                    updateGrid();
-                    activePlayer = PLAYER1;
+                    if(checkPresenceWall(i, j, activePlayer))
+                    {
+                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                        positionPlayer2[0] = i;
+                        positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                        updateGrid();
+                        activePlayer = PLAYER1;
+                    }
                 }
             }
             else if(jP1MinusP2===0){
                 if(positionPlayer1[0]+iP1MinusP2===i){
-                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                    positionPlayer2[0] = i;
-                    positionPlayer2[1] = j;
-                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                    updateGrid();
-                    activePlayer = PLAYER1;
+                    if(checkPresenceWall(i, j, activePlayer))
+                    {
+                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                        positionPlayer2[0] = i;
+                        positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                        updateGrid();
+                        activePlayer = PLAYER1;
+                    }
                 }
             }
         }
@@ -404,7 +413,6 @@ function checkPresenceWall(i,j, player){
         iSub = i - positionPlayer2[0];
         jSub = j - positionPlayer2[1];
     }
-    console.log("jSub",jSub);
     if(jSub===0){
 
         switch (iSub) {
@@ -413,11 +421,20 @@ function checkPresenceWall(i,j, player){
                     return false;
             }
                 break;
+            case -2:
+                if(visionBoard[j][i] & WALL_RIGHT){
+                    return false;
+                }
+                break;
             case 1:
                 if(visionBoard[j][i] & WALL_LEFT){
                     return false;
                 }
                 break;
+            case 2:
+                if(visionBoard[j][i] & WALL_LEFT){
+                    return false;
+                }
             default:
         }
         return true;
@@ -430,7 +447,17 @@ function checkPresenceWall(i,j, player){
                     return false;
                 }
                 break;
+            case -2:
+                if(visionBoard[j][i] & WALL_BOTTOM){
+                    return false;
+                }
+                break;
             case 1:
+                if(visionBoard[j][i] & WALL_TOP){
+                    return false;
+                }
+                break;
+            case 2:
                 if(visionBoard[j][i] & WALL_TOP){
                     return false;
                 }
