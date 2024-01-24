@@ -317,16 +317,16 @@ function handlePlayerClickWallHorizontal(i, j) {
 function validMove(i, j) {
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
-        if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
-            if(checkPresenceWall(i, j,activePlayer)){
-                visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                positionPlayer1[0] = i;
-                positionPlayer1[1] = j;
-                updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                updateGrid();
-                activePlayer = PLAYER2;
+            if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
+                if(checkPresenceWall(i, j,activePlayer)){
+                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                    positionPlayer1[0] = i;
+                    positionPlayer1[1] = j;
+                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                    updateGrid();
+                    activePlayer = PLAYER2;
+                }
             }
-        }
         //partie pour bouger ton pion au dessus du pion de l'adversaire
         else {
             let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
@@ -405,13 +405,16 @@ function validMove(i, j) {
 function checkPresenceWall(i,j, player){
     let iSub;
     let jSub;
+    let posOpponent;
     if(player === PLAYER1) {
         iSub = i - positionPlayer1[0];
         jSub = j - positionPlayer1[1];
+        posOpponent=visionBoard[positionPlayer2[1]][positionPlayer2[0]];
     }
     else if(player === PLAYER2) {
         iSub = i - positionPlayer2[0];
         jSub = j - positionPlayer2[1];
+        posOpponent=visionBoard[positionPlayer1[1]][positionPlayer1[0]];
     }
     if(jSub===0){
 
@@ -422,7 +425,7 @@ function checkPresenceWall(i,j, player){
             }
                 break;
             case -2:
-                if(visionBoard[j][i] & WALL_RIGHT){
+                if(visionBoard[j][i] & WALL_RIGHT || posOpponent & WALL_RIGHT){
                     return false;
                 }
                 break;
@@ -432,7 +435,7 @@ function checkPresenceWall(i,j, player){
                 }
                 break;
             case 2:
-                if(visionBoard[j][i] & WALL_LEFT){
+                if(visionBoard[j][i] & WALL_LEFT || posOpponent & WALL_LEFT){
                     return false;
                 }
             default:
@@ -448,7 +451,7 @@ function checkPresenceWall(i,j, player){
                 }
                 break;
             case -2:
-                if(visionBoard[j][i] & WALL_BOTTOM){
+                if((visionBoard[j][i] & WALL_BOTTOM) || (posOpponent & WALL_BOTTOM)){
                     return false;
                 }
                 break;
@@ -458,7 +461,7 @@ function checkPresenceWall(i,j, player){
                 }
                 break;
             case 2:
-                if(visionBoard[j][i] & WALL_TOP){
+                if(visionBoard[j][i] & WALL_TOP || posOpponent & WALL_TOP){
                     return false;
                 }
                 break;
