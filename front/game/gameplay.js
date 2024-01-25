@@ -317,8 +317,11 @@ function handlePlayerClickWallHorizontal(i, j) {
 function validMove(i, j) {
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
-            if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
-                if(checkPresenceWall(i, j,activePlayer)){
+        console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
+        if (positionPlayer2[0] !== i || positionPlayer2[1] !== j) {
+            if (positionPlayer1[0] === i - 1 && positionPlayer1[1] === j || positionPlayer1[0] === i + 1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j - 1 || positionPlayer1[0] === i && positionPlayer1[1] === j + 1) {
+                console.log("oui"); // rentre pas ici
+                if (checkPresenceWall(i, j, activePlayer)) {
                     visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
                     positionPlayer1[0] = i;
                     positionPlayer1[1] = j;
@@ -327,6 +330,7 @@ function validMove(i, j) {
                     activePlayer = PLAYER2;
                 }
             }
+        }
         //partie pour bouger ton pion au dessus du pion de l'adversaire
         else {
             let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
@@ -360,14 +364,17 @@ function validMove(i, j) {
         }
     }
     else if(activePlayer === PLAYER2 ) {
-        if (positionPlayer2[0] === i-1 && positionPlayer2[1] === j || positionPlayer2[0] === i+1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j-1 || positionPlayer2[0] === i && positionPlayer2[1] === j+1) {
-            if(checkPresenceWall(i, j, activePlayer)) {
-                visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                positionPlayer2[0] = i;
-                positionPlayer2[1] = j;
-                updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                updateGrid();
-                activePlayer = PLAYER1;
+        if (positionPlayer1[0] !== i || positionPlayer1[1] !== j) {
+            if (positionPlayer2[0] === i - 1 && positionPlayer2[1] === j || positionPlayer2[0] === i + 1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j - 1 || positionPlayer2[0] === i && positionPlayer2[1] === j + 1) {
+                console.log("oui2");
+                if (checkPresenceWall(i, j, activePlayer)) {
+                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                    positionPlayer2[0] = i;
+                    positionPlayer2[1] = j;
+                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                    updateGrid();
+                    activePlayer = PLAYER1;
+                }
             }
         }
         else {
