@@ -143,9 +143,17 @@ function createGrid() {
         const j2 = 1 + parseInt(wall.getAttribute("data-j"));
         wall.addEventListener("click", () => handleWallClick(i1, j1, i2, j2));
     });
+    document.getElementById('overlay').classList.add('active');
 
 }
-
+function closeOverlay() {
+    // Masquer l'overlay
+    document.getElementById('overlay').classList.remove('active');
+}
+function displayOverlay() {
+    // Afficher l'overlay
+    document.getElementById('overlay').classList.add('active');
+}
 
 function handleWallClick(i1, j1, i2, j2) {
     wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
@@ -205,11 +213,16 @@ function handleWallClick(i1, j1, i2, j2) {
     const svg = document.querySelector('svg');
 
     if (activePlayer === PLAYER1) {
+        displayOverlay();
         newWall.setAttribute("fill", "#00FF00");
         activePlayer = PLAYER2;
+        displayOverlay();
+
     } else {
+        displayOverlay();
         newWall.setAttribute("fill", "#0000FF");
         activePlayer = PLAYER1;
+
     }
 
     svg.removeChild(wall);
@@ -328,6 +341,7 @@ function validMove(i, j) {
                     updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
                     updateGrid();
                     activePlayer = PLAYER2;
+                    displayOverlay();
                 }
             }
         }
@@ -345,6 +359,7 @@ function validMove(i, j) {
                         updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
                         updateGrid();
                         activePlayer = PLAYER2;
+                        displayOverlay();
                     }
                 }
             }
@@ -358,6 +373,7 @@ function validMove(i, j) {
                         updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
                         updateGrid();
                         activePlayer = PLAYER2;
+                        displayOverlay();
                     }
                 }
             }
@@ -374,6 +390,7 @@ function validMove(i, j) {
                     updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
                     updateGrid();
                     activePlayer = PLAYER1;
+                    displayOverlay();
                 }
             }
         }
@@ -390,6 +407,7 @@ function validMove(i, j) {
                         updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
                         updateGrid();
                         activePlayer = PLAYER1;
+                        displayOverlay();
                     }
                 }
             }
@@ -403,6 +421,7 @@ function validMove(i, j) {
                         updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
                         updateGrid();
                         activePlayer = PLAYER1;
+                        displayOverlay();
                     }
                 }
             }

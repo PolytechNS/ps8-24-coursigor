@@ -7,7 +7,31 @@ body {
     display: grid;
     height: 100vh;
     grid-template: auto 1fr auto / auto 1fr auto;
+    margin: 0;
+
 }
+
+
+.overlay {
+    display: none;
+    position: absolute;
+    background-color: rgb(37, 37, 37);
+    padding: 370px;
+    text-align: center;
+}
+
+.overlay button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: yellow;
+}
+
+.overlay.active {
+    display: block;
+}
+
 
 header {
     display: flex;
