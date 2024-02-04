@@ -157,8 +157,50 @@ function displayOverlay() {
     document.getElementById('overlay').classList.add('active');
 }
 
-function handleWallClick(i1, j1, i2, j2) {
+function notCirclesPlayers(alreadyChecked, i, j, player) {
+    // check if the cell has already been checked
+    if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
+        return false;
+    }
 
+    //if the cell is out of the board
+    if (i < 0 || i > 8 || j < 0 || j > 8) {
+        return false;
+    }
+
+    // store the cell as checked
+    alreadyChecked.push([i, j]);
+
+    if ((player == PLAYER1) && i == 0) {
+        return true;
+    }
+    if ((player == PLAYER2) && j == 8) {
+        return true;
+    }
+
+    let top = false;
+    let bottom = false;
+    let left = false;
+    let right = false;
+
+    if (!(visionBoard[j][i] & WALL_TOP)) {
+        top = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_BOTTOM)) {
+        bottom = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_LEFT)) {
+        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
+    }
+    if (!(visionBoard[j][i] & WALL_RIGHT)) {
+        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
+    }
+
+    return top || bottom || left || right;
+}
+
+function handleWallClick(i1, j1, i2, j2) {
+    // Check if the player has a wall left to place
     if ((activePlayer === PLAYER1 && wallLeftP1 === 0) || (activePlayer === PLAYER2 && wallLeftP2 === 0)) {
         console.log("No more walls left for the active player.");
         return;
@@ -214,6 +256,49 @@ function handleWallClick(i1, j1, i2, j2) {
         wall2 = document.querySelector(`.horizontalWall[data-i="${i2}"][data-j="${j2}"]`);
         wall3 = document.querySelector(`.horizontalWall[data-i="${i1 - 1}"][data-j="${j2}"]`);
         wall4 = document.querySelector(`.verticalWall[data-i="${i1}"][data-j="${j1}"]`);
+    }
+
+
+    //check if placing the wall would block any player
+    let ncP1 = notCirclesPlayers([], positionPlayer1[0], positionPlayer1[1], PLAYER1);
+    let ncP2 = notCirclesPlayers([], positionPlayer2[0], positionPlayer2[1], PLAYER2);
+    if (!ncP1 || !ncP2) {
+        console.log("The player can't reach the end anymore. The move is invalid");
+        if (i1 === i2) {
+            // Vertical wall
+            visionBoard[j1][i1] -= WALL_RIGHT;
+            visionBoard[j2][i2] -= WALL_RIGHT;
+
+            visionBoard[j1][i1 + 1] -= WALL_LEFT;
+            visionBoard[j2][i2 + 1] -= WALL_LEFT;
+
+            //remove the coordinates from the wallsNotToPlace array
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i2 || wall[2] !== j2);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1 - 1);
+
+            // wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
+            // wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+        } else {
+            // Horizontal wall
+            visionBoard[j1][i1] -= WALL_BOTTOM;
+            visionBoard[j2][i2] -= WALL_BOTTOM;
+
+            visionBoard[j1 + 1][i1] -= WALL_TOP;
+            visionBoard[j2 + 1][i2] -= WALL_TOP;
+
+            // remove the coordinates from the wallsNotToPlace array
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i2 || wall[2] !== j2);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 - 1 || wall[2] !== j1);
+
+
+
+            // wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+            // wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+
+        }
+        return;
     }
 
 
