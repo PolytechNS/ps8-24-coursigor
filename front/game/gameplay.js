@@ -184,10 +184,10 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
     let right = false;
 
     if (!(visionBoard[j][i] & WALL_TOP)) {
-        top = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
     }
     if (!(visionBoard[j][i] & WALL_BOTTOM)) {
-        bottom = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
     }
     if (!(visionBoard[j][i] & WALL_LEFT)) {
         left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
