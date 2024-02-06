@@ -146,6 +146,14 @@ function createGrid() {
 
 }
 
+function updateVisionWall(i, j, value) {
+    calculateVision(visionBoard, i, j, value);
+    calculateVision(visionBoard, i + 1, j, value);
+    calculateVision(visionBoard, i, j + 1, value);
+    calculateVision(visionBoard, i + 1, j + 1, value);
+
+    //TODO finish the vision update for the walls
+}
 
 function handleWallClick(i1, j1, i2, j2) {
     wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
@@ -166,7 +174,7 @@ function handleWallClick(i1, j1, i2, j2) {
         newWall.setAttribute("y", (j1*5).toString());
         newWall.setAttribute("width", (1).toString());
         newWall.setAttribute("height", (9).toString());
-        wall.setAttribute("class", activePlayer+ "verticalPlacedWall");
+        newWall.setAttribute("class", activePlayer+ "verticalPlacedWall");
 
         visionBoard[j1][i1] += WALL_RIGHT;
         visionBoard[j2][i2] += WALL_RIGHT;
@@ -185,7 +193,7 @@ function handleWallClick(i1, j1, i2, j2) {
         newWall.setAttribute("y", (j1*5+4).toString());
         newWall.setAttribute("width", (9).toString());
         newWall.setAttribute("height", (1).toString());
-        wall.setAttribute("class", activePlayer+ "horizontalPlacedWall");
+        newWall.setAttribute("class", activePlayer+ "horizontalPlacedWall");
 
         visionBoard[j1][i1] += WALL_BOTTOM;
         visionBoard[j2][i2] += WALL_BOTTOM;
@@ -206,9 +214,11 @@ function handleWallClick(i1, j1, i2, j2) {
 
     if (activePlayer === PLAYER1) {
         newWall.setAttribute("fill", "#00FF00");
+        updateVisionWall(i1, j1, -2);
         activePlayer = PLAYER2;
     } else {
         newWall.setAttribute("fill", "#0000FF");
+        updateVisionWall(i1, j1, 2);
         activePlayer = PLAYER1;
     }
 
@@ -291,17 +301,21 @@ function calculateVision(board,i,j,value){
         if (board[i][j] & NEGMASK)
             board[i][j] -=NEGMASK;
         if (value < 0){
-            board[i][j] -= value;
+            board[i][j] -= 1;
             board[i][j] += NEGMASK;
         }
         else{
-            board[i][j] += value;
+            board[i][j] += 1;
         }
     }
     else if (board[i][j] & NEGMASK)
-        board[i][j] -= value;
+        board[i][j] -= 1;
     else
-        board[i][j] += value;
+        board[i][j] += 1;
+
+    if (value > 1) {
+        calculateVision(board, i, j, value-1);
+    }
 }
 
 function handlePlayerClick(i, j) {
