@@ -7,7 +7,45 @@ body {
     display: grid;
     height: 100vh;
     grid-template: auto 1fr auto / auto 1fr auto;
+    margin: 0;
+
 }
+
+
+.overlay {
+    display: none;
+    position: absolute;
+    background-color: rgb(37, 37, 37);
+    padding: 370px;
+    text-align: center;
+}
+
+.overlay button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fbca1f;
+    font-family: inherit;
+    padding: 0.6em 1.3em;
+    font-weight: 900;
+    font-size: 18px;
+    border: 3px solid black;
+    border-radius: 0.4em;
+    box-shadow: 0.1em 0.1em;
+    cursor: pointer;
+    grid-row: 2/2;
+}
+p{
+    color: yellow;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.overlay.active {
+    display: block;
+}
+
 
 header {
     display: flex;
@@ -46,9 +84,19 @@ header img {
     font-size: 3rem;
     grid-row: 1/2;
 }
+.left-sidebar,
+.right-sidebar {
+    padding: 1rem;
+    text-align: center; /* Ajout pour centrer horizontalement */
+    display: flex; /* Ajout pour aligner verticalement */
+    flex-direction: column; /* Ajout pour aligner verticalement */
+    align-items: center; /* Ajout pour aligner verticalement */
+}
 
 .left-sidebar {
     grid-column: 1 / 2;
+
+
 }
 
 main {
