@@ -186,7 +186,7 @@ function displayOverlay() {
 }
 
 function notCirclesPlayers(alreadyChecked, i, j, player) {
-    // check if the cell has already been checked
+        // check if the cell has already been checked
     if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
         return false;
     }
@@ -196,13 +196,17 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
         return false;
     }
 
+    console.log("checking cell", i, j, "for player", player.toString(2));
+
     // store the cell as checked
     alreadyChecked.push([i, j]);
 
-    if ((player == PLAYER1) && i == 0) {
+    if ((player == PLAYER1) && j == 0) {
+        console.log("player 1 can reach the end");
         return true;
     }
     if ((player == PLAYER2) && j == 8) {
+        console.log("player 2 can reach the end");
         return true;
     }
 
@@ -313,9 +317,15 @@ function handleWallClick(i1, j1, i2, j2) {
             visionBoard[j2][i2 + 1] -= WALL_LEFT;
 
             //remove the coordinates from the wallsNotToPlace array
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i2 || wall[2] !== j2);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1 - 1);
+            removeMatchingWall(placedWalls, "vertical", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1 - 1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1, j1);
+
+            // placedWalls = placedWalls.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i2 || wall[2] !== j2);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1 - 1);
         } else {
             // Horizontal wall
             visionBoard[j1][i1] -= WALL_BOTTOM;
@@ -324,12 +334,29 @@ function handleWallClick(i1, j1, i2, j2) {
             visionBoard[j1 + 1][i1] -= WALL_TOP;
             visionBoard[j2 + 1][i2] -= WALL_TOP;
 
+
+            removeMatchingWall(placedWalls, "horizontal", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1 - 1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1);
             // remove the coordinates from the wallsNotToPlace array
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i2 || wall[2] !== j2);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 - 1 || wall[2] !== j1);
+            // placedWalls = placedWalls.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i2 || wall[2] !== j2);
+            // wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 - 1 || wall[2] !== j1);
         }
         return;
+    }
+
+    function isMatchingWall(wall, type, i, j) {
+        return wall[0] === type && wall[1] === i && wall[2] === j;
+    }
+
+    function removeMatchingWall(arr, type, i, j) {
+        const indexToRemove = arr.findIndex(wall => isMatchingWall(wall, type, i, j));
+        if (indexToRemove !== -1) {
+            arr.splice(indexToRemove, 1);
+        }
     }
 
 
