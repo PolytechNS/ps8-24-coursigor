@@ -14,6 +14,8 @@ const PLAYER1 =0b100000
 const NEGMASK =0b1000
 const VISIONMASK = 0b111
 let activePlayer = PLAYER1;
+let wallLeftP1 = 10;
+let wallLeftP2 = 10;
 
 let positionPlayer1 = [4, 8];
 let positionPlayer2 = [4, 0];
@@ -96,7 +98,7 @@ function createGrid() {
             const y = j * 5;
 
             if (wallsNotToPlace.some(wall => wall[0] === "vertical" && wall[1] === i && wall[2] === j)) {
-                console.log("skipping vertical wall", i, j);
+                //console.log("skipping vertical wall", i, j);
             } else {
                 const verticalWall = createWall(x + 4, y, 1, 4, "verticalWall");
                 verticalWall.setAttribute("data-i", i.toString());
@@ -105,7 +107,7 @@ function createGrid() {
 
             }
             if (wallsNotToPlace.some(wall => wall[0] === "horizontal" && wall[1] === i && wall[2] === j)) {
-                console.log("skipping horizontal wall", i, j);
+                //console.log("skipping horizontal wall", i, j);
             } else {
                 const horizontalWall = createWall(x, y + 4, 4, 1, "horizontalWall");
                 horizontalWall.setAttribute("data-i", i.toString());
@@ -143,8 +145,60 @@ function createGrid() {
         const j2 = 1 + parseInt(wall.getAttribute("data-j"));
         wall.addEventListener("click", () => handleWallClick(i1, j1, i2, j2));
     });
+    document.getElementById('overlay').classList.add('active');
 
 }
+function closeOverlay() {
+    // Masquer l'overlay
+    document.getElementById('overlay').classList.remove('active');
+}
+function displayOverlay() {
+    // Afficher l'overlay
+    document.getElementById('overlay').classList.add('active');
+}
+
+function notCirclesPlayers(alreadyChecked, i, j, player) {
+    // check if the cell has already been checked
+    if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
+        return false;
+    }
+
+    //if the cell is out of the board
+    if (i < 0 || i > 8 || j < 0 || j > 8) {
+        return false;
+    }
+
+    // store the cell as checked
+    alreadyChecked.push([i, j]);
+
+    if ((player == PLAYER1) && i == 0) {
+        return true;
+    }
+    if ((player == PLAYER2) && j == 8) {
+        return true;
+    }
+
+    let top = false;
+    let bottom = false;
+    let left = false;
+    let right = false;
+
+    if (!(visionBoard[j][i] & WALL_TOP)) {
+        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_BOTTOM)) {
+        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_LEFT)) {
+        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
+    }
+    if (!(visionBoard[j][i] & WALL_RIGHT)) {
+        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
+    }
+
+    return top || bottom || left || right;
+}
+
 
 function updateVisionWall(i, j, value) {
     calculateVision(visionBoard, i, j, value);
@@ -156,9 +210,15 @@ function updateVisionWall(i, j, value) {
 }
 
 function handleWallClick(i1, j1, i2, j2) {
+    // Check if the player has a wall left to place
+    if ((activePlayer === PLAYER1 && wallLeftP1 === 0) || (activePlayer === PLAYER2 && wallLeftP2 === 0)) {
+        console.log("No more walls left for the active player.");
+        return;
+    }
+
     wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
     wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left or the top
-    console.log("click wall", i1, j1, i2, j2);
+    //console.log("click wall", i1, j1, i2, j2);
     const wall = event.target;
 
     let newWall = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -209,17 +269,68 @@ function handleWallClick(i1, j1, i2, j2) {
     }
 
 
+    //check if placing the wall would block any player
+    let ncP1 = notCirclesPlayers([], positionPlayer1[0], positionPlayer1[1], PLAYER1);
+    let ncP2 = notCirclesPlayers([], positionPlayer2[0], positionPlayer2[1], PLAYER2);
+    if (!ncP1 || !ncP2) {
+        console.log("The player can't reach the end anymore. The move is invalid");
+        if (i1 === i2) {
+            // Vertical wall
+            visionBoard[j1][i1] -= WALL_RIGHT;
+            visionBoard[j2][i2] -= WALL_RIGHT;
+
+            visionBoard[j1][i1 + 1] -= WALL_LEFT;
+            visionBoard[j2][i2 + 1] -= WALL_LEFT;
+
+            //remove the coordinates from the wallsNotToPlace array
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i2 || wall[2] !== j2);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1 - 1);
+
+            // wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
+            // wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+        } else {
+            // Horizontal wall
+            visionBoard[j1][i1] -= WALL_BOTTOM;
+            visionBoard[j2][i2] -= WALL_BOTTOM;
+
+            visionBoard[j1 + 1][i1] -= WALL_TOP;
+            visionBoard[j2 + 1][i2] -= WALL_TOP;
+
+            // remove the coordinates from the wallsNotToPlace array
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i2 || wall[2] !== j2);
+            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 - 1 || wall[2] !== j1);
+
+
+
+            // wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+            // wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+
+        }
+        return;
+    }
+
+
 
     const svg = document.querySelector('svg');
 
     if (activePlayer === PLAYER1) {
+        displayOverlay();
         newWall.setAttribute("fill", "#00FF00");
         updateVisionWall(i1, j1, -2);
         activePlayer = PLAYER2;
+        wallLeftP1--;
+        console.log("player1",wallLeftP1);
+
     } else {
+        displayOverlay();
         newWall.setAttribute("fill", "#0000FF");
         updateVisionWall(i1, j1, 2);
         activePlayer = PLAYER1;
+        wallLeftP2--;
+        console.log("player2",wallLeftP2);
+
     }
 
     svg.removeChild(wall);
@@ -239,9 +350,10 @@ function handleWallClick(i1, j1, i2, j2) {
 
     }
 
+
     // console.log(visionBoard) as binary
-    console.log(visionBoard.map(row => row.map(cell => cell.toString(2).padStart(16, "0")).join(" ")).join("\n"));
-    console.log(wallsNotToPlace);
+    //console.log(visionBoard.map(row => row.map(cell => cell.toString(2).padStart(16, "0")).join(" ")).join("\n"));
+    //console.log(wallsNotToPlace);
     updateGrid();
 }
 
@@ -319,42 +431,186 @@ function calculateVision(board,i,j,value){
 }
 
 function handlePlayerClick(i, j) {
-    console.log("click cell", i, j);
     validMove(i, j);
 
 }
 
 function handlePlayerClickWallHorizontal(i, j) {
-    console.log("clickwallhorizontal", i, j);
     wall.setAttribute("fill", isHover ? "#000000" : "#ffffffff");
 
 }
 
 function validMove(i, j) {
-    console.log(activePlayer);
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
-        if (positionPlayer1[0] === i-1 && positionPlayer1[1] === j || positionPlayer1[0] === i+1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j-1 || positionPlayer1[0] === i && positionPlayer1[1] === j+1) {
-            visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-            positionPlayer1[0] = i;
-            positionPlayer1[1] = j;
-            console.log("player1", positionPlayer1);
-            updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-            updateGrid();
-            activePlayer = PLAYER2;
+        //console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
+        if (positionPlayer2[0] !== i || positionPlayer2[1] !== j) {
+            if (positionPlayer1[0] === i - 1 && positionPlayer1[1] === j || positionPlayer1[0] === i + 1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j - 1 || positionPlayer1[0] === i && positionPlayer1[1] === j + 1) {
+                //console.log("oui"); // rentre pas ici
+                if (checkPresenceWall(i, j, activePlayer)) {
+                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                    positionPlayer1[0] = i;
+                    positionPlayer1[1] = j;
+                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                    updateGrid();
+                    activePlayer = PLAYER2;
+                    displayOverlay();
+                }
+            }
+        }
+        //partie pour bouger ton pion au dessus du pion de l'adversaire
+        else {
+            let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
+            let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
+            if(iP2MinusP1===0){
+                if(positionPlayer2[1]+jP2MinusP1===j){
+                    if(checkPresenceWall(i, j,activePlayer))
+                    {
+                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                        positionPlayer1[0] = i;
+                        positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                        updateGrid();
+                        activePlayer = PLAYER2;
+                        displayOverlay();
+                    }
+                }
+            }
+            else if(jP2MinusP1===0){
+                if(positionPlayer2[0]+iP2MinusP1===i){
+                    if(checkPresenceWall(i, j,activePlayer))
+                    {
+                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
+                        positionPlayer1[0] = i;
+                        positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
+                        updateGrid();
+                        activePlayer = PLAYER2;
+                        displayOverlay();
+                    }
+                }
+            }
         }
     }
     else if(activePlayer === PLAYER2 ) {
-        if (positionPlayer2[0] === i-1 && positionPlayer2[1] === j || positionPlayer2[0] === i+1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j-1 || positionPlayer2[0] === i && positionPlayer2[1] === j+1) {
-            visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-            positionPlayer2[0] = i;
-            positionPlayer2[1] = j;
-            console.log("player2", positionPlayer2);
-            updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-            updateGrid();
-            activePlayer = PLAYER1;
+        if (positionPlayer1[0] !== i || positionPlayer1[1] !== j) {
+            if (positionPlayer2[0] === i - 1 && positionPlayer2[1] === j || positionPlayer2[0] === i + 1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j - 1 || positionPlayer2[0] === i && positionPlayer2[1] === j + 1) {
+                //console.log("oui2");
+                if (checkPresenceWall(i, j, activePlayer)) {
+                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                    positionPlayer2[0] = i;
+                    positionPlayer2[1] = j;
+                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                    updateGrid();
+                    activePlayer = PLAYER1;
+                    displayOverlay();
+                }
+            }
+        }
+        else {
+            let iP1MinusP2=positionPlayer1[0]-positionPlayer2[0];
+            let jP1MinusP2=positionPlayer1[1]-positionPlayer2[1];
+            if(iP1MinusP2===0){
+                if(positionPlayer1[1]+jP1MinusP2===j){
+                    if(checkPresenceWall(i, j, activePlayer))
+                    {
+                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                        positionPlayer2[0] = i;
+                        positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                        updateGrid();
+                        activePlayer = PLAYER1;
+                        displayOverlay();
+                    }
+                }
+            }
+            else if(jP1MinusP2===0){
+                if(positionPlayer1[0]+iP1MinusP2===i){
+                    if(checkPresenceWall(i, j, activePlayer))
+                    {
+                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
+                        positionPlayer2[0] = i;
+                        positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
+                        updateGrid();
+                        activePlayer = PLAYER1;
+                        displayOverlay();
+                    }
+                }
+            }
         }
     }
+}
+function checkPresenceWall(i,j, player){
+    let iSub;
+    let jSub;
+    let posOpponent;
+    if(player === PLAYER1) {
+        iSub = i - positionPlayer1[0];
+        jSub = j - positionPlayer1[1];
+        posOpponent=visionBoard[positionPlayer2[1]][positionPlayer2[0]];
+    }
+    else if(player === PLAYER2) {
+        iSub = i - positionPlayer2[0];
+        jSub = j - positionPlayer2[1];
+        posOpponent=visionBoard[positionPlayer1[1]][positionPlayer1[0]];
+    }
+    if(jSub===0){
+
+        switch (iSub) {
+            case -1:
+                if(visionBoard[j][i] & WALL_RIGHT){
+                    return false;
+            }
+                break;
+            case -2:
+                if(visionBoard[j][i] & WALL_RIGHT || posOpponent & WALL_RIGHT){
+                    return false;
+                }
+                break;
+            case 1:
+                if(visionBoard[j][i] & WALL_LEFT){
+                    return false;
+                }
+                break;
+            case 2:
+                if(visionBoard[j][i] & WALL_LEFT || posOpponent & WALL_LEFT){
+                    return false;
+                }
+            default:
+        }
+        return true;
+
+    }
+    if(iSub===0){
+        switch (jSub) {
+            case -1:
+                if(visionBoard[j][i] & WALL_BOTTOM){
+                    return false;
+                }
+                break;
+            case -2:
+                if((visionBoard[j][i] & WALL_BOTTOM) || (posOpponent & WALL_BOTTOM)){
+                    return false;
+                }
+                break;
+            case 1:
+                if(visionBoard[j][i] & WALL_TOP){
+                    return false;
+                }
+                break;
+            case 2:
+                if(visionBoard[j][i] & WALL_TOP || posOpponent & WALL_TOP){
+                    return false;
+                }
+                break;
+            default:
+        }
+        return true;
+
+    }
+
+
 }
 function updatePiecePosition(player, i, j) {
     if (player === PLAYER1) {
@@ -368,6 +624,8 @@ function updateGrid() {
     const circles = document.querySelectorAll('circle');
     circles.forEach(circle => circle.remove());
     createGrid();
+    document.getElementById('wallLeftP1').textContent = wallLeftP1.toString();
+    document.getElementById('wallLeftP2').textContent = wallLeftP2.toString();
     checkVictoryCondition();
 }
 function checkVictoryCondition() {
