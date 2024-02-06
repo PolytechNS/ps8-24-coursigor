@@ -8,6 +8,6 @@ WORKDIR /app
 COPY . .
 
 # Run any necessary commands to set up your application
-
+EXPOSE 8000
 # Specify the command to run when the container starts
-CMD [ "node", "app.js" ]
+CMD [ "npm", "start" ]
