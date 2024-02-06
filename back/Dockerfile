@@ -10,4 +10,4 @@ COPY . .
 # Run any necessary commands to set up your application
 
 # Specify the command to run when the container starts
-CMD [ "node", "app.js" ]
+CMD [ "npm", "start" ]
