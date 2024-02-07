@@ -2,6 +2,8 @@ const { MongoClient } = require("mongodb");
 
 const DBuri = "mongodb://root:example@172.20.0.2:27017/";
 const DBClient = new MongoClient(DBuri);
+const http = require('http');
+const cors = require('cors');
 
 const signUpAndPrintDatabase = async (mail, username, password) => {
     try {
@@ -19,7 +21,7 @@ const signUpAndPrintDatabase = async (mail, username, password) => {
         // Ajout de l'utilisateur à la collection
         const utilisateursCollection = db.collection('utilisateurs');
         await utilisateursCollection.insertOne({ mail, username, password });
-
+        //await utilisateursCollection.deleteMany({});
         console.log('Utilisateur ajouté avec succès !');
 
         // Affichage de tous les utilisateurs dans la collection
@@ -33,8 +35,37 @@ const signUpAndPrintDatabase = async (mail, username, password) => {
     }
 };
 
-const exempleMail = 'AAexemple@mail.com';
-const exempleUsername = 'AAutilisateur';
-const exemplePassword = 'AAmotdepasse';
 
-signUpAndPrintDatabase(exempleMail, exempleUsername, exemplePassword);
+
+
+
+const server = http.createServer((req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    const url= req.url;
+    const method = req.method;
+    if(method === 'POST' && url === '/Register') {
+        let requestBody = '';
+        req.on('data', (chunk) => {
+            requestBody += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            const postData = JSON.parse(requestBody);
+            console.log(requestBody);
+            signUpAndPrintDatabase(postData.email, postData.username, postData.password);
+            console.log('Received data:', postData.username, postData.password, postData.email);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ message: 'Data received successfully.' }));
+        });
+    }else {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(`Method: ${req.method}, URL: ${req.url}`);
+    }
+});
+
+const port = 8765;
+server.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
