@@ -2,9 +2,9 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
     console.log('Bouton de connexion clique.');
 
     // Get input values
-    const email = document.getElementsByName('email')[0].value;
-    const username = document.getElementsByName('username')[0].value;
-    const password = await hashPassword(document.getElementsByName('password')[0].value);
+    const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
+    const password = await hashPassword(document.getElementById('password').value);
 
     const postData = {"username": username, "password": password, "email": email}
 
@@ -35,7 +35,51 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
             document.getElementById('successMessage').textContent = 'Inscription réussie!'; // Mise à jour du message de succès
         })
 
+
+
 });
+document.getElementById('LoginBtn').addEventListener('click', async function() {
+    console.log('Bouton de login clique.');
+    const usernameLogin = document.getElementById('usernameLogin').value;
+    const passwordLogin = await hashPassword(document.getElementById('passwordLogin').value);
+    const loginData = { "username": usernameLogin, "password": passwordLogin }
+
+    fetch('http://localhost:8765/Login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                return response.text().then(text => {
+                    console.log('Non-JSON response:', text);
+                    throw new Error('Response is not in JSON format');
+                });
+            }
+        })
+        .then(data => {
+            // Traitement de la réponse JSON du serveur
+            document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
+            if (data.token) {
+                // Afficher le token dans la console (à des fins de débogage)
+                console.log('Token reçu:', data.token);
+            }
+        })
+        .catch(error => {
+            // Gérer les erreurs ici
+            console.error('Erreur lors de la demande de connexion:', error);
+        });
+});
+
+
 
 async function hashPassword(password) {
     console.log('Hachage du mot de passe...');
