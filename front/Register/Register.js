@@ -29,7 +29,12 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
                     throw new Error('Response is not in JSON format');
                 });
             }
-        });
+        })
+        .then(data => {
+            // Traitement de la réponse JSON du serveur
+            document.getElementById('successMessage').textContent = 'Inscription réussie!'; // Mise à jour du message de succès
+        })
+
 });
 
 async function hashPassword(password) {
