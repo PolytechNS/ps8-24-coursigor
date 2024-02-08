@@ -2,18 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login and Register</title>
     <link rel="stylesheet" href="Register.css">
-
 </head>
 <body>
+<div class="container">
     <article id="register">
         <h1>Register</h1>
-        <input name="email">email </input>
-        <input name="username">Username </input>
-        <input name="password">Password </input>
+        <input name="email" placeholder="Email">
+        <input name="username" placeholder="Username">
+        <input name="password" type="password" placeholder="Password">
         <button id="RegisterBtn">Register</button>
     </article>
-    <script type="application/javascript" src="Register.js" defer></script>
+
+    <article id="login">
+        <h1>Login</h1>
+        <input name="username" placeholder="Username">
+        <input name="password" type="password" placeholder="Password">
+        <button id="LoginBtn">Login</button>
+    </article>
+</div>
+
+<script type="application/javascript" src="Register.js" defer></script>
 </body>
 </html>
