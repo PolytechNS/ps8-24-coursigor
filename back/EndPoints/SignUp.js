@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const signUpAndPrintDatabase = async (mail, username, password) => {
     try {
+
         // Connexion à la base de données MongoDB
         await DBClient.connect();
 
@@ -28,7 +29,9 @@ const signUpAndPrintDatabase = async (mail, username, password) => {
         const users = await utilisateursCollection.find().toArray();
         console.log('Utilisateurs dans la collection :', users);
     } catch (error) {
+        console.log('Erreur lors de l\'opération d\'inscription :', error);
         console.error('Erreur lors de l\'opération d\'inscription :', error);
+
     } finally {
         // Fermeture de la connexion à la base de données
         await DBClient.close();
