@@ -107,4 +107,5 @@ dist
 .tern-port
 
 
-back/dockervolume/
+# database
+dockervolume/
