@@ -49,39 +49,39 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
     const passwordLogin = await hashPassword(document.getElementById('passwordLogin').value);
     const loginData = { "username": usernameLogin, "password": passwordLogin }
 
-    fetch('http://localhost:8000/api/Login', {
+    fetch('/api/Login', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(loginData),
     })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return response.json();
-            } else {
-                return response.text().then(text => {
-                    console.log('Non-JSON response:', text);
-                    throw new Error('Response is not in JSON format');
-                });
-            }
+            return response.json();
         })
         .then(data => {
-            // Traitement de la réponse JSON du serveur
-            document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
-            if (data.token) {
-                // Afficher le token dans la console (à des fins de débogage)
-                console.log('Token reçu:', data.token);
+            if (data.error) {
+                document.getElementById('successMessageLogin').textContent = 'Erreur d\'identification';
+
+                console.error('Erreur lors de la connexion:', data.error);
+
+                // Gérez l'affichage ou la manipulation de l'erreur côté client
+            } else {
+                document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
+                if (data.token) {
+                    // Afficher le token dans la console (à des fins de débogage)
+                    console.log('Token reçu:', data.token);
+                }
+                console.log('Connexion réussie:', data.message);
             }
         })
         .catch(error => {
-            // Gérer les erreurs ici
-            console.error('Erreur lors de la demande de connexion:', error);
+            console.error('Erreur lors de la requête:', error);
         });
+
 });
 
 

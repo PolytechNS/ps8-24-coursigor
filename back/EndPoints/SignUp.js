@@ -44,7 +44,7 @@ const signUpAndPrintDatabase = async (DBClient,mail, username, password) => {
     }
 };
 
-const signInAndGenerateToken = async (username, password) => {
+const signInAndGenerateToken = async (DBClient,username, password) => {
     try {
         // Connexion à la base de données MongoDB
         await DBClient.connect();
@@ -58,7 +58,7 @@ const signInAndGenerateToken = async (username, password) => {
         const utilisateur = await db.collection('utilisateurs').findOne({ username, password });
 
         if (!utilisateur) {
-            throw new Error('Nom d\'utilisateur ou mot de passe incorrect.');
+            return { error: 'Nom d\'utilisateur ou mot de passe incorrect.' };
         }
 
         console.log('Connexion réussie !');
@@ -69,7 +69,7 @@ const signInAndGenerateToken = async (username, password) => {
         return { message: 'Connexion réussie.', token };
     } catch (error) {
         console.error('Erreur lors de l\'opération de connexion :', error);
-        throw error;
+        return { error: 'Erreur lors de la connexion.' };
     } finally {
         // Fermeture de la connexion à la base de données
         await DBClient.close();
@@ -125,13 +125,20 @@ function manageRequest(DBClient,req, res) {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(requestBody);
-            console.log(requestBody);
-            const result = await signInAndGenerateToken(postData.username, postData.password);
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(result));
+            try {
+                const postData = JSON.parse(requestBody);
+                console.log(requestBody);
+                const result = await signInAndGenerateToken(DBClient, postData.username, postData.password);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify(result));
+            } catch (error) {
+                res.setHeader('Content-Type', 'application/json');
+                res.statusCode = 401;
+                res.end(JSON.stringify({ error: 'Nom d\'utilisateur ou mot de passe incorrect.' }));
+            }
         });
-    } else {
+    }
+    else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(`Method: ${req.method}, URL: ${req.url}`);
     }
