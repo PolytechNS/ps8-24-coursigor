@@ -74,6 +74,10 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
                     console.log('Token reçu:', data.token);
+                    const expirationDate = new Date();
+                    expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); //expiration 1h
+                    document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}`;
+
                 }
                 console.log('Connexion réussie:', data.message);
             }
@@ -98,4 +102,20 @@ async function hashPassword(password) {
     const hashedPassword = Array.from(new Uint8Array(buffer)).map(byte => byte.toString(16).padStart(2, '0')).join('');
 
     return hashedPassword;
+}
+document.getElementById('showCookies').addEventListener('click', function() {
+    displayCookies();
+});
+
+
+//TODO PROVISOIRE
+function displayCookies() {
+    const cookies = document.cookie.split(';');
+    let cookieString = "Cookies:\n";
+
+    cookies.forEach(cookie => {
+        cookieString += cookie.trim() + '\n';
+    });
+
+    alert(cookieString);
 }
