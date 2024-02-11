@@ -9,7 +9,7 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
     const postData = {"username": username, "password": password, "email": email}
 
     // Send POST request
-    fetch('http://localhost:8765/Register', {
+    fetch('http://localhost:8000/api/Register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -20,20 +20,25 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+
             const contentType = response.headers.get('content-type');
+
             if (contentType && contentType.includes('application/json')) {
-                return response.json();
+                return response.json(); // Si le type de contenu est JSON, parse la réponse
             } else {
-                return response.text().then(text => {
-                    console.log('Non-JSON response:', text);
-                    throw new Error('Response is not in JSON format');
-                });
+                return response.text(); // Sinon, récupère le texte brut de la réponse
             }
         })
         .then(data => {
-            // Traitement de la réponse JSON du serveur
-            document.getElementById('successMessage').textContent = 'Inscription réussie!'; // Mise à jour du message de succès
+            // Traitez la réponse ici
+            document.getElementById('successMessage').textContent = 'Connexion réussie!';
+            console.log('Data reçue:', data);
         })
+        .catch(error => {
+            // Gérer les erreurs ici
+            console.error('Erreur lors de la demande:', error);
+        });
+
 
 
 
@@ -44,7 +49,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
     const passwordLogin = await hashPassword(document.getElementById('passwordLogin').value);
     const loginData = { "username": usernameLogin, "password": passwordLogin }
 
-    fetch('http://localhost:8765/Login', {
+    fetch('http://localhost:8000/api/Login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

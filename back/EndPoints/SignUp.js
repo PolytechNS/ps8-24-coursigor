@@ -1,14 +1,14 @@
 const { MongoClient } = require("mongodb");
 const jwt = require('jsonwebtoken');
 
-const DBuri = "mongodb://root:example@172.20.0.2:27017/";
-const DBClient = new MongoClient(DBuri);
+
+//const DBuri = "mongodb://root:example@172.20.0.2:27017/";
+//const DBClient = new MongoClient(DBuri);
 const http = require('http');
 const cors = require('cors');
 
-const signUpAndPrintDatabase = async (mail, username, password) => {
+const signUpAndPrintDatabase = async (DBClient,mail, username, password) => {
     try {
-
         // Connexion à la base de données MongoDB
         await DBClient.connect();
 
@@ -23,17 +23,21 @@ const signUpAndPrintDatabase = async (mail, username, password) => {
         // Ajout de l'utilisateur à la collection
         const utilisateursCollection = db.collection('utilisateurs');
         await utilisateursCollection.insertOne({ mail, username, password });
-        //ligne pour clear la DB
-        //await utilisateursCollection.deleteMany({});
+
         console.log('Utilisateur ajouté avec succès !');
 
         // Affichage de tous les utilisateurs dans la collection
         const users = await utilisateursCollection.find().toArray();
         console.log('Utilisateurs dans la collection :', users);
+
+        // Retournez la réponse sous forme d'objet JSON
+        return { message: 'Inscription réussie' };
     } catch (error) {
         console.log('Erreur lors de l\'opération d\'inscription :', error);
         console.error('Erreur lors de l\'opération d\'inscription :', error);
 
+        // Retournez une réponse d'erreur sous forme d'objet JSON
+        throw { error: error.message };
     } finally {
         // Fermeture de la connexion à la base de données
         await DBClient.close();
@@ -79,7 +83,7 @@ const generateToken = (username, password) => {
     };
 
     // Génération du token avec une clé secrète (remplacez 'votreCleSecrete' par votre clé réelle)
-    const token = jwt.sign(userInfo, 'votreCleSecrete', { expiresIn: '1h' });
+    const token = jwt.sign(userInfo, 'KcorpUltra', { expiresIn: '1h' });
 
     return token;
 };
@@ -87,15 +91,14 @@ const generateToken = (username, password) => {
 
 
 
-const server = http.createServer(async (req, res) => {
+function manageRequest(DBClient,req, res) {
+    cors()(req, res, () => {});
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
     const url = req.url;
     const method = req.method;
-
-    if (method === 'POST' && url === '/Register') {
+    if (method === 'POST' && url === '/api/Register') {
         let requestBody = '';
         req.on('data', (chunk) => {
             requestBody += chunk.toString();
@@ -105,7 +108,7 @@ const server = http.createServer(async (req, res) => {
             try {
                 const postData = JSON.parse(requestBody);
                 console.log(requestBody);
-                const result = await signUpAndPrintDatabase(postData.email, postData.username, postData.password);
+                const result = await signUpAndPrintDatabase(DBClient, postData.email, postData.username, postData.password);
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify({ message: 'Inscription réussie', data: result }));
             } catch (error) {
@@ -115,7 +118,7 @@ const server = http.createServer(async (req, res) => {
             }
         });
     }
-    else if (method === 'POST' && url === '/Login') {
+    else if (method === 'POST' && url === '/api/Login') {
         let requestBody = '';
         req.on('data', (chunk) => {
             requestBody += chunk.toString();
@@ -132,10 +135,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(`Method: ${req.method}, URL: ${req.url}`);
     }
-});
 
+}
+exports.manage = manageRequest;
 
-const port = 8765;
-server.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
-});

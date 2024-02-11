@@ -43,7 +43,7 @@ button:hover {
     background-color: #2980b9;
 }
 body{
-    background-image: url('../../Images/igor.jpg');
+    background-image: url('../Images/igor.jpg');
     background-size: contain;
     background-repeat: round;
 }
