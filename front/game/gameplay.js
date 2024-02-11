@@ -17,7 +17,8 @@ let activePlayer = PLAYER1;
 let wallLeftP1 = 10;
 let wallLeftP2 = 10;
 
-
+let positionPlayer1 = [4, 8];
+let positionPlayer2 = [4, 0];
 
 let wallsNotToPlace = [];
 
@@ -32,15 +33,12 @@ let visionBoard= [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1
                     [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
                     [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1]];
 
-let positionPlayer1 = [4, 8];
-let positionPlayer2 = [4, 0];
-
 visionBoard[0][4] += PLAYER2;
 visionBoard[8][4] += PLAYER1;
 Game = true;
 while (Game) {
-    updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1);
-    updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1);
+    updatePlayerVision(positionPlayer1[0], positionPlayer1[1], -1);
+    updatePlayerVision(positionPlayer2[0], positionPlayer2[1], 1);
         
     console.log(visionBoard);
     Game = false;
@@ -90,34 +88,6 @@ function createGrid() {
                 circlePlayer2.setAttribute("fill", "#0000FF");
                 circlePlayer2.addEventListener("click", () => handlePlayerClick(i, j));
                 svg.appendChild(circlePlayer2);
-            }
-            if (visionBoard[j][i]& VISIONMASK){
-                
-                
-                if (activePlayer==PLAYER1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(i, j)){
-                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    rect.setAttribute("x", x.toString());
-                    rect.setAttribute("y", y.toString());
-                    rect.setAttribute("width", "4");
-                    rect.setAttribute("height", "4");
-                    rect.setAttribute("fill", "rgba(0,0,0,1)");
-                    rect.setAttribute("data-i", i.toString());
-                    rect.setAttribute("data-j", j.toString());
-                    rect.addEventListener("click", () => handlePlayerClick(i, j));
-                    document.querySelector('svg').appendChild(rect);
-                } else if (activePlayer==PLAYER2 && ((visionBoard[j][i] ^ NEGMASK)&NEGMASK) && !nextToPlayer(i, j)){
-                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    rect.setAttribute("x", x.toString());
-                    rect.setAttribute("y", y.toString());
-                    rect.setAttribute("width", "4");
-                    rect.setAttribute("height", "4");
-                    rect.setAttribute("fill", "rgba(0,0,0,1)");
-                    rect.setAttribute("data-i", i.toString());
-                    rect.setAttribute("data-j", j.toString());
-                    rect.addEventListener("click", () => handlePlayerClick(i, j));
-                    document.querySelector('svg').appendChild(rect);
-                } 
-                    
             }
         }
     }
@@ -178,14 +148,6 @@ function createGrid() {
     document.getElementById('overlay').classList.add('active');
 
 }
-
-function nextToPlayer(i, j) {
-    if (activePlayer === PLAYER1) {
-        return (i===positionPlayer1[0] && j===positionPlayer1[1]) || (i === positionPlayer1[0] + 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] - 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] && j === positionPlayer1[1] + 1) || (i === positionPlayer1[0] && j === positionPlayer1[1] - 1);
-    }else if (activePlayer === PLAYER2) {
-        return (i===positionPlayer2[0] && j===positionPlayer2[1]) || (i === positionPlayer2[0] + 1 && j === positionPlayer2[1]) || (i === positionPlayer2[0] - 1 && j === positionPlayer2[1]) || (i === positionPlayer2[0] && j === positionPlayer2[1] + 1) || (i === positionPlayer2[0] && j === positionPlayer2[1] - 1);
-    }
-}
 function closeOverlay() {
     // Masquer l'overlay
     document.getElementById('overlay').classList.remove('active');
@@ -238,40 +200,13 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
 }
 
 
-function updateVisionWall(i1, j1,i2,j2, value) {
-    if (i1 === i2) {
-        // Vertical wall
+function updateVisionWall(i, j, value) {
+    calculateVision(visionBoard, i, j, value);
+    calculateVision(visionBoard, i + 1, j, value);
+    calculateVision(visionBoard, i, j + 1, value);
+    calculateVision(visionBoard, i + 1, j + 1, value);
 
-        calculateVision(visionBoard, j1, i1, value*2);
-        calculateVision(visionBoard, j2, i2, value*2);
-        calculateVision(visionBoard, j1 , i1 + 1, value*2);
-        calculateVision(visionBoard, j2 , i2 + 1, value*2);
-        calculateVision(visionBoard, j1 - 1 , i1, value);
-        calculateVision(visionBoard,j2 + 1, i2 , value);
-        calculateVision(visionBoard,j1 - 1 , i1+1, value);
-        calculateVision(visionBoard, j2 + 1, i2+1, value);
-        calculateVision(visionBoard, j1, i1+2, value);
-        calculateVision(visionBoard, j2, i2+2, value);
-        calculateVision(visionBoard, j1, i1-1, value);
-        calculateVision(visionBoard, j2, i2-1, value);
-        console.log(visionBoard);
-
-    }
-    else {
-        //horizontal wall
-        calculateVision(visionBoard, j1, i1, value*2);
-        calculateVision(visionBoard, j2, i2, value*2);
-        calculateVision(visionBoard, j1 + 1, i1, value*2);
-        calculateVision(visionBoard, j2 + 1, i2, value*2);
-        calculateVision(visionBoard, j1, i1 - 1, value);
-        calculateVision(visionBoard, j2, i2 + 1, value);
-        calculateVision(visionBoard, j1 + 1, i1 - 1, value);
-        calculateVision(visionBoard, j2 + 1, i2 + 1, value);
-        calculateVision(visionBoard, j1 + 2, i1, value);
-        calculateVision(visionBoard, j2 + 2, i2, value);
-        calculateVision(visionBoard, j1 - 1, i1, value);
-        calculateVision(visionBoard, j2 - 1, i2, value);
-    }
+    //TODO finish the vision update for the walls
 }
 
 function handleWallClick(i1, j1, i2, j2) {
@@ -280,6 +215,7 @@ function handleWallClick(i1, j1, i2, j2) {
         console.log("No more walls left for the active player.");
         return;
     }
+
     wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
     wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left or the top
     //console.log("click wall", i1, j1, i2, j2);
@@ -289,6 +225,7 @@ function handleWallClick(i1, j1, i2, j2) {
     let wall2;
     let wall3;
     let wall4;
+
     //place the wall on the vision board
     //TODO set the player owning the wall
     if (i1 === i2) {
@@ -381,16 +318,18 @@ function handleWallClick(i1, j1, i2, j2) {
     if (activePlayer === PLAYER1) {
         displayOverlay();
         newWall.setAttribute("fill", "#00FF00");
-        updateVisionWall(i1, j1,i2,j2, 1);
+        updateVisionWall(i1, j1, -2);
         activePlayer = PLAYER2;
         wallLeftP1--;
+        console.log("player1",wallLeftP1);
 
     } else {
         displayOverlay();
         newWall.setAttribute("fill", "#0000FF");
-        updateVisionWall(i1, j1,i2,j2, -1);
+        updateVisionWall(i1, j1, 2);
         activePlayer = PLAYER1;
         wallLeftP2--;
+        console.log("player2",wallLeftP2);
 
     }
 
@@ -470,36 +409,24 @@ function updatePlayerVision(i, j, value) {
 function calculateVision(board,i,j,value){
     if (i<0 || i>8 || j<0 || j>8)
         return;
-    if ((board[i][j] & VISIONMASK)===0b111)
-        return;
-    else if (!(board[i][j] & VISIONMASK)){
+    if (!(board[i][j] & VISIONMASK)){
         if (board[i][j] & NEGMASK)
             board[i][j] -=NEGMASK;
         if (value < 0){
-            board[i][j] += 1;
+            board[i][j] -= 1;
             board[i][j] += NEGMASK;
         }
         else{
             board[i][j] += 1;
         }
     }
-    else if (board[i][j] & NEGMASK){
-        if (value > 0)
-            board[i][j] -= 1;
-        else    
-            board[i][j] += 1;
-    }
-    else{
-        if (value>0)
-            board[i][j] += 1;
-        else 
-            board[i][j] -= 1;
-    }
+    else if (board[i][j] & NEGMASK)
+        board[i][j] -= 1;
+    else
+        board[i][j] += 1;
+
     if (value > 1) {
         calculateVision(board, i, j, value-1);
-    }
-    else if(value < -1){
-        calculateVision(board, i, j, value+1);
     }
 }
 
@@ -522,14 +449,11 @@ function validMove(i, j) {
                 //console.log("oui"); // rentre pas ici
                 if (checkPresenceWall(i, j, activePlayer)) {
                     visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                    updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1)
                     positionPlayer1[0] = i;
                     positionPlayer1[1] = j;
                     updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                    updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1)
-                    
-                    activePlayer = PLAYER2;
                     updateGrid();
+                    activePlayer = PLAYER2;
                     displayOverlay();
                 }
             }
@@ -543,13 +467,11 @@ function validMove(i, j) {
                     if(checkPresenceWall(i, j,activePlayer))
                     {
                         visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1)
                         positionPlayer1[0] = i;
                         positionPlayer1[1] = j;
                         updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1)
-                        activePlayer = PLAYER2;
                         updateGrid();
+                        activePlayer = PLAYER2;
                         displayOverlay();
                     }
                 }
@@ -559,14 +481,11 @@ function validMove(i, j) {
                     if(checkPresenceWall(i, j,activePlayer))
                     {
                         visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1)
                         positionPlayer1[0] = i;
                         positionPlayer1[1] = j;
                         updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1]);
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1)
-                        
-                        activePlayer = PLAYER2;
                         updateGrid();
+                        activePlayer = PLAYER2;
                         displayOverlay();
                     }
                 }
@@ -579,14 +498,11 @@ function validMove(i, j) {
                 //console.log("oui2");
                 if (checkPresenceWall(i, j, activePlayer)) {
                     visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                    updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1)
                     positionPlayer2[0] = i;
                     positionPlayer2[1] = j;
                     updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                    updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1)
-                    
-                    activePlayer = PLAYER1;
                     updateGrid();
+                    activePlayer = PLAYER1;
                     displayOverlay();
                 }
             }
@@ -599,14 +515,11 @@ function validMove(i, j) {
                     if(checkPresenceWall(i, j, activePlayer))
                     {
                         visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1)
                         positionPlayer2[0] = i;
                         positionPlayer2[1] = j;
                         updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1)
-                        
-                        activePlayer = PLAYER1;
                         updateGrid();
+                        activePlayer = PLAYER1;
                         displayOverlay();
                     }
                 }
@@ -616,14 +529,11 @@ function validMove(i, j) {
                     if(checkPresenceWall(i, j, activePlayer))
                     {
                         visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1)
                         positionPlayer2[0] = i;
                         positionPlayer2[1] = j;
                         updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1]);
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1)
-                        
-                        activePlayer = PLAYER1;
                         updateGrid();
+                        activePlayer = PLAYER1;
                         displayOverlay();
                     }
                 }
