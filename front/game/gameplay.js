@@ -201,7 +201,7 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
 
 
 function updateVisionWall(i, j, value) {
-    calculateVision(visionBoard, i, j, value);
+    calculateVision(visionBoard, i, j, value*2);
     calculateVision(visionBoard, i + 1, j, value);
     calculateVision(visionBoard, i, j + 1, value);
     calculateVision(visionBoard, i + 1, j + 1, value);
@@ -215,7 +215,6 @@ function handleWallClick(i1, j1, i2, j2) {
         console.log("No more walls left for the active player.");
         return;
     }
-
     wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
     wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left or the top
     //console.log("click wall", i1, j1, i2, j2);
@@ -225,7 +224,6 @@ function handleWallClick(i1, j1, i2, j2) {
     let wall2;
     let wall3;
     let wall4;
-
     //place the wall on the vision board
     //TODO set the player owning the wall
     if (i1 === i2) {
@@ -318,7 +316,7 @@ function handleWallClick(i1, j1, i2, j2) {
     if (activePlayer === PLAYER1) {
         displayOverlay();
         newWall.setAttribute("fill", "#00FF00");
-        updateVisionWall(i1, j1, -2);
+        updateVisionWall(i1, j1, -1);
         activePlayer = PLAYER2;
         wallLeftP1--;
         console.log("player1",wallLeftP1);
@@ -326,7 +324,7 @@ function handleWallClick(i1, j1, i2, j2) {
     } else {
         displayOverlay();
         newWall.setAttribute("fill", "#0000FF");
-        updateVisionWall(i1, j1, 2);
+        updateVisionWall(i1, j1, 1);
         activePlayer = PLAYER1;
         wallLeftP2--;
         console.log("player2",wallLeftP2);
@@ -413,20 +411,30 @@ function calculateVision(board,i,j,value){
         if (board[i][j] & NEGMASK)
             board[i][j] -=NEGMASK;
         if (value < 0){
-            board[i][j] -= 1;
+            board[i][j] += 1;
             board[i][j] += NEGMASK;
         }
         else{
             board[i][j] += 1;
         }
     }
-    else if (board[i][j] & NEGMASK)
-        board[i][j] -= 1;
-    else
-        board[i][j] += 1;
-
+    else if (board[i][j] & NEGMASK){
+        if (value > 0)
+            board[i][j] -= 1;
+        else    
+            board[i][j] += 1;
+    }
+    else{
+        if (value>0)
+            board[i][j] += 1;
+        else 
+            board[i][j] -= 1;
+    }
     if (value > 1) {
         calculateVision(board, i, j, value-1);
+    }
+    else if(value < -1){
+        calculateVision(board, i, j, value+1);
     }
 }
 
