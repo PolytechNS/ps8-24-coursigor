@@ -517,9 +517,10 @@ function validMove(i, j) {
     if(activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         //console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
-        if (positionPlayer2[0] !== i || positionPlayer2[1] !== j) {
-            if (positionPlayer1[0] === i - 1 && positionPlayer1[1] === j || positionPlayer1[0] === i + 1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j - 1 || positionPlayer1[0] === i && positionPlayer1[1] === j + 1) {
-                //console.log("oui"); // rentre pas ici
+        
+        if (positionPlayer1[0] === i - 1 && positionPlayer1[1] === j || positionPlayer1[0] === i + 1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j - 1 || positionPlayer1[0] === i && positionPlayer1[1] === j + 1) {
+            if (positionPlayer2[0] !== i || positionPlayer2[1] !== j) {    
+            //console.log("oui"); // rentre pas ici
                 if (checkPresenceWall(i, j, activePlayer)) {
                     visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
                     updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1)
@@ -539,7 +540,7 @@ function validMove(i, j) {
             let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
             let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
             if(iP2MinusP1===0){
-                if(positionPlayer2[1]+jP2MinusP1===j){
+                if(positionPlayer2[1]+jP2MinusP1 ===j || positionPlayer2[1]+jP2MinusP1===j){
                     if(checkPresenceWall(i, j,activePlayer))
                     {
                         visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
@@ -555,7 +556,7 @@ function validMove(i, j) {
                 }
             }
             else if(jP2MinusP1===0){
-                if(positionPlayer2[0]+iP2MinusP1===i){
+                if(positionPlayer2[0]+iP2MinusP1===i || positionPlayer2[0]+iP2MinusP1===i){
                     if(checkPresenceWall(i, j,activePlayer))
                     {
                         visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
@@ -574,8 +575,8 @@ function validMove(i, j) {
         }
     }
     else if(activePlayer === PLAYER2 ) {
-        if (positionPlayer1[0] !== i || positionPlayer1[1] !== j) {
-            if (positionPlayer2[0] === i - 1 && positionPlayer2[1] === j || positionPlayer2[0] === i + 1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j - 1 || positionPlayer2[0] === i && positionPlayer2[1] === j + 1) {
+        if (positionPlayer2[0] === i - 1 && positionPlayer2[1] === j || positionPlayer2[0] === i + 1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j - 1 || positionPlayer2[0] === i && positionPlayer2[1] === j + 1) {
+            if (positionPlayer1[0] !== i || positionPlayer1[1] !== j) {    
                 //console.log("oui2");
                 if (checkPresenceWall(i, j, activePlayer)) {
                     visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
@@ -595,7 +596,7 @@ function validMove(i, j) {
             let iP1MinusP2=positionPlayer1[0]-positionPlayer2[0];
             let jP1MinusP2=positionPlayer1[1]-positionPlayer2[1];
             if(iP1MinusP2===0){
-                if(positionPlayer1[1]+jP1MinusP2===j){
+                if(positionPlayer1[1]+jP1MinusP2 ===j||positionPlayer1[1]+jP1MinusP2===j){
                     if(checkPresenceWall(i, j, activePlayer))
                     {
                         visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
@@ -612,7 +613,7 @@ function validMove(i, j) {
                 }
             }
             else if(jP1MinusP2===0){
-                if(positionPlayer1[0]+iP1MinusP2===i){
+                if(positionPlayer1[0]+iP1MinusP2===i || positionPlayer1[0]+iP1MinusP2 ===i){
                     if(checkPresenceWall(i, j, activePlayer))
                     {
                         visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
