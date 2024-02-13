@@ -53,4 +53,36 @@ const app = http.createServer(async function (request, response) {
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
+    socket.emit('message', 'Hello there!');
+
+    socket.on('message', (msg) => {
+        console.log('message: ' + msg);
+    });
+
+    socket.on('newGame', () => {
+        console.log('new game: ');
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.newGame(socket.id);
+
+    });
+
+    socket.on('nextMove' , (move) => {
+        console.log('nextMove: ' + move);
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.nextMove(socket.id, move);
+    });
+
+
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+});
+
+
+
+io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
+    const namespace = socket.nsp;
 });

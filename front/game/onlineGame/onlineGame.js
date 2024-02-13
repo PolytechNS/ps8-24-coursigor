@@ -10,6 +10,28 @@ var socket = io("/api/onlineGame");
 
 socket.send("salut !");
 
+const cookies = document.cookie.split(';');
+let cookieString = "Cookies:\n";
+
+cookies.forEach(cookie => {
+    cookieString += cookie.trim() + '\n';
+});
+
+console.log(cookieString);
+
+socket.emit("newGame", cookieString);
+
+socket.on("message", (msg) => {
+    console.log(msg);
+});
+
+
+
+
+
+
+
+
 
 // connexion au websocket du serveur
 
