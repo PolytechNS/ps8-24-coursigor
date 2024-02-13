@@ -81,8 +81,10 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
+exports.io = io;
 
 
-io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-    const namespace = socket.nsp;
-});
+
+// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
+//     const namespace = socket.nsp;
+// });

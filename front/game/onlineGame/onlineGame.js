@@ -25,15 +25,18 @@ socket.on("message", (msg) => {
     console.log(msg);
 });
 
+socket.on("updateGrid", (gameStatus) => {
+    console.log("updateGrid", gameStatus);
+
+
+
+    closeOverlay();
+    createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
+})
 
 
 
 
-
-
-
-
-// connexion au websocket du serveur
 
 
 
@@ -45,6 +48,8 @@ const PLAYER2 =0b10000
 const PLAYER1 =0b100000
 const NEGMASK =0b1000
 const VISIONMASK = 0b111
+
+/*
 let activePlayer = PLAYER1;
 let wallLeftP1 = 10;
 let wallLeftP2 = 10;
@@ -80,7 +85,9 @@ while (Game) {
     Game = false;
 }
 let test=1;
-function createGrid() {
+*/
+
+function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, positionPlayer1, positionPlayer2) {
     const svg = document.querySelector('svg');
     //clear the previous cells and walls but keep the placed walls
     svg.querySelectorAll(".cell").forEach(cell => cell.remove());
@@ -130,7 +137,7 @@ function createGrid() {
             if (visionBoard[j][i]& VISIONMASK){
 
 
-                if (activePlayer==PLAYER1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(i, j)){
+                if (activePlayer==PLAYER1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
                     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rect.setAttribute("x", x.toString());
                     rect.setAttribute("y", y.toString());
@@ -141,7 +148,7 @@ function createGrid() {
                     rect.setAttribute("data-j", j.toString());
                     rect.addEventListener("click", () => handlePlayerClick(i, j));
                     document.querySelector('svg').appendChild(rect);
-                } else if (activePlayer==PLAYER2 && ((visionBoard[j][i] ^ NEGMASK)&NEGMASK) && !nextToPlayer(i, j)){
+                } else if (activePlayer==PLAYER2 && ((visionBoard[j][i] ^ NEGMASK)&NEGMASK) && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
                     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
                     rect.setAttribute("x", x.toString());
                     rect.setAttribute("y", y.toString());
@@ -241,7 +248,7 @@ function createGrid() {
 
 }
 
-function nextToPlayer(i, j) {
+function nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2) {
     if (activePlayer === PLAYER1) {
         return (i===positionPlayer1[0] && j===positionPlayer1[1]) || (i === positionPlayer1[0] + 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] - 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] && j === positionPlayer1[1] + 1) || (i === positionPlayer1[0] && j === positionPlayer1[1] - 1);
     }else if (activePlayer === PLAYER2) {
@@ -256,6 +263,52 @@ function displayOverlay() {
     // Afficher l'overlay
     document.getElementById('overlay').classList.add('active');
 }
+
+function createWall(x, y, width, height, className) {
+    const wall = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    wall.setAttribute("x", x.toString());
+    wall.setAttribute("y", y.toString());
+    wall.setAttribute("width", width.toString());
+    wall.setAttribute("height", height.toString());
+    wall.setAttribute("fill", "rgba(8,59,45,0)");
+    wall.setAttribute("class", "wall " + className);
+
+    return wall;
+}
+
+function horizontalWallHandleHover(event) {
+    const wall = event.target;
+    const isHover = event.type === "mouseenter";
+
+    // Adjust the size on hover
+    wall.setAttribute("width", isHover ? 9 : wall.getAttribute("data-width"));
+    wall.setAttribute("height", isHover ? wall.getAttribute("data-height") : wall.getAttribute("data-height"));
+    wall.setAttribute("fill", isHover ? "#ff0000" : "rgba(255,255,255,0)");
+
+    // Bring the wall to the front on hover
+    if (isHover) {
+        wall.parentElement.appendChild(wall);
+    }
+}
+
+function verticalWallHandleHover(event) {
+    const wall = event.target;
+    const isHover = event.type === "mouseenter";
+
+    // Adjust the size on hover
+    wall.setAttribute("width", isHover ? wall.getAttribute("data-width") : wall.getAttribute("data-width"));
+    wall.setAttribute("height", isHover ? 9 : wall.getAttribute("data-height"));
+    wall.setAttribute("fill", isHover ? "#ff0000" : "rgba(255,255,255,0)");
+
+    // Bring the wall to the front on hover
+    if (isHover) {
+        wall.parentElement.appendChild(wall);
+    }
+}
+
+
+
+/*
 
 function notCirclesPlayers(alreadyChecked, i, j, player) {
     // check if the cell has already been checked
@@ -487,48 +540,6 @@ function handleWallClick(i1, j1, i2, j2) {
     updateGrid();
 }
 
-
-function createWall(x, y, width, height, className) {
-    const wall = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    wall.setAttribute("x", x.toString());
-    wall.setAttribute("y", y.toString());
-    wall.setAttribute("width", width.toString());
-    wall.setAttribute("height", height.toString());
-    wall.setAttribute("fill", "rgba(8,59,45,0)");
-    wall.setAttribute("class", "wall " + className);
-
-    return wall;
-}
-
-function horizontalWallHandleHover(event) {
-    const wall = event.target;
-    const isHover = event.type === "mouseenter";
-
-    // Adjust the size on hover
-    wall.setAttribute("width", isHover ? 9 : wall.getAttribute("data-width"));
-    wall.setAttribute("height", isHover ? wall.getAttribute("data-height") : wall.getAttribute("data-height"));
-    wall.setAttribute("fill", isHover ? "#ff0000" : "rgba(255,255,255,0)");
-
-    // Bring the wall to the front on hover
-    if (isHover) {
-        wall.parentElement.appendChild(wall);
-    }
-}
-
-function verticalWallHandleHover(event) {
-    const wall = event.target;
-    const isHover = event.type === "mouseenter";
-
-    // Adjust the size on hover
-    wall.setAttribute("width", isHover ? wall.getAttribute("data-width") : wall.getAttribute("data-width"));
-    wall.setAttribute("height", isHover ? 9 : wall.getAttribute("data-height"));
-    wall.setAttribute("fill", isHover ? "#ff0000" : "rgba(255,255,255,0)");
-
-    // Bring the wall to the front on hover
-    if (isHover) {
-        wall.parentElement.appendChild(wall);
-    }
-}
 function updatePlayerVision(i, j, value) {
     calculateVision(visionBoard, i, j, value);
     calculateVision(visionBoard,i+1, j, value);
@@ -797,3 +808,5 @@ function checkVictoryCondition() {
         return;
     }
 }
+
+ */
