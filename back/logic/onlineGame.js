@@ -1,37 +1,48 @@
 // gère les parties en ligne
 // possède deux clients, un pour chaque joueur qui sont connectés
 
-// websocket pour joueur 1
-const ws1 = new WebSocket('ws://localhost:8080');
-// websocket pour joueur 2
-const ws2 = new WebSocket('ws://localhost:8080');
-
-// fonction qui gère les parties en ligne
-async function onlineGame() {
-    // connexion des deux joueurs
-    ws1.on('open', function open() {
-        ws1.send('something');
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
     });
+});
 
-    ws2.on('open', function open() {
-        ws2.send('something');
-    });
 
-    // boucle de jeu
-    while (true) {
-        // joueur 1 joue
-        ws1.on('message', function incoming(data) {
-            console.log(data);
-        });
 
-        // joueur 2 joue
-        ws2.on('message', function incoming(data) {
-            console.log(data);
-        });
 
-        // fin de la partie
-        if (true) {
-            break;
-        }
-    }
+// joueur 1 et joueur 2 sont connectés via des sockets
+
+
+// le serveur recoit l'état de la partie et le renvoie à l'autre joueur sous forme d'un objet json
+
+
+
+let wallsNotToPlace = [];
+let placedWalls = [];   //type of wall, wall coordinates and player owning the wall
+
+
+let visionBoard= [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+    [0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0],
+    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1]];
+
+let positionPlayer1 = [4, 8];
+let positionPlayer2 = [4, 0];
+
+
+//on construit l'objet json à partir de ces variables
+function buildJson(){
+    return {
+        wallsNotToPlace: wallsNotToPlace,
+        placedWalls: placedWalls,
+        visionBoard: visionBoard,
+        positionPlayer1: positionPlayer1,
+        positionPlayer2: positionPlayer2
+    };
 }

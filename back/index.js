@@ -4,7 +4,7 @@ const cors = require('cors'); // Ajout du module cors
 const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
-
+const {Server} = require("socket.io");
 
 
 
@@ -49,3 +49,8 @@ const app = http.createServer(async function (request, response) {
         }
     });
 }).listen(8000);
+
+const io = new Server(app);
+io.of("/api/onlineGame").on('connection', (socket) => {
+    console.log('a user connected');
+});
