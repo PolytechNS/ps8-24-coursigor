@@ -115,6 +115,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
 
             document.querySelector('svg').appendChild(rect);
             if (visionBoard[j][i] & PLAYER1) {
+                console.log("draw player 1");
                 const circlePlayer1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circlePlayer1.setAttribute("cx", (x + 2).toString());
                 circlePlayer1.setAttribute("cy", (y + 2).toString());
@@ -126,6 +127,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
 
             // Ajoutez un cercle pour le joueur 2
             if (visionBoard[j][i] & PLAYER2) {
+                console.log("draw player 2");
                 const circlePlayer2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circlePlayer2.setAttribute("cx", (x + 2).toString());
                 circlePlayer2.setAttribute("cy", (y + 2).toString());
@@ -244,7 +246,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
         const j2 = 1 + parseInt(wall.getAttribute("data-j"));
         wall.addEventListener("click", () => handleWallClick(i1, j1, i2, j2));
     });
-    document.getElementById('overlay').classList.add('active');
+    // document.getElementById('overlay').classList.add('active');
 
 }
 
@@ -304,6 +306,171 @@ function verticalWallHandleHover(event) {
     if (isHover) {
         wall.parentElement.appendChild(wall);
     }
+}
+
+
+function handleWallClick(i1, j1, i2, j2) {
+
+    if (i1 === i2) {
+        // Vertical wall
+        console.log("vertical", i1, j1);
+        socket.emit("nextMove", "vertical,"+i1+","+j1);
+    } else {
+        // Horizontal wall
+        console.log("horizontal", i1, j1)
+        socket.emit("nextMove", "horizontal,"+i1+","+j1);
+    }
+
+    /*
+    // Check if the player has a wall left to place
+    if ((activePlayer === PLAYER1 && wallLeftP1 === 0) || (activePlayer === PLAYER2 && wallLeftP2 === 0)) {
+        console.log("No more walls left for the active player.");
+        return;
+    }
+    //console.log("click wall", i1, j1, i2, j2);
+    const wall = event.target;
+
+    let newWall = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    let wall2;
+    let wall3;
+    let wall4;
+    //place the wall on the vision board
+    //TODO set the player owning the wall
+    if (i1 === i2) {
+        // Vertical wall
+        newWall.setAttribute("x", (i1*5+4).toString());
+        newWall.setAttribute("y", (j1*5).toString());
+        newWall.setAttribute("width", (1).toString());
+        newWall.setAttribute("height", (9).toString());
+        newWall.setAttribute("class", activePlayer+ "verticalPlacedWall");
+
+        visionBoard[j1][i1] += WALL_RIGHT;
+        visionBoard[j2][i2] += WALL_RIGHT;
+
+        visionBoard[j1][i1 + 1] += WALL_LEFT;
+        visionBoard[j2][i2 + 1] += WALL_LEFT;
+
+        placedWalls.push(["vertical", i1, j1, activePlayer]);
+        wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
+        wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+        wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
+        wall2 = document.querySelector(`.verticalWall[data-i="${i2}"][data-j="${j2}"]`);
+        wall3 = document.querySelector(`.verticalWall[data-i="${i2}"][data-j="${j1 - 1}"]`);
+        wall4 = document.querySelector(`.horizontalWall[data-i="${i1}"][data-j="${j1}"]`);
+    } else {
+        // Horizontal wall
+        newWall.setAttribute("x", (i1*5).toString());
+        newWall.setAttribute("y", (j1*5+4).toString());
+        newWall.setAttribute("width", (9).toString());
+        newWall.setAttribute("height", (1).toString());
+        newWall.setAttribute("class", activePlayer+ "horizontalPlacedWall");
+
+        visionBoard[j1][i1] += WALL_BOTTOM;
+        visionBoard[j2][i2] += WALL_BOTTOM;
+
+        visionBoard[j1 + 1][i1] += WALL_TOP;
+        visionBoard[j2 + 1][i2] += WALL_TOP;
+
+        placedWalls.push(["horizontal", i1, j1, activePlayer]);
+        wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+        wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+        wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
+        wall2 = document.querySelector(`.horizontalWall[data-i="${i2}"][data-j="${j2}"]`);
+        wall3 = document.querySelector(`.horizontalWall[data-i="${i1 - 1}"][data-j="${j2}"]`);
+        wall4 = document.querySelector(`.verticalWall[data-i="${i1}"][data-j="${j1}"]`);
+    }
+
+
+    //check if placing the wall would block any player
+    let ncP1 = notCirclesPlayers([], positionPlayer1[0], positionPlayer1[1], PLAYER1);
+    let ncP2 = notCirclesPlayers([], positionPlayer2[0], positionPlayer2[1], PLAYER2);
+    if (!ncP1 || !ncP2) {
+        console.log("The player can't reach the end anymore. The move is invalid");
+        if (i1 === i2) {
+            // Vertical wall
+            visionBoard[j1][i1] -= WALL_RIGHT;
+            visionBoard[j2][i2] -= WALL_RIGHT;
+
+            visionBoard[j1][i1 + 1] -= WALL_LEFT;
+            visionBoard[j2][i2 + 1] -= WALL_LEFT;
+
+            //remove the coordinates from the wallsNotToPlace array
+            removeMatchingWall(placedWalls, "vertical", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1 - 1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1, j1);
+
+        } else {
+            // Horizontal wall
+            visionBoard[j1][i1] -= WALL_BOTTOM;
+            visionBoard[j2][i2] -= WALL_BOTTOM;
+
+            visionBoard[j1 + 1][i1] -= WALL_TOP;
+            visionBoard[j2 + 1][i2] -= WALL_TOP;
+
+            // remove the coordinates from the wallsNotToPlace array
+            removeMatchingWall(placedWalls, "horizontal", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1 - 1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1);
+
+        }
+        return;
+    }
+
+    function isMatchingWall(wall, type, i, j) {
+        return wall[0] === type && wall[1] === i && wall[2] === j;
+    }
+
+    function removeMatchingWall(arr, type, i, j) {
+        const indexToRemove = arr.findIndex(wall => isMatchingWall(wall, type, i, j));
+        if (indexToRemove !== -1) {
+            arr.splice(indexToRemove, 1);
+        }
+    }
+
+
+    const svg = document.querySelector('svg');
+
+    if (activePlayer === PLAYER1) {
+        displayOverlay();
+        newWall.setAttribute("fill", "#00FF00");
+        updateVisionWall(i1, j1,i2,j2, 1);
+        activePlayer = PLAYER2;
+        wallLeftP1--;
+
+    } else {
+        displayOverlay();
+        newWall.setAttribute("fill", "#0000FF");
+        updateVisionWall(i1, j1,i2,j2, -1);
+        activePlayer = PLAYER1;
+        wallLeftP2--;
+
+    }
+
+    svg.removeChild(wall);
+    svg.appendChild(newWall);
+
+    if (wall2 != null) {
+        //remove the wall to the right or bottom from being clicked again and hover events
+        svg.removeChild(wall2);
+    }
+    if (wall3 != null) {
+        //remove the wall to the left or top from being clicked again and hover events
+        svg.removeChild(wall3);
+    }
+    if (wall4 != null) {
+        //remove the perpendicular wall to the left or the top from being clicked again and hover events
+        svg.removeChild(wall4);
+
+    }
+
+
+    // console.log(visionBoard) as binary
+    //console.log(visionBoard.map(row => row.map(cell => cell.toString(2).padStart(16, "0")).join(" ")).join("\n"));
+    //console.log(wallsNotToPlace);
+    updateGrid();
+     */
 }
 
 
