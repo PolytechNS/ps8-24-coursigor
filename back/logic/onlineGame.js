@@ -32,6 +32,8 @@ let positionPlayer2 = [4, 0];
 
 visionBoard[positionPlayer1[1]][positionPlayer1[0]] += PLAYER1;
 visionBoard[positionPlayer2[1]][positionPlayer2[0]] += PLAYER2;
+updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
+updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
 
 let numberOfTurns = 0;
 
@@ -93,134 +95,136 @@ function nextMove(id, move) {
     moves[1] = parseInt(moves[1]);
     moves[2] = parseInt(moves[2]);
 
-    let gameState = games[id];
-    let activePlayer = gameState.activePlayer;
-    let wallsLeftP1 = gameState.wallsLeftP1;
-    let wallsLeftP2 = gameState.wallsLeftP2;
-    let positionPlayer1 = gameState.positionPlayer1;
-    let positionPlayer2 = gameState.positionPlayer2;
-    let visionBoard = gameState.visionBoard;
-    let placedWalls = gameState.placedWalls;
-    let wallsNotToPlace = gameState.wallsNotToPlace;
-    let numberOfTurns = gameState.numberOfTurns;
+    // let gameState = games[id];
+    // let activePlayer = gameState.activePlayer;
+    // let wallsLeftP1 = gameState.wallsLeftP1;
+    // let wallsLeftP2 = gameState.wallsLeftP2;
+    // let positionPlayer1 = gameState.positionPlayer1;
+    // let positionPlayer2 = gameState.positionPlayer2;
+    // let visionBoard = gameState.visionBoard;
+    // let placedWalls = gameState.placedWalls;
+    // let wallsNotToPlace = gameState.wallsNotToPlace;
+    // let numberOfTurns = gameState.numberOfTurns;
 
 
 
     if (moves[0] === "cell") {
-        validMove(id, moves[1], moves[2], activePlayer, positionPlayer1, positionPlayer2, visionBoard);
+        validMove(id, moves[1], moves[2]);
     }
     else if (moves[0] === "horizontal") {
         console.log('horizontal', moves[1], moves[2]);
+        let gameState = games[id];
         let i1 = moves[1];
         let j1 = moves[2];
         let i2 = i1 + 1;
         let j2 = j1;
 
-        visionBoard[j1][i1] += WALL_BOTTOM;
-        visionBoard[j2][i2] += WALL_BOTTOM;
+        gameState.visionBoard[j1][i1] += WALL_BOTTOM;
+        gameState.visionBoard[j2][i2] += WALL_BOTTOM;
 
-        visionBoard[j1 + 1][i1] += WALL_TOP;
-        visionBoard[j2 + 1][i2] += WALL_TOP;
+        gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
+        gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
 
-        placedWalls.push(["horizontal", i1, j1, activePlayer]);
-        wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
-        wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
-        wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
+        gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
+        gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+        gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+        gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
 
-        let ncP1 = notCirclesPlayers([], positionPlayer1[0], positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], positionPlayer2[0], positionPlayer2[1], PLAYER2);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
 
 
         if (!ncP1 || !ncP2) {
             console.log("The player can't reach the end anymore. The move is invalid");
 
-            visionBoard[j1][i1] -= WALL_BOTTOM;
-            visionBoard[j2][i2] -= WALL_BOTTOM;
+            gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
+            gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
 
-            visionBoard[j1 + 1][i1] -= WALL_TOP;
-            visionBoard[j2 + 1][i2] -= WALL_TOP;
+            gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
+            gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
 
             // remove the coordinates from the wallsNotToPlace array
-            removeMatchingWall(placedWalls, "horizontal", i1, j1);
-            removeMatchingWall(wallsNotToPlace, "horizontal", i2, j2);
-            removeMatchingWall(wallsNotToPlace, "horizontal", i1 - 1, j1);
-            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1);
+            removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
+            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
+            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
+            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
 
             sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
         }
 
-        if (activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1,i2,j2, 1);
-            activePlayer = PLAYER2;
-            wallsLeftP1--;
-            numberOfTurns++;
-            console.log("Changed active player : ", activePlayer);
+        if (gameState.activePlayer === PLAYER1) {
+            updateVisionWall(i1, j1, i2, j2, 1);
+            gameState.activePlayer = PLAYER2;
+            gameState.wallsLeftP1--;
+            gameState.numberOfTurns++;
+            console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
-            updateVisionWall(i1, j1,i2,j2, -1);
-            activePlayer = PLAYER1;
-            wallsLeftP2--;
-            numberOfTurns++;
-            console.log("Changed active player : ", activePlayer);
+            updateVisionWall(i1, j1, i2, j2, -1);
+            gameState.activePlayer = PLAYER1;
+            gameState.wallsLeftP2--;
+            gameState.numberOfTurns++;
+            console.log("Changed active player : ", gameState.activePlayer);
         }
 
         sendGameState(id);
     }
     else if (moves[0] === "vertical") {
         console.log('vertical', moves[1], moves[2]);
+        let gameState = games[id];
         let i1 = moves[1];
         let j1 = moves[2];
         let i2 = i1;
         let j2 = j1 + 1;
 
-        visionBoard[j1][i1] += WALL_RIGHT;
-        visionBoard[j2][i2] += WALL_RIGHT;
+        gameState.visionBoard[j1][i1] += WALL_RIGHT;
+        gameState.visionBoard[j2][i2] += WALL_RIGHT;
 
-        visionBoard[j1][i1 + 1] += WALL_LEFT;
-        visionBoard[j2][i2 + 1] += WALL_LEFT;
+        gameState.visionBoard[j1][i1 + 1] += WALL_LEFT;
+        gameState.visionBoard[j2][i2 + 1] += WALL_LEFT;
 
-        placedWalls.push(["vertical", i1, j1, activePlayer]);
-        wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
-        wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
-        wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
+        gameState.placedWalls.push(["vertical", i1, j1, gameState.activePlayer]);
+        gameState.wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
+        gameState.wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+        gameState.wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
 
 
-        let ncP1 = notCirclesPlayers([], positionPlayer1[0], positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], positionPlayer2[0], positionPlayer2[1], PLAYER2);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
 
 
         if (!ncP1 || !ncP2) {
             console.log("The player can't reach the end anymore. The move is invalid");
             // Vertical wall
-            visionBoard[j1][i1] -= WALL_RIGHT;
-            visionBoard[j2][i2] -= WALL_RIGHT;
+            gameState.visionBoard[j1][i1] -= WALL_RIGHT;
+            gameState.visionBoard[j2][i2] -= WALL_RIGHT;
 
-            visionBoard[j1][i1 + 1] -= WALL_LEFT;
-            visionBoard[j2][i2 + 1] -= WALL_LEFT;
+            gameState.visionBoard[j1][i1 + 1] -= WALL_LEFT;
+            gameState.visionBoard[j2][i2 + 1] -= WALL_LEFT;
 
             //remove the coordinates from the wallsNotToPlace array
-            removeMatchingWall(placedWalls, "vertical", i1, j1);
-            removeMatchingWall(wallsNotToPlace, "vertical", i2, j2);
-            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1 - 1);
-            removeMatchingWall(wallsNotToPlace, "horizontal", i1, j1);
+            removeMatchingWall(gameState.placedWalls, "vertical", i1, j1);
+            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i2, j2);
+            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1 - 1);
+            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1, j1);
 
             sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
             return;
         }
 
-        if (activePlayer === PLAYER1) {
+        if (gameState.activePlayer === PLAYER1) {
             updateVisionWall(i1, j1,i2,j2, 1);
-            activePlayer = PLAYER2;
-            wallsLeftP1--;
-            numberOfTurns++;
-            console.log("Changed active player : ", activePlayer);
+            gameState.activePlayer = PLAYER2;
+            gameState.wallsLeftP1--;
+            gameState.numberOfTurns++;
+            console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
             updateVisionWall(i1, j1,i2,j2, -1);
-            activePlayer = PLAYER1;
-            wallsLeftP2--;
-            numberOfTurns++;
-            console.log("Changed active player : ", activePlayer);
+            gameState.activePlayer = PLAYER1;
+            gameState.wallsLeftP2--;
+            gameState.numberOfTurns++;
+            console.log("Changed active player : ", gameState.activePlayer);
         }
 
         sendGameState(id);
@@ -359,111 +363,112 @@ function calculateVision(board,i,j,value){
 }
 
 
-function validMove(id, i, j, activePlayer, positionPlayer1, positionPlayer2, visionBoard, ) {
-    if(activePlayer === PLAYER1) {
+function validMove(id, i, j) {
+    let gameState = games[id];
+    if(gameState.activePlayer === PLAYER1) {
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         //console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
-        if (positionPlayer2[0] !== i || positionPlayer2[1] !== j) {
-            if (positionPlayer1[0] === i - 1 && positionPlayer1[1] === j || positionPlayer1[0] === i + 1 && positionPlayer1[1] === j || positionPlayer1[0] === i && positionPlayer1[1] === j - 1 || positionPlayer1[0] === i && positionPlayer1[1] === j + 1) {
+        if (gameState.positionPlayer2[0] !== i || gameState.positionPlayer2[1] !== j) {
+            if (gameState.positionPlayer1[0] === i - 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i + 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j - 1 || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j + 1) {
                 //console.log("oui"); // rentre pas ici
-                if (checkPresenceWall(i, j, activePlayer, visionBoard, positionPlayer1, positionPlayer2)) {
-                    visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                    updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1, visionBoard);
-                    positionPlayer1[0] = i;
-                    positionPlayer1[1] = j;
-                    updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1], visionBoard);
-                    updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
+                if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
+                    gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                    updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
+                    gameState.positionPlayer1[0] = i;
+                    gameState.positionPlayer1[1] = j;
+                    updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
+                    updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
-                    activePlayer = PLAYER2;
+                    gameState.activePlayer = PLAYER2;
                     sendGameState(id);
                 }
             }
         }
         //partie pour bouger ton pion au dessus du pion de l'adversaire
         else {
-            let iP2MinusP1=positionPlayer2[0]-positionPlayer1[0];
-            let jP2MinusP1=positionPlayer2[1]-positionPlayer1[1];
+            let iP2MinusP1= gameState.positionPlayer2[0] - gameState.positionPlayer1[0];
+            let jP2MinusP1= gameState.positionPlayer2[1] - gameState.positionPlayer1[1];
             if(iP2MinusP1===0){
-                if(positionPlayer2[1]+jP2MinusP1===j){
-                    if(checkPresenceWall(i, j,activePlayer, visionBoard, positionPlayer1, positionPlayer2))
+                if(gameState.positionPlayer2[1] + jP2MinusP1 === j){
+                    if(checkPresenceWall(i, j,gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
                     {
-                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1, visionBoard);
-                        positionPlayer1[0] = i;
-                        positionPlayer1[1] = j;
-                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1], visionBoard);
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
-                        activePlayer = PLAYER2;
+                        gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
+                        gameState.positionPlayer1[0] = i;
+                        gameState.positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
+                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
+                        gameState.activePlayer = PLAYER2;
                         sendGameState(id);
                     }
                 }
             }
             else if(jP2MinusP1===0){
-                if(positionPlayer2[0]+iP2MinusP1===i){
-                    if(checkPresenceWall(i, j,activePlayer, visionBoard, positionPlayer1, positionPlayer2))
+                if(gameState.positionPlayer2[0] + iP2MinusP1 === i){
+                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
                     {
-                        visionBoard[positionPlayer1[1]][positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], -1, visionBoard);
-                        positionPlayer1[0] = i;
-                        positionPlayer1[1] = j;
-                        updatePiecePosition(PLAYER1, positionPlayer1[0], positionPlayer1[1], visionBoard);
-                        updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
+                        gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
+                        gameState.positionPlayer1[0] = i;
+                        gameState.positionPlayer1[1] = j;
+                        updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
+                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
-                        activePlayer = PLAYER2;
+                        gameState.activePlayer = PLAYER2;
                         sendGameState(id);
                     }
                 }
             }
         }
     }
-    else if(activePlayer === PLAYER2 ) {
-        if (positionPlayer1[0] !== i || positionPlayer1[1] !== j) {
-            if (positionPlayer2[0] === i - 1 && positionPlayer2[1] === j || positionPlayer2[0] === i + 1 && positionPlayer2[1] === j || positionPlayer2[0] === i && positionPlayer2[1] === j - 1 || positionPlayer2[0] === i && positionPlayer2[1] === j + 1) {
+    else if(gameState.activePlayer === PLAYER2 ) {
+        if (gameState.positionPlayer1[0] !== i || gameState.positionPlayer1[1] !== j) {
+            if (gameState.positionPlayer2[0] === i - 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i + 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j - 1 || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j + 1) {
                 //console.log("oui2");
-                if (checkPresenceWall(i, j, activePlayer, visionBoard, positionPlayer1, positionPlayer2)) {
-                    visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                    updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1, visionBoard);
-                    positionPlayer2[0] = i;
-                    positionPlayer2[1] = j;
-                    updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1], visionBoard);
-                    updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
+                if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
+                    gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
+                    updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
+                    gameState.positionPlayer2[0] = i;
+                    gameState.positionPlayer2[1] = j;
+                    updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
+                    updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
-                    activePlayer = PLAYER1;
+                    gameState.activePlayer = PLAYER1;
                     sendGameState(id);
                 }
             }
         }
         else {
-            let iP1MinusP2=positionPlayer1[0]-positionPlayer2[0];
-            let jP1MinusP2=positionPlayer1[1]-positionPlayer2[1];
+            let iP1MinusP2=gameState.positionPlayer1[0]-gameState.positionPlayer2[0];
+            let jP1MinusP2=gameState.positionPlayer1[1]-gameState.positionPlayer2[1];
             if(iP1MinusP2===0){
-                if(positionPlayer1[1]+jP1MinusP2===j){
-                    if(checkPresenceWall(i, j, activePlayer, visionBoard, positionPlayer1, positionPlayer2))
+                if(gameState.positionPlayer1[1]+jP1MinusP2===j){
+                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
                     {
-                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1, visionBoard);
-                        positionPlayer2[0] = i;
-                        positionPlayer2[1] = j;
-                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1], visionBoard);
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
+                        gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
+                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
+                        gameState.positionPlayer2[0] = i;
+                        gameState.positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
+                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
-                        activePlayer = PLAYER1;
+                        gameState.activePlayer = PLAYER1;
                         sendGameState(id);
                     }
                 }
             }
             else if(jP1MinusP2===0){
-                if(positionPlayer1[0]+iP1MinusP2===i){
-                    if(checkPresenceWall(i, j, activePlayer, visionBoard, positionPlayer1, positionPlayer2))
+                if(gameState.positionPlayer1[0]+iP1MinusP2===i){
+                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
                     {
-                        visionBoard[positionPlayer2[1]][positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], 1, visionBoard);
-                        positionPlayer2[0] = i;
-                        positionPlayer2[1] = j;
-                        updatePiecePosition(PLAYER2, positionPlayer2[0], positionPlayer2[1], visionBoard);
-                        updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
+                        gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
+                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
+                        gameState.positionPlayer2[0] = i;
+                        gameState.positionPlayer2[1] = j;
+                        updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
+                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
-                        activePlayer = PLAYER1;
+                        gameState.activePlayer = PLAYER1;
                         sendGameState(id);
                     }
                 }
