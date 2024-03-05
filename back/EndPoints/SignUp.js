@@ -145,4 +145,3 @@ function manageRequest(DBClient,req, res) {
 
 }
 exports.manage = manageRequest;
-

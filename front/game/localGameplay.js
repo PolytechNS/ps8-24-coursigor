@@ -20,6 +20,7 @@ let wallLeftP2 = 10;
 
 
 let wallsNotToPlace = [];
+let placedWalls = [];   //type of wall, wall coordinates and player owning the wall
 
 
 let visionBoard= [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
@@ -53,6 +54,8 @@ function createGrid() {
     svg.querySelectorAll(".wall").forEach(wall => wall.remove());
     var StartGame= document.getElementById("StartGame");
     StartGame.style.display = "none";
+
+    // Create the cells
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             const x = i * 5;
@@ -122,6 +125,8 @@ function createGrid() {
         }
     }
 
+
+    //create the walls
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             const x = i * 5;
@@ -133,6 +138,18 @@ function createGrid() {
                 const verticalWall = createWall(x + 4, y, 1, 4, "verticalWall");
                 verticalWall.setAttribute("data-i", i.toString());
                 verticalWall.setAttribute("data-j", j.toString());
+
+                if (placedWalls.some(wall => wall[0] === "vertical" && wall[1] === i && wall[2] === j && wall[3] === PLAYER1)) {
+                    verticalWall.setAttribute("height", "9");
+                    verticalWall.setAttribute("fill", "#00FF00");
+                    verticalWall.setAttribute("class", "placedVerticalWall");
+                } else if (placedWalls.some(wall => wall[0] === "vertical" && wall[1] === i && wall[2] === j && wall[3] === PLAYER2)) {
+                    verticalWall.setAttribute("height", "9");
+                    verticalWall.setAttribute("fill", "#0000FF");
+                    verticalWall.setAttribute("class", "placedVerticalWall");
+
+                }
+
                 document.querySelector('svg').appendChild(verticalWall);
 
             }
@@ -142,6 +159,18 @@ function createGrid() {
                 const horizontalWall = createWall(x, y + 4, 4, 1, "horizontalWall");
                 horizontalWall.setAttribute("data-i", i.toString());
                 horizontalWall.setAttribute("data-j", j.toString());
+
+                if (placedWalls.some(wall => wall[0] === "horizontal" && wall[1] === i && wall[2] === j && wall[3] === PLAYER1)) {
+                    horizontalWall.setAttribute("width", "9");
+                    horizontalWall.setAttribute("fill", "#00FF00");
+                    horizontalWall.setAttribute("class", "placedHorizontalWall");
+                } else if (placedWalls.some(wall => wall[0] === "horizontal" && wall[1] === i && wall[2] === j && wall[3] === PLAYER2)) {
+                    horizontalWall.setAttribute("width", "9");
+                    horizontalWall.setAttribute("fill", "#0000FF");
+                    horizontalWall.setAttribute("class", "placedHorizontalWall");
+
+                }
+
                 document.querySelector('svg').appendChild(horizontalWall);
 
             }
@@ -209,7 +238,7 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
     // store the cell as checked
     alreadyChecked.push([i, j]);
 
-    if ((player == PLAYER1) && i == 0) {
+    if ((player == PLAYER1) && j == 0) {
         return true;
     }
     if ((player == PLAYER2) && j == 8) {
@@ -280,8 +309,6 @@ function handleWallClick(i1, j1, i2, j2) {
         console.log("No more walls left for the active player.");
         return;
     }
-    wallsNotToPlace.push(["vertical", i1, j1]);     //the selected wall
-    wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left or the top
     //console.log("click wall", i1, j1, i2, j2);
     const wall = event.target;
 
@@ -305,8 +332,10 @@ function handleWallClick(i1, j1, i2, j2) {
         visionBoard[j1][i1 + 1] += WALL_LEFT;
         visionBoard[j2][i2 + 1] += WALL_LEFT;
 
+        placedWalls.push(["vertical", i1, j1, activePlayer]);
         wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
         wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+        wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
         wall2 = document.querySelector(`.verticalWall[data-i="${i2}"][data-j="${j2}"]`);
         wall3 = document.querySelector(`.verticalWall[data-i="${i2}"][data-j="${j1 - 1}"]`);
         wall4 = document.querySelector(`.horizontalWall[data-i="${i1}"][data-j="${j1}"]`);
@@ -324,8 +353,10 @@ function handleWallClick(i1, j1, i2, j2) {
         visionBoard[j1 + 1][i1] += WALL_TOP;
         visionBoard[j2 + 1][i2] += WALL_TOP;
 
+        placedWalls.push(["horizontal", i1, j1, activePlayer]);
         wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
         wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+        wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
         wall2 = document.querySelector(`.horizontalWall[data-i="${i2}"][data-j="${j2}"]`);
         wall3 = document.querySelector(`.horizontalWall[data-i="${i1 - 1}"][data-j="${j2}"]`);
         wall4 = document.querySelector(`.verticalWall[data-i="${i1}"][data-j="${j1}"]`);
@@ -346,12 +377,11 @@ function handleWallClick(i1, j1, i2, j2) {
             visionBoard[j2][i2 + 1] -= WALL_LEFT;
 
             //remove the coordinates from the wallsNotToPlace array
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 || wall[2] !== j1);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i2 || wall[2] !== j2);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1 - 1);
+            removeMatchingWall(placedWalls, "vertical", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1 - 1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1, j1);
 
-            // wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
-            // wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
         } else {
             // Horizontal wall
             visionBoard[j1][i1] -= WALL_BOTTOM;
@@ -361,19 +391,25 @@ function handleWallClick(i1, j1, i2, j2) {
             visionBoard[j2 + 1][i2] -= WALL_TOP;
 
             // remove the coordinates from the wallsNotToPlace array
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "vertical" || wall[1] !== i1 || wall[2] !== j1);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i2 || wall[2] !== j2);
-            wallsNotToPlace = wallsNotToPlace.filter(wall => wall[0] !== "horizontal" || wall[1] !== i1 - 1 || wall[2] !== j1);
-
-
-
-            // wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
-            // wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+            removeMatchingWall(placedWalls, "horizontal", i1, j1);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i2, j2);
+            removeMatchingWall(wallsNotToPlace, "horizontal", i1 - 1, j1);
+            removeMatchingWall(wallsNotToPlace, "vertical", i1, j1);
 
         }
         return;
     }
 
+    function isMatchingWall(wall, type, i, j) {
+        return wall[0] === type && wall[1] === i && wall[2] === j;
+    }
+
+    function removeMatchingWall(arr, type, i, j) {
+        const indexToRemove = arr.findIndex(wall => isMatchingWall(wall, type, i, j));
+        if (indexToRemove !== -1) {
+            arr.splice(indexToRemove, 1);
+        }
+    }
 
 
     const svg = document.querySelector('svg');

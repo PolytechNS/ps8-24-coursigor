@@ -4,7 +4,7 @@ const cors = require('cors'); // Ajout du module cors
 const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
-
+const {Server} = require("socket.io");
 
 
 
@@ -49,3 +49,42 @@ const app = http.createServer(async function (request, response) {
         }
     });
 }).listen(8000);
+
+const io = new Server(app);
+io.of("/api/onlineGame").on('connection', (socket) => {
+    console.log('a user connected');
+    socket.emit('message', 'Hello there!');
+
+    socket.on('message', (msg) => {
+        console.log('message: ' + msg);
+    });
+
+    socket.on('newGame', () => {
+        console.log('new game: ');
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.newGame(socket.id);
+
+    });
+
+    socket.on('nextMove' , (move) => {
+        console.log('nextMove: ' + move);
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.nextMove(socket.id, move);
+    });
+
+
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+});
+
+exports.io = io;
+
+
+
+// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
+//     const namespace = socket.nsp;
+// });

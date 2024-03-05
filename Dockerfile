@@ -10,5 +10,9 @@ COPY . .
 # Run any necessary commands to set up your application
 EXPOSE 8000
 EXPOSE 27017
+
+RUN npm install
+
+
 # Specify the command to run when the container starts
 CMD [ "npm", "start" ]
