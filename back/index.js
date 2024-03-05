@@ -81,6 +81,22 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
+
+io.of("/api/online1V1").on('connection', (socket) => {
+    console.log('a user connected');
+    socket.emit('message', 'Hello there!');
+
+    socket.on('message', (msg) => {
+        console.log('message: ' + msg);
+    });
+
+
+
+});
+
+
+
+
 exports.io = io;
 
 
