@@ -1,20 +1,4 @@
-
-
-
-class Move {
-    constructor(action, value) {
-      this.action = action;
-      this.value = value;
-    }
-  }
-
-class gameState {
-    constructor(opponentWalls, ownWalls, board) {
-      this.opponentWalls = opponentWalls;
-      this.ownWalls = ownWalls;
-      this.board = board;
-    }
-  };
+import { Move, gameState } from './Classes.js';
 
 const WALL_RIGHT =  0b10000000;
 const WALL_BOTTOM = 0b1000000000;
