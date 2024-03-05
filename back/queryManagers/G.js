@@ -1,4 +1,21 @@
-import { GameState, Move } from './Classes';
+
+
+
+class Move {
+    constructor(action, value) {
+      this.action = action;
+      this.value = value;
+    }
+  }
+
+class gameState {
+    constructor(opponentWalls, ownWalls, board) {
+      this.opponentWalls = opponentWalls;
+      this.ownWalls = ownWalls;
+      this.board = board;
+    }
+  };
+
 const WALL_RIGHT =  0b10000000;
 const WALL_BOTTOM = 0b1000000000;
 const WALL_LEFT =   0b100000000000;
@@ -50,7 +67,7 @@ function nextMove(gameState) {
 
     setTimeout(() => {
 
-        reject('timeout');
+        resolve(new Move("move",ownPosition[0].toString() + (ownPosition[1]+advance).toString()));
     }, 200);
     });
 }
