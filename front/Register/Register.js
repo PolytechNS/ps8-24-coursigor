@@ -76,8 +76,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     console.log('Token reçu:', data.token);
                     const expirationDate = new Date();
                     expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); //expiration 1h
-                    document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}; path=/`;
-
+                    document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}`;
 
                 }
                 console.log('Connexion réussie:', data.message);
