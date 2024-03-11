@@ -28,10 +28,13 @@ function hasJwtCookie() {
 
 // Fonction pour rediriger vers la page "Online 1v1" si le token est présent
 function redirectToOnline1v1() {
+    window.location.href = "game/online1v1/online1v1.html";
+    /*const socket = io("/api/1v1Online");
     const token = getToken();
     if (token) {
+        socket.emit('joinOrCreate1v1', { token: token });
         window.location.href = "game/onlineGame/online1v1.html?token=${token}";
-    }
+    }*/
 }
 
 // Fonction pour obtenir le token depuis les cookies
