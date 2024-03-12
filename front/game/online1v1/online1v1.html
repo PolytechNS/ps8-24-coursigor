@@ -3,9 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="online1v1.css">
     <script src="online1v1.js"></script>
 </head>
 <body>
+<header>
+    <button class="button" ><img src="../images/point-dinterrogation-blanc.png"></button>
+    <div class="MiddleHeader">
+        <h1 class="gameTitle">
+            COURS IGOR
+        </h1>
+        <button id="StartGame" onclick="closeOverlay()" > Start Game </button>
+
+    </div>
+    <button class="button" ><img src="../images/engrenage.png"></button>
+</header>
+<div class="left-sidebar">D
+    <p>Murs restants pour le Joueur 1 : <span id="wallLeftP1">10</span></p>
+    Left Sidebar
+</div>
+<main class="container">
+    <div class="child">
+        <svg viewBox="0 0 44 44">
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+        </svg>
+
+    </div>
+
+</main>
+
+
+<div class="right-sidebar">
+    <p>Murs restants pour le Joueur 2 : <span id="wallLeftP2">10</span></p>
+    Right Sidebar
+</div>
+<footer>Footer Content — Header.com 2020</footer>
     <script src="../../js/socket.io.js"></script>
     <script src="online1v1.js"></script>
 </body>
