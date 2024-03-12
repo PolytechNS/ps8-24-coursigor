@@ -1,3 +1,4 @@
+// const {tokenCache} = require("mongodb/src/client-side-encryption/providers/azure");
 const io = require("../index.js").io;
 
 const WALL_RIGHT =  0b10000000;
@@ -12,43 +13,31 @@ const VISIONMASK = 0b111
 // dictionary of games
 let games = {};
 
-
-// initial game state
-let wallsNotToPlace = [];
-let placedWalls = [];   //type of wall, wall coordinates and player owning the wall
-
-let visionBoard= [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
-    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
-    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
-    [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
-    [0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0],
-    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
-    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
-    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
-    [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1]];
-
-let positionPlayer1 = [4, 8];
-let positionPlayer2 = [4, 0];
-
-visionBoard[positionPlayer1[1]][positionPlayer1[0]] += PLAYER1;
-visionBoard[positionPlayer2[1]][positionPlayer2[0]] += PLAYER2;
-updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
-updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
-
-let numberOfTurns = 0;
-
-
 class GameState {
-    constructor(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, activePlayer, wallsLeftP1, wallsLeftP2, numberOfTurns) {
-        this.wallsNotToPlace = wallsNotToPlace;
-        this.placedWalls = placedWalls;
-        this.visionBoard = visionBoard;
-        this.positionPlayer1 = positionPlayer1;
-        this.positionPlayer2 = positionPlayer2;
-        this.activePlayer = activePlayer;
-        this.wallsLeftP1 = wallsLeftP1;
-        this.wallsLeftP2 = wallsLeftP2;
-        this.numberOfTurns = numberOfTurns;
+    constructor(token) {
+        this.token = token;
+        this.wallsNotToPlace = [];
+        this.placedWalls = [];
+        this.visionBoard = [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+            [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+            [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+            [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
+            [0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0, 0b0],
+            [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+            [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+            [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1],
+            [0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1, 0b1]];
+        this.positionPlayer1 = [4, 8];
+        this.positionPlayer2 = [4, 0];
+        this.activePlayer = PLAYER1;
+        this.wallsLeftP1 = 10;
+        this.wallsLeftP2 = 10;
+        this.numberOfTurns = 0;
+
+        this.visionBoard[this.positionPlayer1[1]][this.positionPlayer1[0]] += PLAYER1;
+        this.visionBoard[this.positionPlayer2[1]][this.positionPlayer2[0]] += PLAYER2;
+        updatePlayerVision(this.positionPlayer1[1], this.positionPlayer1[0], 1, this.visionBoard);
+        updatePlayerVision(this.positionPlayer2[1], this.positionPlayer2[0], -1, this.visionBoard);
     }
 }
 
@@ -56,15 +45,27 @@ class GameState {
 
 
 
-function newGame(socketId) {
-    console.log('new game: ' + socketId);
-
-    games[socketId] = new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
+function newGame(socketId, token) {
+    console.log('new game: socket : ' + socketId + " token : " + token);
+    if (games[token] == undefined) {
+        games[token] = new GameState(token);
+    }
+    games[socketId] = games[token];
     console.log(games);
 
     sendGameState(socketId);
 }
 exports.newGame = newGame;
+
+
+function loadGame(socketId, token) {
+    if (games[token] == undefined) {
+        return;
+    }
+    games[socketId] = games[token];
+    sendGameState(socketId);
+}
+exports.loadGame = loadGame;
 
 function sendGameState(id) {
     console.log('sendGameState: ' + id);
@@ -79,6 +80,10 @@ function sendGameState(id) {
 function sendEndOfGame(id, player) {
     let socket = io.of("/api/onlineGame").sockets.get(id);
     socket.emit("gameOver", player);
+
+    // games[games[id].token] = undefined;
+    // games[id] = undefined;
+
 }
 
 function sendInvalidMove(id, message) {
@@ -130,8 +135,8 @@ function nextMove(id, move) {
         gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
         gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
 
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
 
 
         if (!ncP1 || !ncP2) {
@@ -153,14 +158,14 @@ function nextMove(id, move) {
         }
 
         if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1, i2, j2, 1);
+            updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, 1);
             gameState.activePlayer = PLAYER2;
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
             console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
-            updateVisionWall(i1, j1, i2, j2, -1);
+            updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, -1);
             gameState.activePlayer = PLAYER1;
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
@@ -189,8 +194,8 @@ function nextMove(id, move) {
         gameState.wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
 
 
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
 
 
         if (!ncP1 || !ncP2) {
@@ -213,14 +218,14 @@ function nextMove(id, move) {
         }
 
         if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1,i2,j2, 1);
+            updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, 1);
             gameState.activePlayer = PLAYER2;
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
             console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
-            updateVisionWall(i1, j1,i2,j2, -1);
+            updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, -1);
             gameState.activePlayer = PLAYER1;
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
@@ -247,7 +252,7 @@ function removeMatchingWall(arr, type, i, j) {
     }
 }
 
-function notCirclesPlayers(alreadyChecked, i, j, player) {
+function notCirclesPlayers(alreadyChecked, i, j, player, visionBoard) {
     // check if the cell has already been checked
     if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
         return false;
@@ -273,24 +278,26 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
     let left = false;
     let right = false;
 
+    console.log(visionBoard);
+
     if (!(visionBoard[j][i] & WALL_TOP)) {
-        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+        top = notCirclesPlayers(alreadyChecked, i, j - 1, player, visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_BOTTOM)) {
-        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player, visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_LEFT)) {
-        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
+        left = notCirclesPlayers(alreadyChecked, i - 1, j, player, visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_RIGHT)) {
-        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
+        right = notCirclesPlayers(alreadyChecked, i + 1, j, player, visionBoard);
     }
 
     return top || bottom || left || right;
 }
 
 
-function updateVisionWall(i1, j1,i2,j2, value) {
+function updateVisionWall(visionBoard, i1, j1,i2,j2, value) {
     if (i1 === i2) {
         // Vertical wall
 

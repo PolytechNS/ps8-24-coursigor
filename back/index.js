@@ -21,13 +21,6 @@ const app = http.createServer(async function (request, response) {
         });
 
         try {
-            DBClient.connect()
-                .then(()=>{
-                    console.log("db connect success");
-                })
-                .catch((err)=>{
-                    throw err;
-                });
 
             // Ajout des en-têtes CORS manuellement
             response.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,21 +44,36 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
+DBClient.connect()
+    .then(()=>{
+        console.log("db connect success");
+    })
+    .catch((err)=>{
+        throw err;
+    });
+
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
-    socket.emit('message', 'Hello there!');
 
     socket.on('message', (msg) => {
         console.log('message: ' + msg);
     });
 
-    socket.on('newGame', () => {
-        console.log('new game: ');
+    socket.on('newGame', (cookieToken) => {
+        console.log('new game: ' + cookieToken);
+        socket.emit('message', 'Starting new game...');
         let onlineGame = require('./logic/onlineGame.js');
 
-        onlineGame.newGame(socket.id);
+        onlineGame.newGame(socket.id, cookieToken);
 
+    });
+
+    socket.on('loadGame', (cookieToken) => {
+        console.log('load game: ' + cookieToken);
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.loadGame(socket.id, cookieToken);
     });
 
     socket.on('nextMove' , (move) => {
