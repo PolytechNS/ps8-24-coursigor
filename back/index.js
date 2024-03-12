@@ -5,6 +5,7 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
+const onlineGame = require("./logic/onlineGame");
 
 
 
@@ -94,11 +95,35 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 io.of("/api/1v1Online").on('connection', (socket) => {
 
     socket.on('joinOrCreate1v1', (data) => {
-        console.log("joinOrCreate1v1");
-        console.log(data);
         let online1v1 = require('./Sockets/Online1v1.js');
-        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
         online1v1.handleStartGame(socket, data);
+
+        console.log('a user connected');
+        socket.emit('message', 'Hello there!');
+
+        socket.on('message', (msg) => {
+            console.log('message: ' + msg);
+        });
+
+        socket.on('newGame', () => {
+            console.log('new game: ');
+            let onlineGame = require('./Sockets/Online1v1.js');
+
+            onlineGame.newGame(socket.id);
+
+        });
+
+        socket.on('nextMove' , (move) => {
+            console.log('nextMove: ' + move);
+            let onlineGame = require('./Sockets/Online1v1.js');
+            onlineGame.nextMove(socket.id, move);
+        });
+
+
+
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+        });
 
     });
 
