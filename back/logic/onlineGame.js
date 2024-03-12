@@ -1,3 +1,4 @@
+const {tokenCache} = require("mongodb/src/client-side-encryption/providers/azure");
 const io = require("../index.js").io;
 
 const WALL_RIGHT =  0b10000000;
@@ -13,7 +14,8 @@ const VISIONMASK = 0b111
 let games = {};
 
 class GameState {
-    constructor() {
+    constructor(token) {
+        this.token = token;
         this.wallsNotToPlace = [];
         this.placedWalls = [];
         this.visionBoard = [  [0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001,0b1001],
@@ -43,10 +45,12 @@ class GameState {
 
 
 
-function newGame(socketId) {
-    console.log('new game: ' + socketId);
-
-    games[socketId] = new GameState();
+function newGame(socketId, token) {
+    console.log('new game: socket : ' + socketId + " token : " + token);
+    if (games[token] == undefined) {
+        games[token] = new GameState(token);
+    }
+    games[socketId] = games[token];
     console.log(games);
 
     sendGameState(socketId);
@@ -66,6 +70,10 @@ function sendGameState(id) {
 function sendEndOfGame(id, player) {
     let socket = io.of("/api/onlineGame").sockets.get(id);
     socket.emit("gameOver", player);
+
+    // games[games[id].token] = undefined;
+    // games[id] = undefined;
+
 }
 
 function sendInvalidMove(id, message) {

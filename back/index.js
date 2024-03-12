@@ -53,17 +53,17 @@ const app = http.createServer(async function (request, response) {
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
-    socket.emit('message', 'Hello there!');
 
     socket.on('message', (msg) => {
         console.log('message: ' + msg);
     });
 
-    socket.on('newGame', () => {
-        console.log('new game: ');
+    socket.on('newGame', (cookieToken) => {
+        console.log('new game: ' + cookieToken);
+        socket.emit('message', 'Starting new game...');
         let onlineGame = require('./logic/onlineGame.js');
 
-        onlineGame.newGame(socket.id);
+        onlineGame.newGame(socket.id, cookieToken);
 
     });
 

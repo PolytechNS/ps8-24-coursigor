@@ -20,3 +20,27 @@ function printCookies() {
 window.onload = function () {
     printCookies();
 };
+
+//waits for the page to load
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("onlineGame").addEventListener('click', function () {
+        //socket emits a new game event with the cookie token
+        const cookies = document.cookie.split(';');
+        let cookieString = "Cookies:\n";
+        cookies.forEach(cookie => {
+            cookieString += cookie.trim() + '\n';
+        });
+
+        console.log(cookieString);
+        const socket = io('/api/onlineGame');
+        socket.emit('newGame', cookieString);
+
+
+        //loads the game page on message event
+        socket.on('message', (msg) => {
+            window.location.href = 'game/onlineGame/onlineGame.html';
+        });
+
+
+    });
+});
