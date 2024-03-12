@@ -20,6 +20,7 @@ cookies.forEach(cookie => {
 console.log(cookieString);
 
 // socket.emit("newGame", cookieString);
+socket.emit("loadGame", cookieString);
 
 socket.on("message", (msg) => {
     console.log(msg);

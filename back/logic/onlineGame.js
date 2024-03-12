@@ -1,4 +1,4 @@
-const {tokenCache} = require("mongodb/src/client-side-encryption/providers/azure");
+// const {tokenCache} = require("mongodb/src/client-side-encryption/providers/azure");
 const io = require("../index.js").io;
 
 const WALL_RIGHT =  0b10000000;
@@ -56,6 +56,16 @@ function newGame(socketId, token) {
     sendGameState(socketId);
 }
 exports.newGame = newGame;
+
+
+function loadGame(socketId, token) {
+    if (games[token] == undefined) {
+        return;
+    }
+    games[socketId] = games[token];
+    sendGameState(socketId);
+}
+exports.loadGame = loadGame;
 
 function sendGameState(id) {
     console.log('sendGameState: ' + id);

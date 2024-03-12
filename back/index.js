@@ -20,13 +20,6 @@ const app = http.createServer(async function (request, response) {
         });
 
         try {
-            DBClient.connect()
-                .then(()=>{
-                    console.log("db connect success");
-                })
-                .catch((err)=>{
-                    throw err;
-                });
 
             // Ajout des en-têtes CORS manuellement
             response.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,6 +43,14 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
+DBClient.connect()
+    .then(()=>{
+        console.log("db connect success");
+    })
+    .catch((err)=>{
+        throw err;
+    });
+
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
@@ -65,6 +66,13 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
         onlineGame.newGame(socket.id, cookieToken);
 
+    });
+
+    socket.on('loadGame', (cookieToken) => {
+        console.log('load game: ' + cookieToken);
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.loadGame(socket.id, cookieToken);
     });
 
     socket.on('nextMove' , (move) => {
