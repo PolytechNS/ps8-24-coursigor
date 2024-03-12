@@ -14,7 +14,6 @@ services:
     environment: 
       - MONGO_INITDB_ROOT_USERNAME="${mongodbuser}"
       - MONGO_INITDB_ROOT_PASSWORD="${mongodbpassword}"
-      - MONGO_INITDB_DATABASE=test
       
     volumes:
       - './dockervolume/mongodb:/data/db'
