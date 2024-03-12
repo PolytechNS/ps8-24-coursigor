@@ -57,6 +57,12 @@ function newGame(socketId, token) {
 }
 exports.newGame = newGame;
 
+//removes socket from the games dictionary as the game is saved under the token
+function removeSocket(socketId) {
+    games[socketId] = undefined;
+}
+exports.removeSocket = removeSocket;
+
 
 function loadGame(socketId, token) {
     if (games[token] == undefined) {
@@ -155,6 +161,7 @@ function nextMove(id, move) {
             removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
 
             sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
+            return;
         }
 
         if (gameState.activePlayer === PLAYER1) {
@@ -236,6 +243,7 @@ function nextMove(id, move) {
     }
     else {
         sendInvalidMove(id, "Type of move not recognized");
+        return;
     }
 }
 exports.nextMove = nextMove;

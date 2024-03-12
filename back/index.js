@@ -84,6 +84,8 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.removeSocket(socket.id);
         console.log('user disconnected');
     });
 
