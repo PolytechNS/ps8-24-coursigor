@@ -8,8 +8,18 @@ const {Server} = require("socket.io");
 
 
 
-const DBuri = "mongodb://root:example@mongodb:27017/";
+const DBuri = "mongodb://{$mongodbuser}:{$mongodbpassword}@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
+
+
+DBClient.connect()
+.then(()=>{
+    console.log("db connect success");
+})
+.catch((err)=>{
+    console.log("db connect error");
+    throw err;
+});
 
 
 const app = http.createServer(async function (request, response) {
@@ -20,19 +30,12 @@ const app = http.createServer(async function (request, response) {
         });
 
         try {
-            DBClient.connect()
-                .then(()=>{
-                    console.log("db connect success");
-                })
-                .catch((err)=>{
-                    throw err;
-                });
+            
 
             // Ajout des en-têtes CORS manuellement
             response.setHeader('Access-Control-Allow-Origin', '*');
             response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
             response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
             // Si le URL commence par /api, alors c'est une requête REST.
             if (filePath[1] === "api") {
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
