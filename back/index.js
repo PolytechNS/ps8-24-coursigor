@@ -89,22 +89,18 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
+io.of("/api/1v1Online").on('connection', (socket) => {
 
-io.of("/api/online1V1").on('connection', (socket) => {
-    console.log('a user connected');
-    socket.emit('message', 'Hello there!');
+    socket.on('joinOrCreate1v1', (data) => {
+        console.log("joinOrCreate1v1");
+        console.log(data);
+        let online1v1 = require('./Sockets/Online1v1.js');
+        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
+        online1v1.handleStartGame(socket, data);
 
-    socket.on('message', (msg) => {
-        console.log('message: ' + msg);
     });
 
-
-
 });
-
-
-
-
 exports.io = io;
 
 

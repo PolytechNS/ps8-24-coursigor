@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>TEST</title>
     <script src="/js/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
     <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <a href="game/localGame.html">Local game</a>
@@ -12,11 +12,15 @@
 <!--    <a href="game/onlineGame/onlineGame.html">Online game</a>-->
     <button id="onlineGame">Online game</button>
     <br/>
-    <a href="Register/Register.html" style="position: fixed; top: 10px; right: 10px;">Login</a>
+    <button id="online1v1Button" disabled onclick="redirectToOnline1v1()">
+        Online 1v1
+    </button>
     <br/>
-    <a href="" > Online 1v1</a>
-    TEST
 
+    <a href="Register/Register.html" class="login-button">Login</a>
+    <button id="disconnect" onclick="disconnect()">
+        Disconnect
+    </button>
+    <br/>
+    TEST1
 </body>
-</html>
-
