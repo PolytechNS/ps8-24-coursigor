@@ -1,6 +1,7 @@
 var socket = io("/api/1v1Online");
 var roomName = "";
 var whichPlayer;
+var activePlayer="1";
 window.addEventListener('load', function() {
     console.log("load");
     socket.emit('joinOrCreate1v1', { message: "Okay" });
@@ -17,8 +18,20 @@ window.addEventListener('load', function() {
 });
 
 socket.on("updateGrid", (gameStatus) => {
-    console.log("updateGrid", gameStatus);
+
+    console.log("updateGrid", gameStatus.activePlayer);
     createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
+    if(gameStatus.activePlayer===32){
+        activePlayer=1;
+    }else {
+        activePlayer=2;
+    }
+    if(activePlayer!=whichPlayer){
+        document.getElementById('whichTurn').textContent = "Tour Adverse";
+    }else
+    {
+        document.getElementById('whichTurn').textContent = "Votre tour";
+    }
 });
 
 
