@@ -1,58 +1,6 @@
 const rooms = [];
 
-function handleStartGame(nsp, socket) {
 
-    const playerInQueue = rooms.find((room) => room.players.length === 1);
-    if(playerInQueue){
-        //un joueur est déjà en attente
-        //il faut l'associer à cette room
-        //ajoût du joueur dans l'objet room
-        //ajout du joueur dans la room
-        console.log("playerInQueue.roomName", playerInQueue.roomName);
-        socket.join(playerInQueue.roomName);
-
-
-        console.log("you are not alone in the room");
-        nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
-        nsp.to(socket.id).emit("whichPlayer", 2);
-    }else{
-        //aucun joueur en attente
-        //il faut créer une room
-        //création d'une room avec socket.id
-        roomName=generateRoomName();
-        console.log("roomName", roomName);
-        //socket.join(roomName);
-        socket.join(roomName);
-
-
-        //création de l'objet room
-        const room = {
-            players: [socket.id],
-            roomName: roomName
-        }
-        //ajout de l'objet room dans le tableau rooms
-        rooms.push(room);
-        console.log("you are alone in the room");
-        nsp.to(roomName).emit("nbJoueur", 1);
-        nsp.to(socket.id).emit("whichPlayer", 1);
-    }
-}
-exports.handleStartGame = handleStartGame;
-
-
-function generateRoomName() {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let roomName = '';
-
-    for (let i = 0; i < 6; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        roomName += characters.charAt(randomIndex);
-    }
-
-    return roomName;
-}
-
-/*
 const WALL_RIGHT =  0b10000000;
 const WALL_BOTTOM = 0b1000000000;
 const WALL_LEFT =   0b100000000000;
@@ -105,10 +53,64 @@ class GameState {
     }
 }
 
+function handleStartGame(nsp, socket) {
+
+    const playerInQueue = rooms.find((room) => room.players.length === 1);
+    if(playerInQueue){
+        //un joueur est déjà en attente
+        //il faut l'associer à cette room
+        //ajoût du joueur dans l'objet room
+        //ajout du joueur dans la room
+        console.log("playerInQueue.roomName", playerInQueue.roomName);
+        socket.join(playerInQueue.roomName);
+
+
+        console.log("you are not alone in the room");
+        nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
+        nsp.to(socket.id).emit("whichPlayer", 2);
+        nsp.to(roomName).emit("roomName", roomName);
+        games[roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
+        nsp.to(roomName).emit('updateGrid', games[roomName]);
+    }else{
+        //aucun joueur en attente
+        //il faut créer une room
+        //création d'une room avec socket.id
+        roomName=generateRoomName();
+        console.log("roomName", roomName);
+        //socket.join(roomName);
+        socket.join(roomName);
+
+
+        //création de l'objet room
+        const room = {
+            players: [socket.id],
+            roomName: roomName
+        }
+        //ajout de l'objet room dans le tableau rooms
+        rooms.push(room);
+        console.log("you are alone in the room");
+        nsp.to(roomName).emit("nbJoueur", 1);
+        nsp.to(socket.id).emit("whichPlayer", 1);
+    }
+}
+exports.handleStartGame = handleStartGame;
+
+
+function generateRoomName() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let roomName = '';
+
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        roomName += characters.charAt(randomIndex);
+    }
+
+    return roomName;
+}
 
 
 
-
+/*
 function newGame(nsp, socketId) {
     console.log('new game: ' + socketId);
 
@@ -376,6 +378,7 @@ function updateVisionWall(i1, j1,i2,j2, value) {
     }
 }
 
+*/
 function calculateVision(board,i,j,value){
     if (i<0 || i>8 || j<0 || j>8)
         return;
@@ -411,6 +414,16 @@ function calculateVision(board,i,j,value){
         calculateVision(board, i, j, value+1);
     }
 }
+
+
+function sendGameState(nsp) {
+    console.log('sendGameState: ');
+    //change active player in gameState
+    // make gameState into a json to send it to the client
+    //socket of id sends the gameState to the client
+    nsp.to(roomName).emit('updateGrid', games[roomName]);
+    }
+/*
 
 
 function validMove(id, i, j, nsp) {
@@ -634,11 +647,11 @@ function checkVictoryCondition(id, positionPlayer1, positionPlayer2) {
         return;
     }
 }
-
+*/
 function updatePlayerVision(i, j, value, visionBoard) {
     calculateVision(visionBoard, i, j, value);
     calculateVision(visionBoard,i+1, j, value);
     calculateVision(visionBoard,i-1,j, value);
     calculateVision(visionBoard, i, j+1, value);
     calculateVision(visionBoard, i, j-1, value);
-}*/
+}
