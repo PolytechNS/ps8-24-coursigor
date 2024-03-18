@@ -87,28 +87,32 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
             rect.addEventListener("click", () => handlePlayerClick(i, j));
 
             document.querySelector('svg').appendChild(rect);
+            // Create a circle with an image for player 1
             if (visionBoard[j][i] & PLAYER1) {
-                const circlePlayer1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circlePlayer1.setAttribute("cx", (x + 2).toString());
-                circlePlayer1.setAttribute("cy", (y + 2).toString());
-                circlePlayer1.setAttribute("r", "1.8");
-                circlePlayer1.setAttribute("fill", "#00FF00");
+                const circlePlayer1 = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                circlePlayer1.setAttribute("x", (x + 0.2).toString()); // ajuster x pour le centrage horizontal
+                circlePlayer1.setAttribute("y", (y + 0.2).toString()); // ajuster y pour le centrage vertical
+                circlePlayer1.setAttribute("width", "3.6");
+                circlePlayer1.setAttribute("height", "3.6");
+                circlePlayer1.setAttribute("href", "../../Images/kenedy.png");
                 circlePlayer1.setAttribute("class", "player");
                 circlePlayer1.addEventListener("click", () => handlePlayerClick(i, j));
                 svg.appendChild(circlePlayer1);
             }
 
-            // Ajoutez un cercle pour le joueur 2
+// Create a circle with an image for player 2
             if (visionBoard[j][i] & PLAYER2) {
-                const circlePlayer2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circlePlayer2.setAttribute("cx", (x + 2).toString());
-                circlePlayer2.setAttribute("cy", (y + 2).toString());
-                circlePlayer2.setAttribute("r", "1.8");
-                circlePlayer2.setAttribute("fill", "#0000FF");
+                const circlePlayer2 = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                circlePlayer2.setAttribute("x", (x + 0.2).toString()); // ajuster x pour le centrage horizontal
+                circlePlayer2.setAttribute("y", (y + 0.2).toString()); // ajuster y pour le centrage vertical
+                circlePlayer2.setAttribute("width", "3.6");
+                circlePlayer2.setAttribute("height", "3.6");
+                circlePlayer2.setAttribute("href", "../../Images/staline.png");
                 circlePlayer2.setAttribute("class", "player");
                 circlePlayer2.addEventListener("click", () => handlePlayerClick(i, j));
                 svg.appendChild(circlePlayer2);
             }
+
             if (visionBoard[j][i]& VISIONMASK){
 
 
