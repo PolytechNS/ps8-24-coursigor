@@ -24,29 +24,14 @@ window.addEventListener('load', function() {
         this.whichPlayer = whichPlayer;
         console.log("whichPlayer", whichPlayer);
     });
-
-
-
-    /*socket.emit('joinOrCreate1v1', { message: "Okay" });
-    socket.emit('newGame', { message: "Okay" });
-    console.log("load");
     socket.on("roomName", (roomName) => {
         console.log("roomName", roomName)
         this.roomName = roomName;
     });
-    socket.on("whichPlayer", (whichPlayer) => {
-        console.log("whichPlayer", whichPlayer)
-        this.whichPlayer = whichPlayer;
-    });*/
 
 });
-
-/*
-
-
-
 socket.on("updateGrid", (gameStatus) => {
-    console.log("BIEN RECU");
+    console.log("GamesState reçu");
     if(gameStatus.activePlayer===32){
         activePlayer=1;
     }else {
@@ -60,13 +45,10 @@ socket.on("updateGrid", (gameStatus) => {
         myTurn=true;
         document.getElementById('whichTurn').textContent = "Votre tour";
     }
-    console.log("updateGrid", gameStatus.activePlayer);
+
     createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
 
 });
-
-
-
 
 
 function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, positionPlayer1, positionPlayer2) {
@@ -84,8 +66,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
     svg.querySelectorAll(".cell").forEach(cell => cell.remove());
     svg.querySelectorAll(".wall").forEach(wall => wall.remove());
     svg.querySelectorAll(".player").forEach(player => player.remove());
-    var StartGame= document.getElementById("StartGame");
-    StartGame.style.display = "none";
+
 
     // Create the cells
     for (let i = 0; i < 9; i++) {
@@ -226,6 +207,8 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
 
 }
 
+
+
 function createGridPlayer1(x,y, i, j) {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", x.toString());
@@ -331,4 +314,3 @@ function verticalWallHandleHover(event) {
         wall.parentElement.appendChild(wall);
     }
 }
-*/
