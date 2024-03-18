@@ -1,11 +1,35 @@
 var socket = io("/api/1v1Online");
+var ingame = false;
 var roomName = "";
 var whichPlayer;
 var activePlayer="1";
+var myTurn;
+
 window.addEventListener('load', function() {
-    console.log("load");
-    socket.emit('joinOrCreate1v1', { message: "Okay" });
+    socket.emit('firstConnection');
+    socket.on("nbJoueur", (nbJoueur) => {
+        console.log("un joueur a rejoint la partie", nbJoueur);
+        if (nbJoueur === 2) {
+            // Enlever l'overlay
+            document.getElementById("overlay").style.display = "none";
+
+            // Afficher le contenu du jeu
+            document.getElementById("game").style.display = "grid";
+        }
+
+
+    });
+    socket.on("whichPlayer", (whichPlayer) => {
+
+        this.whichPlayer = whichPlayer;
+        console.log("whichPlayer", whichPlayer);
+    });
+
+
+
+    /*socket.emit('joinOrCreate1v1', { message: "Okay" });
     socket.emit('newGame', { message: "Okay" });
+    console.log("load");
     socket.on("roomName", (roomName) => {
         console.log("roomName", roomName)
         this.roomName = roomName;
@@ -13,25 +37,32 @@ window.addEventListener('load', function() {
     socket.on("whichPlayer", (whichPlayer) => {
         console.log("whichPlayer", whichPlayer)
         this.whichPlayer = whichPlayer;
-    });
+    });*/
 
 });
 
-socket.on("updateGrid", (gameStatus) => {
+/*
 
-    console.log("updateGrid", gameStatus.activePlayer);
-    createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
+
+
+socket.on("updateGrid", (gameStatus) => {
+    console.log("BIEN RECU");
     if(gameStatus.activePlayer===32){
         activePlayer=1;
     }else {
         activePlayer=2;
     }
-    if(activePlayer!=whichPlayer){
+    if(activePlayer!==whichPlayer){
+        myTurn=false;
         document.getElementById('whichTurn').textContent = "Tour Adverse";
     }else
     {
+        myTurn=true;
         document.getElementById('whichTurn').textContent = "Votre tour";
     }
+    console.log("updateGrid", gameStatus.activePlayer);
+    createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
+
 });
 
 
@@ -223,10 +254,19 @@ function createGridPlayer2(x,y, i, j) {
 
 
 function handlePlayerClick(i, j) {
+    console.log(myTurn)
+    if (!myTurn) {
+        // Ne rien faire si ce n'est pas votre tour
+        return;
+    }
     socket.emit("nextMove", "cell," + i + "," + j);
 }
 
 function handleWallClick(i1, j1, i2, j2) {
+    if (!myTurn) {
+        // Ne rien faire si ce n'est pas votre tour
+        return;
+    }
 
     if (i1 === i2) {
         // Vertical wall
@@ -291,3 +331,4 @@ function verticalWallHandleHover(event) {
         wall.parentElement.appendChild(wall);
     }
 }
+*/
