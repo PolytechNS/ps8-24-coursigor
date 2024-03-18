@@ -1,23 +1,30 @@
 const rooms = [];
 
-function handleStartGame(socket, data) {
+function handleStartGame(nsp, socket) {
 
     const playerInQueue = rooms.find((room) => room.players.length === 1);
     if(playerInQueue){
         //un joueur est déjà en attente
         //il faut l'associer à cette room
         //ajoût du joueur dans l'objet room
-        playerInQueue.players.push(socket.id);
         //ajout du joueur dans la room
+        console.log("playerInQueue.roomName", playerInQueue.roomName);
         socket.join(playerInQueue.roomName);
+
+
         console.log("you are not alone in the room");
-        socket.emit("whichPlayer", 2);
+        nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
+        nsp.to(socket.id).emit("whichPlayer", 2);
     }else{
         //aucun joueur en attente
         //il faut créer une room
         //création d'une room avec socket.id
         roomName=generateRoomName();
+        console.log("roomName", roomName);
+        //socket.join(roomName);
         socket.join(roomName);
+
+
         //création de l'objet room
         const room = {
             players: [socket.id],
@@ -26,8 +33,8 @@ function handleStartGame(socket, data) {
         //ajout de l'objet room dans le tableau rooms
         rooms.push(room);
         console.log("you are alone in the room");
-        socket.emit('roomName', roomName);
-        socket.emit("whichPlayer", 1);
+        nsp.to(roomName).emit("nbJoueur", 1);
+        nsp.to(socket.id).emit("whichPlayer", 1);
     }
 }
 exports.handleStartGame = handleStartGame;
@@ -45,8 +52,7 @@ function generateRoomName() {
     return roomName;
 }
 
-const io = require("../index.js").io;
-
+/*
 const WALL_RIGHT =  0b10000000;
 const WALL_BOTTOM = 0b1000000000;
 const WALL_LEFT =   0b100000000000;
@@ -103,29 +109,33 @@ class GameState {
 
 
 
-function newGame(socketId) {
+function newGame(nsp, socketId) {
     console.log('new game: ' + socketId);
 
     games[socketId] = new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
     //push the gameState in the room associated withe soketId of the player
     //if room already have a gameState it will be replaced
     rooms.find((room) => room.players.includes(socketId)).gameState = games[socketId];
-    console.log(rooms.find((room) => room.players.includes(socketId)).gameState);
-
-
-    sendGameState(socketId);
+    //console.log(rooms.find((room) => room.players.includes(socketId)).gameState);
+    sendGameState(socketId, nsp);
 }
 exports.newGame = newGame;
 
-function sendGameState(id) {
+function sendGameState(id,nsp) {
     console.log('sendGameState: ' + id);
+    //change active player in gameState
+
     let gameState = games[id];
     // make gameState into a json to send it to the client
-
-    let socket = io.of("/api/1v1Online").sockets.get(id);
     //socket of id sends the gameState to the client
-    socket.emit('updateGrid', gameState);
+    console.log("roomName du io.to", roomName);
+    nsp.to(roomName).emit('updateGrid', gameState);
+    //socket.emit('updateGrid', gameState);
+
+
+    //socket.emit('updateGrid', gameState);
 }
+exports.sendGameState = sendGameState;
 
 function sendEndOfGame(id, player) {
     let socket = io.of("/api/1v1Online").sockets.get(id);
@@ -138,7 +148,8 @@ function sendInvalidMove(id, message) {
 
 }
 
-function nextMove(id, move) {
+function nextMove(nsp,id, move) {
+    console.log("activePlayer: " + games[id].activePlayer);
     // move contains the type of move as a string and a pair of coordinates
     console.log('nextMove: ' + move);
     // move is ["type, i, j"]
@@ -148,7 +159,7 @@ function nextMove(id, move) {
 
 
     if (moves[0] === "cell") {
-        validMove(id, moves[1], moves[2]);
+        validMove(id, moves[1], moves[2],nsp);
     }
     else if (moves[0] === "horizontal") {
         console.log('horizontal', moves[1], moves[2]);
@@ -206,7 +217,7 @@ function nextMove(id, move) {
             console.log("Changed active player : ", gameState.activePlayer);
         }
 
-        sendGameState(id);
+        sendGameState(id,nsp);
     }
     else if (moves[0] === "vertical") {
         console.log('vertical', moves[1], moves[2]);
@@ -266,7 +277,7 @@ function nextMove(id, move) {
             console.log("Changed active player : ", gameState.activePlayer);
         }
 
-        sendGameState(id);
+        sendGameState(id,nsp);
     }
     else {
         sendInvalidMove(id, "Type of move not recognized");
@@ -402,15 +413,20 @@ function calculateVision(board,i,j,value){
 }
 
 
-function validMove(id, i, j) {
+function validMove(id, i, j, nsp) {
+    console.log("test if valid move");
+    console.log('activePlayer: ' + games[id].activePlayer);
     let gameState = games[id];
-    if(gameState.activePlayer === PLAYER1) {
+    if(gameState.activePlayer === 32) {
+        console.log("player 1");
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         //console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
         if (gameState.positionPlayer2[0] !== i || gameState.positionPlayer2[1] !== j) {
+            console.log("oui");
             if (gameState.positionPlayer1[0] === i - 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i + 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j - 1 || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j + 1) {
-                //console.log("oui"); // rentre pas ici
+                console.log("oui"); // rentre pas ici
                 if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
+                    console.log("move valid 0");
                     gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
                     updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
                     gameState.positionPlayer1[0] = i;
@@ -419,7 +435,8 @@ function validMove(id, i, j) {
                     updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
                     gameState.activePlayer = PLAYER2;
-                    sendGameState(id);
+                    games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                    sendGameState(id,nsp);
                 }
             }
         }
@@ -438,7 +455,9 @@ function validMove(id, i, j) {
                         updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
                         gameState.activePlayer = PLAYER2;
-                        sendGameState(id);
+                        console.log("move valid 1")
+                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                        sendGameState(id,nsp);
                     }
                 }
             }
@@ -454,13 +473,15 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER2;
-                        sendGameState(id);
+                        console.log("move valid 2")
+                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                        sendGameState(id,nsp);
                     }
                 }
             }
         }
     }
-    else if(gameState.activePlayer === PLAYER2 ) {
+    else if(gameState.activePlayer === 16 ) {
         if (gameState.positionPlayer1[0] !== i || gameState.positionPlayer1[1] !== j) {
             if (gameState.positionPlayer2[0] === i - 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i + 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j - 1 || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j + 1) {
                 //console.log("oui2");
@@ -473,7 +494,9 @@ function validMove(id, i, j) {
                     updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                     gameState.activePlayer = PLAYER1;
-                    sendGameState(id);
+                    console.log("move valid 3")
+                    games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                    sendGameState(id,nsp);
                 }
             }
         }
@@ -492,7 +515,9 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        sendGameState(id);
+                        console.log("move valid 4");
+                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                        sendGameState(id,nsp);
                     }
                 }
             }
@@ -508,7 +533,9 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        sendGameState(id);
+                        console.log("move valid 5");
+                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                        sendGameState(id,nsp);
                     }
                 }
             }
@@ -614,4 +641,4 @@ function updatePlayerVision(i, j, value, visionBoard) {
     calculateVision(visionBoard,i-1,j, value);
     calculateVision(visionBoard, i, j+1, value);
     calculateVision(visionBoard, i, j-1, value);
-}
+}*/

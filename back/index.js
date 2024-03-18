@@ -6,11 +6,13 @@ const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
 const onlineGame = require("./logic/onlineGame");
+const online1v1 = require("./Sockets/Online1v1");
 
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
+
 
 
 const app = http.createServer(async function (request, response) {
@@ -53,6 +55,8 @@ DBClient.connect()
     });
 
 const io = new Server(app);
+// Pour l'espace de noms '/api/onlineGame'
+
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
 
@@ -90,11 +94,19 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
-io.of("/api/1v1Online").on('connection', (socket) => {
 
-    socket.on('joinOrCreate1v1', (data) => {
-        let online1v1 = require('./Sockets/Online1v1.js');
-        online1v1.handleStartGame(socket, data);
+let nsp = io.of("/api/1v1Online");
+nsp.on('connection', (socket) => {
+    console.log('a user connected');
+
+    let online1v1 = require('./Sockets/Online1v1.js');
+    socket.on("firstConnection", () => {
+        console.log("first connection");
+        online1v1.handleStartGame(nsp, socket);
+    });
+
+
+    /*socket.on('joinOrCreate1v1', (data) => {
 
         console.log('a user connected');
         socket.emit('message', 'Hello there!');
@@ -107,14 +119,14 @@ io.of("/api/1v1Online").on('connection', (socket) => {
             console.log('new game: ');
             let onlineGame = require('./Sockets/Online1v1.js');
 
-            onlineGame.newGame(socket.id);
+            onlineGame.newGame(nsp, socket.id);
 
         });
 
         socket.on('nextMove' , (move) => {
             console.log('nextMove: ' + move);
             let onlineGame = require('./Sockets/Online1v1.js');
-            onlineGame.nextMove(socket.id, move);
+            onlineGame.nextMove(nsp, socket.id, move);
         });
 
 
@@ -122,9 +134,14 @@ io.of("/api/1v1Online").on('connection', (socket) => {
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
+        socket.on('reloadGame', () => {
+            console.log('reload');
+            let onlineGame = require('./Sockets/Online1v1.js');
+            onlineGame.sendGameState(nsp, socket.id);
+        });
 
     });
-
+*/
 });
 exports.io = io;
 
