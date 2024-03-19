@@ -246,7 +246,7 @@ function handlePlayerClick(i, j) {
         // Ne rien faire si ce n'est pas votre tour
         return;
     }
-    socket.emit("nextMove", "cell," + i + "," + j);
+    socket.emit("nextMove", "cell," + i + "," + j, roomName);
 }
 
 function handleWallClick(i1, j1, i2, j2) {
@@ -258,11 +258,11 @@ function handleWallClick(i1, j1, i2, j2) {
     if (i1 === i2) {
         // Vertical wall
         console.log("vertical", i1, j1);
-        socket.emit("nextMove", "vertical," + i1 + "," + j1);
+        socket.emit("nextMove", "vertical," + i1 + "," + j1,roomName);
     } else {
         // Horizontal wall
         console.log("horizontal", i1, j1)
-        socket.emit("nextMove", "horizontal," + i1 + "," + j1);
+        socket.emit("nextMove", "horizontal," + i1 + "," + j1,roomName);
     }
 }
 
@@ -318,3 +318,7 @@ function verticalWallHandleHover(event) {
         wall.parentElement.appendChild(wall);
     }
 }
+
+socket.on("invalidMove", (msg) => {
+    console.log(msg);
+});

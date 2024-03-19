@@ -108,50 +108,8 @@ function generateRoomName() {
     return roomName;
 }
 
-
-
-/*
-function newGame(nsp, socketId) {
-    console.log('new game: ' + socketId);
-
-    games[socketId] = new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
-    //push the gameState in the room associated withe soketId of the player
-    //if room already have a gameState it will be replaced
-    rooms.find((room) => room.players.includes(socketId)).gameState = games[socketId];
-    //console.log(rooms.find((room) => room.players.includes(socketId)).gameState);
-    sendGameState(socketId, nsp);
-}
-exports.newGame = newGame;
-
-function sendGameState(id,nsp) {
-    console.log('sendGameState: ' + id);
-    //change active player in gameState
-
-    let gameState = games[id];
-    // make gameState into a json to send it to the client
-    //socket of id sends the gameState to the client
-    console.log("roomName du io.to", roomName);
-    nsp.to(roomName).emit('updateGrid', gameState);
-    //socket.emit('updateGrid', gameState);
-
-
-    //socket.emit('updateGrid', gameState);
-}
-exports.sendGameState = sendGameState;
-
-function sendEndOfGame(id, player) {
-    let socket = io.of("/api/1v1Online").sockets.get(id);
-    socket.emit("gameOver", player);
-}
-
-function sendInvalidMove(id, message) {
-    let socket = io.of("/api/1v1Online").sockets.get(id);
-    socket.emit('invalidMove', message);
-
-}
-
-function nextMove(nsp,id, move) {
-    console.log("activePlayer: " + games[id].activePlayer);
+function nextMove(nsp,roomName, move) {
+    console.log("activePlayer: " + games[roomName].activePlayer);
     // move contains the type of move as a string and a pair of coordinates
     console.log('nextMove: ' + move);
     // move is ["type, i, j"]
@@ -161,11 +119,11 @@ function nextMove(nsp,id, move) {
 
 
     if (moves[0] === "cell") {
-        validMove(id, moves[1], moves[2],nsp);
+        validMove(roomName, moves[1], moves[2],nsp);
     }
     else if (moves[0] === "horizontal") {
         console.log('horizontal', moves[1], moves[2]);
-        let gameState = games[id];
+        let gameState = games[roomName];
         let i1 = moves[1];
         let j1 = moves[2];
         let i2 = i1 + 1;
@@ -201,29 +159,28 @@ function nextMove(nsp,id, move) {
             removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
             removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
 
-            sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
+            sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
+            return;
         }
 
         if (gameState.activePlayer === PLAYER1) {
             updateVisionWall(i1, j1, i2, j2, 1);
-            gameState.activePlayer = PLAYER2;
+
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
             updateVisionWall(i1, j1, i2, j2, -1);
-            gameState.activePlayer = PLAYER1;
+
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
         }
 
-        sendGameState(id,nsp);
+        sendGameState(roomName,nsp);
     }
     else if (moves[0] === "vertical") {
         console.log('vertical', moves[1], moves[2]);
-        let gameState = games[id];
+        let gameState = games[roomName];
         let i1 = moves[1];
         let j1 = moves[2];
         let i2 = i1;
@@ -260,170 +217,28 @@ function nextMove(nsp,id, move) {
             removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1 - 1);
             removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1, j1);
 
-            sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
+            sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
             return;
         }
 
         if (gameState.activePlayer === PLAYER1) {
             updateVisionWall(i1, j1,i2,j2, 1);
-            gameState.activePlayer = PLAYER2;
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
 
         } else {
             updateVisionWall(i1, j1,i2,j2, -1);
-            gameState.activePlayer = PLAYER1;
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
         }
 
-        sendGameState(id,nsp);
+        sendGameState(roomName,nsp);
     }
     else {
-        sendInvalidMove(id, "Type of move not recognized");
+        sendInvalidMove(roomName, "Type of move not recognized", nsp);
     }
 }
 exports.nextMove = nextMove;
-
-
-function isMatchingWall(wall, type, i, j) {
-    return wall[0] === type && wall[1] === i && wall[2] === j;
-}
-
-function removeMatchingWall(arr, type, i, j) {
-    const indexToRemove = arr.findIndex(wall => isMatchingWall(wall, type, i, j));
-    if (indexToRemove !== -1) {
-        arr.splice(indexToRemove, 1);
-    }
-}
-
-function notCirclesPlayers(alreadyChecked, i, j, player) {
-    // check if the cell has already been checked
-    if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
-        return false;
-    }
-
-    //if the cell is out of the board
-    if (i < 0 || i > 8 || j < 0 || j > 8) {
-        return false;
-    }
-
-    // store the cell as checked
-    alreadyChecked.push([i, j]);
-
-    if ((player == PLAYER1) && j == 0) {
-        return true;
-    }
-    if ((player == PLAYER2) && j == 8) {
-        return true;
-    }
-
-    let top = false;
-    let bottom = false;
-    let left = false;
-    let right = false;
-
-    if (!(visionBoard[j][i] & WALL_TOP)) {
-        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
-    }
-    if (!(visionBoard[j][i] & WALL_BOTTOM)) {
-        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
-    }
-    if (!(visionBoard[j][i] & WALL_LEFT)) {
-        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
-    }
-    if (!(visionBoard[j][i] & WALL_RIGHT)) {
-        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
-    }
-
-    return top || bottom || left || right;
-}
-
-
-function updateVisionWall(i1, j1,i2,j2, value) {
-    if (i1 === i2) {
-        // Vertical wall
-
-        calculateVision(visionBoard, j1, i1, value*2);
-        calculateVision(visionBoard, j2, i2, value*2);
-        calculateVision(visionBoard, j1 , i1 + 1, value*2);
-        calculateVision(visionBoard, j2 , i2 + 1, value*2);
-        calculateVision(visionBoard, j1 - 1 , i1, value);
-        calculateVision(visionBoard,j2 + 1, i2 , value);
-        calculateVision(visionBoard,j1 - 1 , i1+1, value);
-        calculateVision(visionBoard, j2 + 1, i2+1, value);
-        calculateVision(visionBoard, j1, i1+2, value);
-        calculateVision(visionBoard, j2, i2+2, value);
-        calculateVision(visionBoard, j1, i1-1, value);
-        calculateVision(visionBoard, j2, i2-1, value);
-        console.log(visionBoard);
-
-    }
-    else {
-        //horizontal wall
-        calculateVision(visionBoard, j1, i1, value*2);
-        calculateVision(visionBoard, j2, i2, value*2);
-        calculateVision(visionBoard, j1 + 1, i1, value*2);
-        calculateVision(visionBoard, j2 + 1, i2, value*2);
-        calculateVision(visionBoard, j1, i1 - 1, value);
-        calculateVision(visionBoard, j2, i2 + 1, value);
-        calculateVision(visionBoard, j1 + 1, i1 - 1, value);
-        calculateVision(visionBoard, j2 + 1, i2 + 1, value);
-        calculateVision(visionBoard, j1 + 2, i1, value);
-        calculateVision(visionBoard, j2 + 2, i2, value);
-        calculateVision(visionBoard, j1 - 1, i1, value);
-        calculateVision(visionBoard, j2 - 1, i2, value);
-    }
-}
-
-*/
-function calculateVision(board,i,j,value){
-    if (i<0 || i>8 || j<0 || j>8)
-        return;
-    if ((board[i][j] & VISIONMASK)===0b111)
-        return;
-    else if (!(board[i][j] & VISIONMASK)){
-        if (board[i][j] & NEGMASK)
-            board[i][j] -=NEGMASK;
-        if (value < 0){
-            board[i][j] += 1;
-            board[i][j] += NEGMASK;
-        }
-        else{
-            board[i][j] += 1;
-        }
-    }
-    else if (board[i][j] & NEGMASK){
-        if (value > 0)
-            board[i][j] -= 1;
-        else
-            board[i][j] += 1;
-    }
-    else{
-        if (value>0)
-            board[i][j] += 1;
-        else
-            board[i][j] -= 1;
-    }
-    if (value > 1) {
-        calculateVision(board, i, j, value-1);
-    }
-    else if(value < -1){
-        calculateVision(board, i, j, value+1);
-    }
-}
-
-
-function sendGameState(nsp) {
-    console.log('sendGameState: ');
-    //change active player in gameState
-    // make gameState into a json to send it to the client
-    //socket of id sends the gameState to the client
-    nsp.to(roomName).emit('updateGrid', games[roomName]);
-    }
-/*
 
 
 function validMove(id, i, j, nsp) {
@@ -556,6 +371,192 @@ function validMove(id, i, j, nsp) {
     }
 }
 
+
+function notCirclesPlayers(alreadyChecked, i, j, player) {
+    // check if the cell has already been checked
+    if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
+        return false;
+    }
+
+    //if the cell is out of the board
+    if (i < 0 || i > 8 || j < 0 || j > 8) {
+        return false;
+    }
+
+    // store the cell as checked
+    alreadyChecked.push([i, j]);
+
+    if ((player == PLAYER1) && j == 0) {
+        return true;
+    }
+    if ((player == PLAYER2) && j == 8) {
+        return true;
+    }
+
+    let top = false;
+    let bottom = false;
+    let left = false;
+    let right = false;
+
+    if (!(visionBoard[j][i] & WALL_TOP)) {
+        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_BOTTOM)) {
+        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+    }
+    if (!(visionBoard[j][i] & WALL_LEFT)) {
+        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
+    }
+    if (!(visionBoard[j][i] & WALL_RIGHT)) {
+        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
+    }
+
+    return top || bottom || left || right;
+}
+
+
+/*
+function newGame(nsp, socketId) {
+    console.log('new game: ' + socketId);
+
+    games[socketId] = new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
+    //push the gameState in the room associated withe soketId of the player
+    //if room already have a gameState it will be replaced
+    rooms.find((room) => room.players.includes(socketId)).gameState = games[socketId];
+    //console.log(rooms.find((room) => room.players.includes(socketId)).gameState);
+    sendGameState(socketId, nsp);
+}
+exports.newGame = newGame;
+
+function sendGameState(id,nsp) {
+    console.log('sendGameState: ' + id);
+    //change active player in gameState
+
+    let gameState = games[id];
+    // make gameState into a json to send it to the client
+    //socket of id sends the gameState to the client
+    console.log("roomName du io.to", roomName);
+    nsp.to(roomName).emit('updateGrid', gameState);
+    //socket.emit('updateGrid', gameState);
+
+
+    //socket.emit('updateGrid', gameState);
+}
+exports.sendGameState = sendGameState;
+
+*/
+
+function sendEndOfGame(id, player) {
+    let socket = io.of("/api/1v1Online").sockets.get(id);
+    socket.emit("gameOver", player);
+}
+
+function sendInvalidMove(id, message, nsp) {
+    nsp.to(roomName).emit('invalidMove', message);
+
+}
+
+
+
+
+function isMatchingWall(wall, type, i, j) {
+    return wall[0] === type && wall[1] === i && wall[2] === j;
+}
+
+function removeMatchingWall(arr, type, i, j) {
+    const indexToRemove = arr.findIndex(wall => isMatchingWall(wall, type, i, j));
+    if (indexToRemove !== -1) {
+        arr.splice(indexToRemove, 1);
+    }
+}
+
+function updateVisionWall(i1, j1,i2,j2, value) {
+    if (i1 === i2) {
+        // Vertical wall
+
+        calculateVision(visionBoard, j1, i1, value*2);
+        calculateVision(visionBoard, j2, i2, value*2);
+        calculateVision(visionBoard, j1 , i1 + 1, value*2);
+        calculateVision(visionBoard, j2 , i2 + 1, value*2);
+        calculateVision(visionBoard, j1 - 1 , i1, value);
+        calculateVision(visionBoard,j2 + 1, i2 , value);
+        calculateVision(visionBoard,j1 - 1 , i1+1, value);
+        calculateVision(visionBoard, j2 + 1, i2+1, value);
+        calculateVision(visionBoard, j1, i1+2, value);
+        calculateVision(visionBoard, j2, i2+2, value);
+        calculateVision(visionBoard, j1, i1-1, value);
+        calculateVision(visionBoard, j2, i2-1, value);
+        console.log(visionBoard);
+
+    }
+    else {
+        //horizontal wall
+        calculateVision(visionBoard, j1, i1, value*2);
+        calculateVision(visionBoard, j2, i2, value*2);
+        calculateVision(visionBoard, j1 + 1, i1, value*2);
+        calculateVision(visionBoard, j2 + 1, i2, value*2);
+        calculateVision(visionBoard, j1, i1 - 1, value);
+        calculateVision(visionBoard, j2, i2 + 1, value);
+        calculateVision(visionBoard, j1 + 1, i1 - 1, value);
+        calculateVision(visionBoard, j2 + 1, i2 + 1, value);
+        calculateVision(visionBoard, j1 + 2, i1, value);
+        calculateVision(visionBoard, j2 + 2, i2, value);
+        calculateVision(visionBoard, j1 - 1, i1, value);
+        calculateVision(visionBoard, j2 - 1, i2, value);
+    }
+}
+function calculateVision(board,i,j,value){
+    if (i<0 || i>8 || j<0 || j>8)
+        return;
+    if ((board[i][j] & VISIONMASK)===0b111)
+        return;
+    else if (!(board[i][j] & VISIONMASK)){
+        if (board[i][j] & NEGMASK)
+            board[i][j] -=NEGMASK;
+        if (value < 0){
+            board[i][j] += 1;
+            board[i][j] += NEGMASK;
+        }
+        else{
+            board[i][j] += 1;
+        }
+    }
+    else if (board[i][j] & NEGMASK){
+        if (value > 0)
+            board[i][j] -= 1;
+        else
+            board[i][j] += 1;
+    }
+    else{
+        if (value>0)
+            board[i][j] += 1;
+        else
+            board[i][j] -= 1;
+    }
+    if (value > 1) {
+        calculateVision(board, i, j, value-1);
+    }
+    else if(value < -1){
+        calculateVision(board, i, j, value+1);
+    }
+}
+
+
+function sendGameState(roomName,nsp) {
+    console.log('sendGameState: ');
+    //change active player in gameState
+    // make gameState into a json to send it to the client
+    //socket of id sends the gameState to the client
+    //switch active player
+    console.log("activePlayer before: " + games[roomName].activePlayer);
+    games[roomName].activePlayer = games[roomName].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+    console.log("activePlayer now: " + games[roomName].activePlayer);
+
+
+    nsp.to(roomName).emit('updateGrid', games[roomName]);
+}
+
+
 function checkPresenceWall(i,j, player, visionBoard, positionPlayer1, positionPlayer2){
     let iSub;
     let jSub;
@@ -647,7 +648,8 @@ function checkVictoryCondition(id, positionPlayer1, positionPlayer2) {
         return;
     }
 }
-*/
+
+
 function updatePlayerVision(i, j, value, visionBoard) {
     calculateVision(visionBoard, i, j, value);
     calculateVision(visionBoard,i+1, j, value);
