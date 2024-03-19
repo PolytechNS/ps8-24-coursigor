@@ -53,21 +53,36 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
+DBClient.connect()
+    .then(()=>{
+        console.log("db connect success");
+    })
+    .catch((err)=>{
+        throw err;
+    });
+
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
-    socket.emit('message', 'Hello there!');
 
     socket.on('message', (msg) => {
         console.log('message: ' + msg);
     });
 
-    socket.on('newGame', () => {
-        console.log('new game: ');
+    socket.on('newGame', (cookieToken) => {
+        console.log('new game: ' + cookieToken);
+        socket.emit('message', 'Starting new game...');
         let onlineGame = require('./logic/onlineGame.js');
 
-        onlineGame.newGame(socket.id);
+        onlineGame.newGame(socket.id, cookieToken);
 
+    });
+
+    socket.on('loadGame', (cookieToken) => {
+        console.log('load game: ' + cookieToken);
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.loadGame(socket.id, cookieToken);
     });
 
     socket.on('nextMove' , (move) => {
@@ -79,11 +94,25 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.removeSocket(socket.id);
         console.log('user disconnected');
     });
 
 });
 
+io.of("/api/1v1Online").on('connection', (socket) => {
+
+    socket.on('joinOrCreate1v1', (data) => {
+        console.log("joinOrCreate1v1");
+        console.log(data);
+        let online1v1 = require('./Sockets/Online1v1.js');
+        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
+        online1v1.handleStartGame(socket, data);
+
+    });
+
+});
 exports.io = io;
 
 
