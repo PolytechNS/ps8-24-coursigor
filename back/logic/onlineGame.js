@@ -1,4 +1,5 @@
 // const {tokenCache} = require("mongodb/src/client-side-encryption/providers/azure");
+const {AI, AIGameState} = require("../queryManagers/G.js");
 const io = require("../index.js").io;
 
 const WALL_RIGHT =  0b10000000;
@@ -12,6 +13,7 @@ const VISIONMASK = 0b111
 
 // dictionary of games
 let games = {};
+let ais = {};
 
 class GameState {
     constructor(token) {
@@ -47,10 +49,12 @@ class GameState {
 
 function newGame(socketId, token) {
     console.log('new game: socket : ' + socketId + " token : " + token);
-    if (games[token] == undefined) {
-        games[token] = new GameState(token);
-    }
+    games[token] = new GameState(token);
+    ais[token] = new AI();
+    //sets ai as player 2
+    ais[token].setup(2);
     games[socketId] = games[token];
+    ais[socketId] = ais[token];
     console.log(games);
 
     sendGameState(socketId);
@@ -60,6 +64,7 @@ exports.newGame = newGame;
 //removes socket from the games dictionary as the game is saved under the token
 function removeSocket(socketId) {
     games[socketId] = undefined;
+    ais[socketId] = undefined;
 }
 exports.removeSocket = removeSocket;
 
@@ -69,6 +74,7 @@ function loadGame(socketId, token) {
         return;
     }
     games[socketId] = games[token];
+    ais[socketId] = ais[token];
     sendGameState(socketId);
 }
 exports.loadGame = loadGame;
@@ -120,134 +126,238 @@ function nextMove(id, move) {
 
 
     if (moves[0] === "cell") {
-        validMove(id, moves[1], moves[2]);
+        if (validMove(id, moves[1], moves[2])) {
+        }
+        else {
+            sendInvalidMove(id, "You cannot reach there. The move is invalid");
+            return;
+        }
     }
     else if (moves[0] === "horizontal") {
-        console.log('horizontal', moves[1], moves[2]);
-        let gameState = games[id];
-        let i1 = moves[1];
-        let j1 = moves[2];
-        let i2 = i1 + 1;
-        let j2 = j1;
-
-        gameState.visionBoard[j1][i1] += WALL_BOTTOM;
-        gameState.visionBoard[j2][i2] += WALL_BOTTOM;
-
-        gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
-        gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
-
-        gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
-        gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
-        gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
-        gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
-
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
-
-
-        if (!ncP1 || !ncP2) {
-            console.log("The player can't reach the end anymore. The move is invalid");
-
-            gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
-            gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
-
-            gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
-            gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
-
-            // remove the coordinates from the wallsNotToPlace array
-            removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
-            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
-            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
-            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
-
+        if (validHorizontalWall(id, moves)) {
+        }
+        else {
             sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
             return;
         }
-
-        if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, 1);
-            gameState.activePlayer = PLAYER2;
-            gameState.wallsLeftP1--;
-            gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
-
-        } else {
-            updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, -1);
-            gameState.activePlayer = PLAYER1;
-            gameState.wallsLeftP2--;
-            gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
-        }
-
-        sendGameState(id);
     }
     else if (moves[0] === "vertical") {
-        console.log('vertical', moves[1], moves[2]);
-        let gameState = games[id];
-        let i1 = moves[1];
-        let j1 = moves[2];
-        let i2 = i1;
-        let j2 = j1 + 1;
-
-        gameState.visionBoard[j1][i1] += WALL_RIGHT;
-        gameState.visionBoard[j2][i2] += WALL_RIGHT;
-
-        gameState.visionBoard[j1][i1 + 1] += WALL_LEFT;
-        gameState.visionBoard[j2][i2 + 1] += WALL_LEFT;
-
-        gameState.placedWalls.push(["vertical", i1, j1, gameState.activePlayer]);
-        gameState.wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
-        gameState.wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
-        gameState.wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
-
-
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
-
-
-        if (!ncP1 || !ncP2) {
-            console.log("The player can't reach the end anymore. The move is invalid");
-            // Vertical wall
-            gameState.visionBoard[j1][i1] -= WALL_RIGHT;
-            gameState.visionBoard[j2][i2] -= WALL_RIGHT;
-
-            gameState.visionBoard[j1][i1 + 1] -= WALL_LEFT;
-            gameState.visionBoard[j2][i2 + 1] -= WALL_LEFT;
-
-            //remove the coordinates from the wallsNotToPlace array
-            removeMatchingWall(gameState.placedWalls, "vertical", i1, j1);
-            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i2, j2);
-            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1 - 1);
-            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1, j1);
-
+        if (validVerticalWall(id, moves)) {
+        }
+        else {
             sendInvalidMove(id, "The player can't reach the end anymore. The move is invalid");
             return;
         }
-
-        if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, 1);
-            gameState.activePlayer = PLAYER2;
-            gameState.wallsLeftP1--;
-            gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
-
-        } else {
-            updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, -1);
-            gameState.activePlayer = PLAYER1;
-            gameState.wallsLeftP2--;
-            gameState.numberOfTurns++;
-            console.log("Changed active player : ", gameState.activePlayer);
-        }
-
-        sendGameState(id);
     }
     else {
         sendInvalidMove(id, "Type of move not recognized");
         return;
     }
+
+    //plays for the AI
+    let placedWalls = games[id].placedWalls;
+    let placedWallsP1 = [];
+    let placedWallsP2 = [];
+    for (let i = 0; i < placedWalls.length; i++) {
+        if (placedWalls[i][3] === PLAYER1) {
+            placedWallsP1.push(placedWalls[i]);
+        }
+        else {
+            placedWallsP2.push(placedWalls[i]);
+        }
+    }
+    let aiGameState = new AIGameState(placedWallsP1, placedWallsP2, games[id].visionBoard);
+    let aiMove = ais[id].nextMove(aiGameState);
+    //wait for the promise to resolve
+    aiMove.then((move) => {
+        console.log("AI move: ", move);
+
+
+
+        if (move.action === "move") {
+            if (validMove(id, move.value[0].split(""))){
+            }
+            else {
+                games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+            }
+            sendGameState(id);
+        }
+
+        //horizontal wall
+        else if (move.value[1] === 0) {
+            let aiMoves = [];
+            aiMoves.push("horizontal");
+            let coordinates = move.value[0].split("");
+            aiMoves.push(parseInt(coordinates[0]) - 1);
+            aiMoves.push(parseInt(coordinates[1]) - 1);
+            if (validHorizontalWall(id, aiMoves)) {
+            }
+            else {
+                games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+            }
+            sendGameState(id);
+        }
+        //vertical wall
+        else if (move.value[1] === 1) {
+            let aiMoves = [];
+            aiMoves.push("vertical");
+            let coordinates = move.value[0].split("");
+            aiMoves.push(parseInt(coordinates[0]) - 1);
+            aiMoves.push(parseInt(coordinates[1]) - 1);
+            if (validVerticalWall(id, aiMoves)) {
+            }
+            else {
+                games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+            }
+            sendGameState(id);
+        }
+        else {
+            games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+            sendGameState(id);
+        }
+    });
+
+    function transformMove(aiMove) {
+        const { action, value } = aiMove;
+        let result = [];
+
+        if (aiMove.action === "move") {
+            result.push("cell");
+            result.push(value[0].split(""));
+        } else if (action === "wall") {
+            const [coordinates, orientation] = value;
+            if (orientation === 0) {
+                result.push("horizontal");
+            } else if (orientation === 1) {
+                result.push("vertical");
+            }
+            result.push(coordinates.split(""));
+            console.log(result);
+        }
+        return result;
+    }
 }
 exports.nextMove = nextMove;
 
+
+function validHorizontalWall(id, moves) {
+    console.log('horizontal', moves[1], moves[2]);
+    let gameState = games[id];
+    let i1 = moves[1];
+    let j1 = moves[2];
+    let i2 = i1 + 1;
+    let j2 = j1;
+
+    gameState.visionBoard[j1][i1] += WALL_BOTTOM;
+    gameState.visionBoard[j2][i2] += WALL_BOTTOM;
+
+    gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
+    gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
+
+    gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
+    gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+    gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+    gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
+
+    let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
+    let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
+
+
+    if (!ncP1 || !ncP2) {
+        console.log("The player can't reach the end anymore. The move is invalid");
+
+        gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
+        gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
+
+        gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
+        gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
+
+        // remove the coordinates from the wallsNotToPlace array
+        removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
+        removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
+        removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
+        removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
+
+        return false;
+    }
+
+    if (gameState.activePlayer === PLAYER1) {
+        updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, 1);
+        gameState.activePlayer = PLAYER2;
+        gameState.wallsLeftP1--;
+        gameState.numberOfTurns++;
+        console.log("Changed active player : ", gameState.activePlayer);
+
+    } else {
+        updateVisionWall(gameState.visionBoard, i1, j1, i2, j2, -1);
+        gameState.activePlayer = PLAYER1;
+        gameState.wallsLeftP2--;
+        gameState.numberOfTurns++;
+        console.log("Changed active player : ", gameState.activePlayer);
+    }
+
+    return true;
+}
+
+function validVerticalWall(id, moves) {
+    console.log('vertical', moves[1], moves[2]);
+    let gameState = games[id];
+    let i1 = moves[1];
+    let j1 = moves[2];
+    let i2 = i1;
+    let j2 = j1 + 1;
+
+    gameState.visionBoard[j1][i1] += WALL_RIGHT;
+    gameState.visionBoard[j2][i2] += WALL_RIGHT;
+
+    gameState.visionBoard[j1][i1 + 1] += WALL_LEFT;
+    gameState.visionBoard[j2][i2 + 1] += WALL_LEFT;
+
+    gameState.placedWalls.push(["vertical", i1, j1, gameState.activePlayer]);
+    gameState.wallsNotToPlace.push(["vertical", i2, j2]);     //the wall to the bottom
+    gameState.wallsNotToPlace.push(["vertical", i1, j1 - 1]);   //the wall to the top
+    gameState.wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
+
+
+    let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
+    let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
+
+
+    if (!ncP1 || !ncP2) {
+        console.log("The player can't reach the end anymore. The move is invalid");
+        // Vertical wall
+        gameState.visionBoard[j1][i1] -= WALL_RIGHT;
+        gameState.visionBoard[j2][i2] -= WALL_RIGHT;
+
+        gameState.visionBoard[j1][i1 + 1] -= WALL_LEFT;
+        gameState.visionBoard[j2][i2 + 1] -= WALL_LEFT;
+
+        //remove the coordinates from the wallsNotToPlace array
+        removeMatchingWall(gameState.placedWalls, "vertical", i1, j1);
+        removeMatchingWall(gameState.wallsNotToPlace, "vertical", i2, j2);
+        removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1 - 1);
+        removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1, j1);
+
+        return false;
+    }
+
+    if (gameState.activePlayer === PLAYER1) {
+        updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, 1);
+        gameState.activePlayer = PLAYER2;
+        gameState.wallsLeftP1--;
+        gameState.numberOfTurns++;
+        console.log("Changed active player : ", gameState.activePlayer);
+
+    } else {
+        updateVisionWall(gameState.visionBoard, i1, j1,i2,j2, -1);
+        gameState.activePlayer = PLAYER1;
+        gameState.wallsLeftP2--;
+        gameState.numberOfTurns++;
+        console.log("Changed active player : ", gameState.activePlayer);
+    }
+
+    return true;
+}
 
 function isMatchingWall(wall, type, i, j) {
     return wall[0] === type && wall[1] === i && wall[2] === j;
@@ -395,7 +505,7 @@ function validMove(id, i, j) {
                     updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
                     gameState.activePlayer = PLAYER2;
-                    sendGameState(id);
+                    return true;
                 }
             }
         }
@@ -414,7 +524,7 @@ function validMove(id, i, j) {
                         updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
                         gameState.activePlayer = PLAYER2;
-                        sendGameState(id);
+                        return true;
                     }
                 }
             }
@@ -430,7 +540,7 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER2;
-                        sendGameState(id);
+                        return true;
                     }
                 }
             }
@@ -449,7 +559,7 @@ function validMove(id, i, j) {
                     updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                     gameState.activePlayer = PLAYER1;
-                    sendGameState(id);
+                    return true;
                 }
             }
         }
@@ -468,7 +578,7 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        sendGameState(id);
+                        return true;
                     }
                 }
             }
@@ -484,7 +594,7 @@ function validMove(id, i, j) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        sendGameState(id);
+                        return true;
                     }
                 }
             }
