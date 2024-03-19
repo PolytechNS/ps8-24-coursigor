@@ -105,8 +105,9 @@ nsp.on('connection', (socket) => {
         online1v1.handleStartGame(nsp, socket);
     });
 
-    socket.on('nextMove' , (move) => {
+    socket.on('nextMove' , (move,roomName) => {
         console.log('nextMove: ' + move);
+        console.log("salle associée au move : " + roomName);
         let onlineGame = require('./Sockets/Online1v1.js');
         onlineGame.nextMove(nsp, roomName, move);
     });

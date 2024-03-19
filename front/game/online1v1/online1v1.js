@@ -112,9 +112,10 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
                 circlePlayer2.addEventListener("click", () => handlePlayerClick(i, j));
                 svg.appendChild(circlePlayer2);
             }
-
+            console.log("j,i", j, i);
+            console.log(visionBoard[j][i] & VISIONMASK);
             if (visionBoard[j][i]& VISIONMASK){
-
+                console.log("test pour 8 3",!nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2))
 
                 if (whichPlayer==1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
                     console.log("oui");
@@ -208,7 +209,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
         wall.addEventListener("click", () => handleWallClick(i1, j1, i2, j2));
     });
     // document.getElementById('overlay').classList.add('active');
-
+    console.log("visionBoard", visionBoard);
 }
 
 

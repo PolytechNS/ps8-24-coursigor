@@ -11,7 +11,7 @@ const NEGMASK =0b1000
 const VISIONMASK = 0b111
 
 // dictionary of games
-let games = {};
+
 
 
 // initial game state
@@ -41,11 +41,12 @@ let numberOfTurns = 0;
 
 class GameState {
     constructor(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, activePlayer, wallsLeftP1, wallsLeftP2, numberOfTurns) {
-        this.wallsNotToPlace = wallsNotToPlace;
-        this.placedWalls = placedWalls;
-        this.visionBoard = visionBoard;
-        this.positionPlayer1 = positionPlayer1;
-        this.positionPlayer2 = positionPlayer2;
+        // Utilisation de l'opérateur spread pour créer des clones des propriétés passées
+        this.wallsNotToPlace = [...wallsNotToPlace];
+        this.placedWalls = [...placedWalls];
+        this.visionBoard = [...visionBoard.map(row => [...row])]; // Clonage de la matrice 2D
+        this.positionPlayer1 = [...positionPlayer1];
+        this.positionPlayer2 = [...positionPlayer2];
         this.activePlayer = activePlayer;
         this.wallsLeftP1 = wallsLeftP1;
         this.wallsLeftP2 = wallsLeftP2;
@@ -53,9 +54,12 @@ class GameState {
     }
 }
 
+let games = {};
 function handleStartGame(nsp, socket) {
+    //console.log("handleStartGame\n");
+    let playerInQueue = rooms.find((room) => room.players.length === 1);
+    //console.log("que vaut playerInQueue :", playerInQueue);
 
-    const playerInQueue = rooms.find((room) => room.players.length === 1);
     if(playerInQueue){
         //un joueur est déjà en attente
         //il faut l'associer à cette room
@@ -65,12 +69,16 @@ function handleStartGame(nsp, socket) {
         socket.join(playerInQueue.roomName);
 
 
-        console.log("you are not alone in the room");
+        //console.log("you are not alone in the room");
         nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
         nsp.to(socket.id).emit("whichPlayer", 2);
         nsp.to(roomName).emit("roomName", roomName);
         games[roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
         nsp.to(roomName).emit('updateGrid', games[roomName]);
+        //add the player to the room
+        playerInQueue.players.push(socket.id);
+
+
     }else{
         //aucun joueur en attente
         //il faut créer une room
@@ -109,6 +117,7 @@ function generateRoomName() {
 }
 
 function nextMove(nsp,roomName, move) {
+    console.log("\nthis move is made in the room: "+ roomName+"\n");
     console.log("activePlayer: " + games[roomName].activePlayer);
     // move contains the type of move as a string and a pair of coordinates
     console.log('nextMove: ' + move);
@@ -145,7 +154,7 @@ function nextMove(nsp,roomName, move) {
 
 
         if (!ncP1 || !ncP2) {
-            console.log("The player can't reach the end anymore. The move is invalid");
+            //console.log("The player can't reach the end anymore. The move is invalid");
 
             gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
             gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
@@ -179,7 +188,7 @@ function nextMove(nsp,roomName, move) {
         sendGameState(roomName,nsp);
     }
     else if (moves[0] === "vertical") {
-        console.log('vertical', moves[1], moves[2]);
+        //console.log('vertical', moves[1], moves[2]);
         let gameState = games[roomName];
         let i1 = moves[1];
         let j1 = moves[2];
@@ -203,7 +212,7 @@ function nextMove(nsp,roomName, move) {
 
 
         if (!ncP1 || !ncP2) {
-            console.log("The player can't reach the end anymore. The move is invalid");
+            //console.log("The player can't reach the end anymore. The move is invalid");
             // Vertical wall
             gameState.visionBoard[j1][i1] -= WALL_RIGHT;
             gameState.visionBoard[j2][i2] -= WALL_RIGHT;
@@ -242,20 +251,33 @@ exports.nextMove = nextMove;
 
 
 function validMove(id, i, j, nsp) {
-    console.log("test if valid move");
-    console.log('activePlayer: ' + games[id].activePlayer);
+    //console.log("test if valid move\n");
+    //console.log('activePlayer: ' + games[id].activePlayer);
     let gameState = games[id];
+    console.log("on récupère le gameState de la room: " + id);
+
     if(gameState.activePlayer === 32) {
-        console.log("player 1");
+        //console.log("player 1");
         //prevent the player to move on an illegal cell or on a cell separated with a wall
         //console.log(positionPlayer2[0] !== i || positionPlayer2[1] !== j);
         if (gameState.positionPlayer2[0] !== i || gameState.positionPlayer2[1] !== j) {
-            console.log("oui");
+
             if (gameState.positionPlayer1[0] === i - 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i + 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j - 1 || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j + 1) {
-                console.log("oui"); // rentre pas ici
+
                 if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
-                    console.log("move valid 0");
+                    for(game in games){
+                        console.log("\nroom name: " + game);
+                        console.log("game visionBoard before: " + games[game].visionBoard +"\n\n");
+
+                    }
+                    console.log("vision board du fichier avant: " + visionBoard);
                     gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                    for(game in games){
+                        console.log("\nroom name: " + game);
+                        console.log("game visionBoard after: " + games[game].visionBoard +"\n\n");
+
+                    }
+                    console.log("vision board du fichier après: " + visionBoard);
                     updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
                     gameState.positionPlayer1[0] = i;
                     gameState.positionPlayer1[1] = j;
@@ -283,7 +305,6 @@ function validMove(id, i, j, nsp) {
                         updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
                         gameState.activePlayer = PLAYER2;
-                        console.log("move valid 1")
                         games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
                         sendGameState(id,nsp);
                     }
@@ -301,7 +322,6 @@ function validMove(id, i, j, nsp) {
                         updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER2;
-                        console.log("move valid 2")
                         games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
                         sendGameState(id,nsp);
                     }
@@ -312,7 +332,7 @@ function validMove(id, i, j, nsp) {
     else if(gameState.activePlayer === 16 ) {
         if (gameState.positionPlayer1[0] !== i || gameState.positionPlayer1[1] !== j) {
             if (gameState.positionPlayer2[0] === i - 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i + 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j - 1 || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j + 1) {
-                //console.log("oui2");
+
                 if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
                     gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
                     updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
@@ -322,7 +342,6 @@ function validMove(id, i, j, nsp) {
                     updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                     gameState.activePlayer = PLAYER1;
-                    console.log("move valid 3")
                     games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
                     sendGameState(id,nsp);
                 }
@@ -343,7 +362,6 @@ function validMove(id, i, j, nsp) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        console.log("move valid 4");
                         games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
                         sendGameState(id,nsp);
                     }
@@ -361,7 +379,6 @@ function validMove(id, i, j, nsp) {
                         updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
                         gameState.activePlayer = PLAYER1;
-                        console.log("move valid 5");
                         games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
                         sendGameState(id,nsp);
                     }
@@ -415,36 +432,6 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
 }
 
 
-/*
-function newGame(nsp, socketId) {
-    console.log('new game: ' + socketId);
-
-    games[socketId] = new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
-    //push the gameState in the room associated withe soketId of the player
-    //if room already have a gameState it will be replaced
-    rooms.find((room) => room.players.includes(socketId)).gameState = games[socketId];
-    //console.log(rooms.find((room) => room.players.includes(socketId)).gameState);
-    sendGameState(socketId, nsp);
-}
-exports.newGame = newGame;
-
-function sendGameState(id,nsp) {
-    console.log('sendGameState: ' + id);
-    //change active player in gameState
-
-    let gameState = games[id];
-    // make gameState into a json to send it to the client
-    //socket of id sends the gameState to the client
-    console.log("roomName du io.to", roomName);
-    nsp.to(roomName).emit('updateGrid', gameState);
-    //socket.emit('updateGrid', gameState);
-
-
-    //socket.emit('updateGrid', gameState);
-}
-exports.sendGameState = sendGameState;
-
-*/
 
 function sendEndOfGame(id, player) {
     let socket = io.of("/api/1v1Online").sockets.get(id);
@@ -486,8 +473,6 @@ function updateVisionWall(i1, j1,i2,j2, value) {
         calculateVision(visionBoard, j2, i2+2, value);
         calculateVision(visionBoard, j1, i1-1, value);
         calculateVision(visionBoard, j2, i2-1, value);
-        console.log(visionBoard);
-
     }
     else {
         //horizontal wall
@@ -543,14 +528,13 @@ function calculateVision(board,i,j,value){
 
 
 function sendGameState(roomName,nsp) {
-    console.log('sendGameState: ');
     //change active player in gameState
     // make gameState into a json to send it to the client
     //socket of id sends the gameState to the client
     //switch active player
-    console.log("activePlayer before: " + games[roomName].activePlayer);
+    //console.log("activePlayer before: " + games[roomName].activePlayer);
     games[roomName].activePlayer = games[roomName].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
-    console.log("activePlayer now: " + games[roomName].activePlayer);
+    //console.log("activePlayer now: " + games[roomName].activePlayer);
 
 
     nsp.to(roomName).emit('updateGrid', games[roomName]);
