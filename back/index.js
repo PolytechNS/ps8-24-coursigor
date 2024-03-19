@@ -105,6 +105,12 @@ nsp.on('connection', (socket) => {
         online1v1.handleStartGame(nsp, socket);
     });
 
+    socket.on('nextMove' , (move) => {
+        console.log('nextMove: ' + move);
+        let onlineGame = require('./Sockets/Online1v1.js');
+        onlineGame.nextMove(nsp, roomName, move);
+    });
+
 
     /*socket.on('joinOrCreate1v1', (data) => {
 
@@ -123,11 +129,7 @@ nsp.on('connection', (socket) => {
 
         });
 
-        socket.on('nextMove' , (move) => {
-            console.log('nextMove: ' + move);
-            let onlineGame = require('./Sockets/Online1v1.js');
-            onlineGame.nextMove(nsp, socket.id, move);
-        });
+
 
 
 
