@@ -141,6 +141,13 @@ footer {
     color: yellow;
 }
 
+#Winning{
+
+    text-align: center;
+
+    color: yellow;
+}
+
 body {
     font-family: system-ui, sans-serif;
 }

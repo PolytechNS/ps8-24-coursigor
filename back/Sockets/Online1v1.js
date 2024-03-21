@@ -77,6 +77,8 @@ function handleStartGame(nsp, socket) {
         nsp.to(roomName).emit('updateGrid', games[roomName]);
         //add the player to the room
         playerInQueue.players.push(socket.id);
+        console.log("vision board de ref : ", visionBoard);
+        console.log(games[roomName].visionBoard);
 
 
     }else{
@@ -129,6 +131,7 @@ function nextMove(nsp,roomName, move) {
 
     if (moves[0] === "cell") {
         validMove(roomName, moves[1], moves[2],nsp);
+
     }
     else if (moves[0] === "horizontal") {
         console.log('horizontal', moves[1], moves[2]);
@@ -173,13 +176,13 @@ function nextMove(nsp,roomName, move) {
         }
 
         if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1, i2, j2, 1);
+            updateVisionWall(i1, j1, i2, j2, 1, gameState.visionBoard);
 
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
 
         } else {
-            updateVisionWall(i1, j1, i2, j2, -1);
+            updateVisionWall(i1, j1, i2, j2, -1,gameState.visionBoard);
 
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
@@ -231,12 +234,12 @@ function nextMove(nsp,roomName, move) {
         }
 
         if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1,i2,j2, 1);
+            updateVisionWall(i1, j1,i2,j2, 1, gameState.visionBoard);
             gameState.wallsLeftP1--;
             gameState.numberOfTurns++;
 
         } else {
-            updateVisionWall(i1, j1,i2,j2, -1);
+            updateVisionWall(i1, j1,i2,j2, -1, gameState.visionBoard);
             gameState.wallsLeftP2--;
             gameState.numberOfTurns++;
         }
@@ -265,19 +268,9 @@ function validMove(id, i, j, nsp) {
             if (gameState.positionPlayer1[0] === i - 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i + 1 && gameState.positionPlayer1[1] === j || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j - 1 || gameState.positionPlayer1[0] === i && gameState.positionPlayer1[1] === j + 1) {
 
                 if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
-                    for(game in games){
-                        console.log("\nroom name: " + game);
-                        console.log("game visionBoard before: " + games[game].visionBoard +"\n\n");
 
-                    }
-                    console.log("vision board du fichier avant: " + visionBoard);
                     gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
-                    for(game in games){
-                        console.log("\nroom name: " + game);
-                        console.log("game visionBoard after: " + games[game].visionBoard +"\n\n");
 
-                    }
-                    console.log("vision board du fichier après: " + visionBoard);
                     updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
                     gameState.positionPlayer1[0] = i;
                     gameState.positionPlayer1[1] = j;
@@ -433,15 +426,25 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
 
 
 
-function sendEndOfGame(id, player) {
-    let socket = io.of("/api/1v1Online").sockets.get(id);
-    socket.emit("gameOver", player);
+function sendEndOfGameP1(id, player, nsp) {
+    console.log("P1win nsp.to");
+    console.log(id);
+    nsp.to(id).emit("P1win", player);
+}
+
+function sendEndOfGameP2(id, player, nsp) {
+    nsp.to(id).emit("P2win", player);
+}
+
+function sendEndOfGameDraw(id, player, nsp) {
+    nsp.to(id).emit("Draw", player);
 }
 
 function sendInvalidMove(id, message, nsp) {
-    nsp.to(roomName).emit('invalidMove', message);
+    nsp.to(id).emit('invalidMove', message);
 
 }
+
 
 
 
@@ -457,7 +460,7 @@ function removeMatchingWall(arr, type, i, j) {
     }
 }
 
-function updateVisionWall(i1, j1,i2,j2, value) {
+function updateVisionWall(i1, j1,i2,j2, value, visionBoard) {
     if (i1 === i2) {
         // Vertical wall
 
@@ -538,6 +541,7 @@ function sendGameState(roomName,nsp) {
 
 
     nsp.to(roomName).emit('updateGrid', games[roomName]);
+    checkVictoryCondition(roomName, games[roomName].positionPlayer1, games[roomName].positionPlayer2, nsp);
 }
 
 
@@ -620,15 +624,20 @@ function updatePiecePosition(player, i, j, visionBoard) {
         visionBoard[j][i] += PLAYER2;
     }
 }
-function checkVictoryCondition(id, positionPlayer1, positionPlayer2) {
+function checkVictoryCondition(id, positionPlayer1, positionPlayer2, nsp) {
     if(positionPlayer1[1]===0){
         console.log("player 1 wins");
-        sendEndOfGame(id, PLAYER1);
+        sendEndOfGameP1(id, PLAYER1, nsp);
         return;
     }
-    if(positionPlayer2[1]===8){
+    if(positionPlayer2[1]===8 && positionPlayer1[1]!==0){
         console.log("player 2 wins");
-        sendEndOfGame(id, PLAYER2);
+        sendEndOfGameP2(id, PLAYER2, nsp);
+        return;
+    }
+    if(positionPlayer2[1]===8 && positionPlayer1[1]===0){
+        console.log("Draw");
+        sendEndOfGameDraw(id, PLAYER2, nsp);
         return;
     }
 }
