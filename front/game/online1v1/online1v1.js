@@ -112,16 +112,11 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
                 circlePlayer2.addEventListener("click", () => handlePlayerClick(i, j));
                 svg.appendChild(circlePlayer2);
             }
-            console.log("j,i", j, i);
-            console.log(visionBoard[j][i] & VISIONMASK);
             if (visionBoard[j][i]& VISIONMASK){
-                console.log("test pour 8 3",!nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2))
 
                 if (whichPlayer==1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
-                    console.log("oui");
                     createGridPlayer1(x,y, i, j);
                 } else if (whichPlayer==2 && ((visionBoard[j][i] ^ NEGMASK)&NEGMASK) && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
-                    console.log("oui2")
                     createGridPlayer2(x,y, i, j);
                 }
 
@@ -209,7 +204,6 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
         wall.addEventListener("click", () => handleWallClick(i1, j1, i2, j2));
     });
     // document.getElementById('overlay').classList.add('active');
-    console.log("visionBoard", visionBoard);
 }
 
 
@@ -322,4 +316,22 @@ function verticalWallHandleHover(event) {
 
 socket.on("invalidMove", (msg) => {
     console.log(msg);
+});
+
+socket.on("P1Win", (player) => {
+    console.log("P1 va gagner"+player);
+    //get by id whichTurn
+    document.getElementById('Winning').textContent = "Dernier tour pour Staline";
+});
+
+socket.on("P2Win", () => {
+    console.log("P2 a gagné");
+    //get by id whichTurn
+    document.getElementById('Winning').textContent = "Staline a gagné";
+});
+
+socket.on("draw", () => {
+    console.log("Match nul");
+    //get by id whichTurn
+    document.getElementById('Winning').textContent = "Match nul";
 });
