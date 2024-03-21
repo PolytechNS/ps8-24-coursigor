@@ -15,7 +15,7 @@
 
 <div id="gameplayExplanation">
     <button id="closeButton" onclick="closeGameExplanation()">&times;</button>
-    <h2> Bienvenue dans Cours Igor</h2>
+    <h2 id="titleExplanation"> Bienvenue dans Cours Igor</h2>
     Dans Quorridor, vous incarnez un joueur qui cherche à atteindre le côté opposé du plateau de jeu avant votre adversaire. Mais attention, le brouillard limite votre vision et rend la navigation plus difficile ! <br><br>
 
     Comment jouer :<br>
@@ -37,7 +37,7 @@
             <h1 class="gameTitle">
                 COURS IGOR
             </h1>
-            <div id="Winning"></div>
+            <p id="whichTurn"></p>
         </div>
         <button class="button"><img src="../../Images/engrenage.png"></button>
     </header>
@@ -56,7 +56,7 @@
         <p>Murs restants pour le Joueur 2 : <span id="wallLeftP2">10</span></p>
         Right Sidebar
     </div>
-    <footer id="whichTurn"></footer>
+    <footer></footer>
 </div>
 
 <script src="../../js/socket.io.js"></script>
