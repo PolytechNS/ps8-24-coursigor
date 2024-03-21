@@ -367,3 +367,10 @@ socket.on("draw", () => {
     //get by id whichTurn
     document.getElementById('Winning').textContent = "Match nul";
 });
+
+function showGameplayExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "block";
+}
+function closeGameExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "none";
+}

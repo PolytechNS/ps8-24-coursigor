@@ -196,3 +196,68 @@ button {
     /*transition: all 0.3s ease;*/
     transform-origin: center;
 }
+
+#gameplayExplanation {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+}
+
+#closeButton {
+    /* Styles pour le bouton de croix */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #000;
+    outline: none;
+}
+
+#closeButton:hover {
+    color: #ff0000;
+}
+
+
+#gameplayExplanation h2 {
+    color: #343a40;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#gameplayExplanation p {
+    color: #6c757d;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+#gameplayExplanation ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+#gameplayExplanation ul li {
+    margin-bottom: 10px;
+}
+
+#gameplayExplanation a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+#gameplayExplanation a:hover {
+    text-decoration: underline;
+}
