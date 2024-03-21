@@ -1,4 +1,5 @@
 /* Styles pour l'overlay */
+html, body {margin: 0; height: 100%; overflow: hidden}
 #overlay {
     display: flex;
     justify-content: center;
@@ -22,18 +23,15 @@
 #game {
     display: none;
     grid-template-rows: auto 1fr auto;
-
 }
 
 
 body {
-
-    background: #000000;
-    display: grid;
+    font-family: system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
     height: 100vh;
-    grid-template: auto 1fr auto / auto 1fr auto;
-    margin: 0;
-
+    background: black;
 }
 
 
@@ -75,15 +73,18 @@ p{
 header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     grid-column: 1 / 4;
+    padding: 10px;
 }
 
 header img {
-    height: 5rem;
+    height: 3rem;
 }
-.MiddleHeader{
+.MiddleHeader {
     display: block;
     text-align: center;
+    flex-grow: 1;
 }
 #StartGame{
     background: #fbca1f;
@@ -105,8 +106,8 @@ header img {
 
 .gameTitle {
     color: white;
-    padding-top: 4rem;
-    font-size: 3rem;
+    font-size: 2rem;
+    margin-top: 0.5rem;
     grid-row: 1/2;
 }
 .left-sidebar,
@@ -134,10 +135,8 @@ main {
     grid-column: 3 / 4;
 }
 
-footer {
-    padding: 2rem;
+#whichTurn {
     text-align: center;
-    grid-column: 1 / 4;
     color: yellow;
 }
 
@@ -164,15 +163,22 @@ button {
 }
 .button:hover{
     cursor: pointer;
-    background: rgba(138, 0, 0, 0.55);
+    background: rgba(193, 35, 35, 0.55);
 }
 
 .container {
-    width: 80vmin;
-    height: 80vmin;
+    width: 70vmin;
+    height: 70vmin;
     display: flex;
     justify-content: center;
-
+    align-items: center;
+}
+#titleExplanation{
+    color: yellow;
+    font-size: 2rem;
+    margin-top: 0.5rem;
+    text-align: center;
+    grid-row: 1/2;
 }
 .child{
     width: 100%;
@@ -203,16 +209,16 @@ button {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
+    background-color: #000;
     padding: 20px;
-    border: 2px solid #000;
+    border: 2px solid #fff;
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    max-width: 600px;
+    max-width: 1300px;
+    color: white;
 }
 
 #closeButton {
-    /* Styles pour le bouton de croix */
     position: absolute;
     top: 10px;
     right: 10px;
@@ -220,7 +226,7 @@ button {
     border: none;
     font-size: 40px;
     cursor: pointer;
-    color: #000;
+    color: #fff;
     outline: none;
 }
 
@@ -229,11 +235,7 @@ button {
 }
 
 
-#gameplayExplanation h2 {
-    color: #343a40;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
+
 
 #gameplayExplanation p {
     color: #6c757d;
