@@ -159,63 +159,80 @@ function nextMove(id, move) {
     let placedWallsP1 = [];
     let placedWallsP2 = [];
     for (let i = 0; i < placedWalls.length; i++) {
-        if (placedWalls[i][3] === PLAYER1) {
-            placedWallsP1.push(placedWalls[i]);
+        let direction;
+        if (placedWalls[i][0] === "horizontal") {
+            direction = 0;
         }
         else {
-            placedWallsP2.push(placedWalls[i]);
+            direction = 1;
+        }
+        if (placedWalls[i][3] === PLAYER1) {
+            placedWallsP1.push([(placedWalls[i][1]).toString() + (placedWalls[i][2]).toString(), direction]);
+        }
+        else {
+            placedWallsP2.push([(placedWalls[i][1]).toString() + (placedWalls[i][2]).toString(), direction]);
         }
     }
+    console.log("Placed walls P1: ", placedWallsP1);
+    console.log("Placed walls P2: ", placedWallsP2);
     let aiGameState = new AIGameState(placedWallsP1, placedWallsP2, games[id].visionBoard);
-    let aiMove = ais[id].nextMove(aiGameState);
+
+
+    let aiUpdate = ais[id].updateBoard(aiGameState);
     //wait for the promise to resolve
-    aiMove.then((move) => {
-        console.log("AI move: ", move);
+    aiUpdate.then((value) => {
+        console.log("AI updated board: ", value);
+        let aiMove = ais[id].nextMove(aiGameState);
+        //wait for the promise to resolve
+        aiMove.then((move) => {
+            console.log("AI move: ", move);
 
 
 
-        if (move.action === "move") {
-            if (validMove(id, move.value[0].split(""))){
+            if (move.action === "move") {
+                if (validMove(id, move.value[0].split(""))){
+                }
+                else {
+                    games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+                }
+                sendGameState(id);
+            }
+
+            //horizontal wall
+            else if (move.value[1] === 0) {
+                let aiMoves = [];
+                aiMoves.push("horizontal");
+                let coordinates = move.value[0].split("");
+                aiMoves.push(parseInt(coordinates[0]) - 1);
+                aiMoves.push(parseInt(coordinates[1]) - 1);
+                if (validHorizontalWall(id, aiMoves)) {
+                }
+                else {
+                    games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+                }
+                sendGameState(id);
+            }
+            //vertical wall
+            else if (move.value[1] === 1) {
+                let aiMoves = [];
+                aiMoves.push("vertical");
+                let coordinates = move.value[0].split("");
+                aiMoves.push(parseInt(coordinates[0]) - 1);
+                aiMoves.push(parseInt(coordinates[1]) - 1);
+                if (validVerticalWall(id, aiMoves)) {
+                }
+                else {
+                    games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+                }
+                sendGameState(id);
             }
             else {
                 games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
+                sendGameState(id);
             }
-            sendGameState(id);
-        }
-
-        //horizontal wall
-        else if (move.value[1] === 0) {
-            let aiMoves = [];
-            aiMoves.push("horizontal");
-            let coordinates = move.value[0].split("");
-            aiMoves.push(parseInt(coordinates[0]) - 1);
-            aiMoves.push(parseInt(coordinates[1]) - 1);
-            if (validHorizontalWall(id, aiMoves)) {
-            }
-            else {
-                games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
-            }
-            sendGameState(id);
-        }
-        //vertical wall
-        else if (move.value[1] === 1) {
-            let aiMoves = [];
-            aiMoves.push("vertical");
-            let coordinates = move.value[0].split("");
-            aiMoves.push(parseInt(coordinates[0]) - 1);
-            aiMoves.push(parseInt(coordinates[1]) - 1);
-            if (validVerticalWall(id, aiMoves)) {
-            }
-            else {
-                games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
-            }
-            sendGameState(id);
-        }
-        else {
-            games[id].activePlayer = PLAYER1;   //change the active player back to the human player to skip ai broken move
-            sendGameState(id);
-        }
+        });
     });
+
 
     function transformMove(aiMove) {
         const { action, value } = aiMove;
