@@ -133,62 +133,67 @@ function nextMove(nsp,roomName, move) {
         validMove(roomName, moves[1], moves[2],nsp);
 
     }
-    else if (moves[0] === "horizontal") {
-        console.log('horizontal', moves[1], moves[2]);
-        let gameState = games[roomName];
-        let i1 = moves[1];
-        let j1 = moves[2];
-        let i2 = i1 + 1;
-        let j2 = j1;
+        else if (moves[0] === "horizontal") {
 
-        gameState.visionBoard[j1][i1] += WALL_BOTTOM;
-        gameState.visionBoard[j2][i2] += WALL_BOTTOM;
+            console.log('horizontal', moves[1], moves[2]);
+            let gameState = games[roomName];
+            let i1 = moves[1];
+            let j1 = moves[2];
+            let i2 = i1 + 1;
+            let j2 = j1;
+            if(gameState.activePlayer===PLAYER1 && gameState.wallsLeftP1===0 || gameState.activePlayer===PLAYER2 && gameState.wallsLeftP2===0) {
+                sendInvalidMove(roomName, "No more walls left", nsp);
+                return;
+            }
+            gameState.visionBoard[j1][i1] += WALL_BOTTOM;
+            gameState.visionBoard[j2][i2] += WALL_BOTTOM;
 
-        gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
-        gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
+            gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
+            gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
 
-        gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
-        gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
-        gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
-        gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
+            gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
+            gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+            gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+            gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
 
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
+            let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
+            let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
 
 
-        if (!ncP1 || !ncP2) {
-            //console.log("The player can't reach the end anymore. The move is invalid");
+            if (!ncP1 || !ncP2) {
+                //console.log("The player can't reach the end anymore. The move is invalid");
 
-            gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
-            gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
+                gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
+                gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
 
-            gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
-            gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
+                gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
+                gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
 
-            // remove the coordinates from the wallsNotToPlace array
-            removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
-            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
-            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
-            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
+                // remove the coordinates from the wallsNotToPlace array
+                removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
+                removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
+                removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
+                removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
 
-            sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
-            return;
-        }
+                sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
+                return;
+            }
 
-        if (gameState.activePlayer === PLAYER1) {
-            updateVisionWall(i1, j1, i2, j2, 1, gameState.visionBoard);
+            if (gameState.activePlayer === PLAYER1) {
+                updateVisionWall(i1, j1, i2, j2, 1, gameState.visionBoard);
 
-            gameState.wallsLeftP1--;
-            gameState.numberOfTurns++;
+                gameState.wallsLeftP1--;
+                gameState.numberOfTurns++;
 
-        } else {
-            updateVisionWall(i1, j1, i2, j2, -1,gameState.visionBoard);
+            } else {
+                updateVisionWall(i1, j1, i2, j2, -1,gameState.visionBoard);
 
-            gameState.wallsLeftP2--;
-            gameState.numberOfTurns++;
-        }
+                gameState.wallsLeftP2--;
+                gameState.numberOfTurns++;
+            }
 
-        sendGameState(roomName,nsp);
+            sendGameState(roomName,nsp);
+
     }
     else if (moves[0] === "vertical") {
         //console.log('vertical', moves[1], moves[2]);
@@ -197,7 +202,10 @@ function nextMove(nsp,roomName, move) {
         let j1 = moves[2];
         let i2 = i1;
         let j2 = j1 + 1;
-
+        if(gameState.activePlayer===PLAYER1 && gameState.wallsLeftP1===0 || gameState.activePlayer===PLAYER2 && gameState.wallsLeftP2===0) {
+            sendInvalidMove(roomName, "No more walls left", nsp);
+            return;
+        }
         gameState.visionBoard[j1][i1] += WALL_RIGHT;
         gameState.visionBoard[j2][i2] += WALL_RIGHT;
 
