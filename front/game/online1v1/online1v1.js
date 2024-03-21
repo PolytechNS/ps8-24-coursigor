@@ -114,11 +114,17 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
             }
             if (visionBoard[j][i]& VISIONMASK){
 
-                if (whichPlayer==1 && visionBoard[j][i] & NEGMASK && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
-                    createGridPlayer1(x,y, i, j);
-                } else if (whichPlayer==2 && ((visionBoard[j][i] ^ NEGMASK)&NEGMASK) && !nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2)){
-                    createGridPlayer2(x,y, i, j);
-                }
+
+                   if (whichPlayer === 1 && (visionBoard[j][i] & NEGMASK)) {
+                       if(!casesACote(i,j,positionPlayer1,positionPlayer2, whichPlayer)) {
+                           createGridPlayer1(x, y, i, j);
+                       }
+                   } else if (whichPlayer === 2 && ((visionBoard[j][i] ^ NEGMASK) & NEGMASK)) {
+                       if(!casesACote(i,j,positionPlayer1,positionPlayer2, whichPlayer)) {
+                            createGridPlayer2(x, y, i, j);
+                       }
+                   }
+
 
             }
         }
@@ -272,15 +278,39 @@ function createWall(x, y, width, height, className) {
 
     return wall;
 }
-function nextToPlayer(activePlayer, i, j, positionPlayer1, positionPlayer2) {
-    const PLAYER2 =0b10000
-    const PLAYER1 =0b100000
-
-
-    if (activePlayer === PLAYER1) {
-        return (i===positionPlayer1[0] && j===positionPlayer1[1]) || (i === positionPlayer1[0] + 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] - 1 && j === positionPlayer1[1]) || (i === positionPlayer1[0] && j === positionPlayer1[1] + 1) || (i === positionPlayer1[0] && j === positionPlayer1[1] - 1);
-    }else if (activePlayer === PLAYER2) {
-        return (i===positionPlayer2[0] && j===positionPlayer2[1]) || (i === positionPlayer2[0] + 1 && j === positionPlayer2[1]) || (i === positionPlayer2[0] - 1 && j === positionPlayer2[1]) || (i === positionPlayer2[0] && j === positionPlayer2[1] + 1) || (i === positionPlayer2[0] && j === positionPlayer2[1] - 1);
+function casesACote(i,j,positionPlayer1,positionPlayer2, whichPlayer){
+    if(whichPlayer===1){
+        if(positionPlayer1[0]===i && positionPlayer1[1]===j){
+            return true;
+        }
+        if(positionPlayer1[0]===i+1 && positionPlayer1[1]===j){
+            return true;
+        }
+        if(positionPlayer1[0]===i-1 && positionPlayer1[1]===j){
+            return true;
+        }
+        if(positionPlayer1[0]===i && positionPlayer1[1]===j+1){
+            return true;
+        }
+        if(positionPlayer1[0]===i && positionPlayer1[1]===j-1){
+            return true;
+        }
+    }else{
+        if(positionPlayer2[0]===i && positionPlayer2[1]===j){
+            return true;
+        }
+        if(positionPlayer2[0]===i+1 && positionPlayer2[1]===j){
+            return true;
+        }
+        if(positionPlayer2[0]===i-1 && positionPlayer2[1]===j){
+            return true;
+        }
+        if(positionPlayer2[0]===i && positionPlayer2[1]===j+1){
+            return true;
+        }
+        if(positionPlayer2[0]===i && positionPlayer2[1]===j-1){
+            return true;
+        }
     }
 }
 
