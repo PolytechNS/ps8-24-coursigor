@@ -31,6 +31,8 @@ window.addEventListener('load', function() {
 
 });
 socket.on("updateGrid", (gameStatus) => {
+    document.getElementById("wallLeftP1").textContent= gameStatus.wallsLeftP1;
+    document.getElementById("wallLeftP2").textContent= gameStatus.wallsLeftP2;
     console.log("GamesState reçu");
     if(gameStatus.activePlayer===32){
         activePlayer=1;
