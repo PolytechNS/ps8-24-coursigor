@@ -658,3 +658,13 @@ function updatePlayerVision(i, j, value, visionBoard) {
     calculateVision(visionBoard, i, j+1, value);
     calculateVision(visionBoard, i, j-1, value);
 }
+
+function userLeft(socket) {
+    console.log("userLeft");
+    let room = rooms.find(room => room.players.includes(socket.id));
+    if (room) {
+        let index = rooms.indexOf(room);
+        rooms.splice(index, 1);
+    }
+}
+exports.userLeft = userLeft;

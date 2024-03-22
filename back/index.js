@@ -5,6 +5,9 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
+const onlineGame = require("./logic/onlineGame");
+const online1v1 = require("./Sockets/Online1v1");
+const onlineGame = require("./Sockets/Online1v1");
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
