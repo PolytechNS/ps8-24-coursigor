@@ -5,9 +5,6 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
-const onlineGame = require("./logic/onlineGame");
-const online1v1 = require("./Sockets/Online1v1");
-
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
@@ -111,40 +108,12 @@ nsp.on('connection', (socket) => {
         let onlineGame = require('./Sockets/Online1v1.js');
         onlineGame.nextMove(nsp, roomName, move);
     });
-
-
-    /*socket.on('joinOrCreate1v1', (data) => {
-
-        console.log('a user connected');
-        socket.emit('message', 'Hello there!');
-
-        socket.on('message', (msg) => {
-            console.log('message: ' + msg);
-        });
-
-        socket.on('newGame', () => {
-            console.log('new game: ');
-            let onlineGame = require('./Sockets/Online1v1.js');
-
-            onlineGame.newGame(nsp, socket.id);
-
-        });
-
-
-
-
-
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
-        });
-        socket.on('reloadGame', () => {
-            console.log('reload');
-            let onlineGame = require('./Sockets/Online1v1.js');
-            onlineGame.sendGameState(nsp, socket.id);
-        });
+    socket.on('userLeft', () => {
+        console.log("user left");
+        online1v1.userLeft(socket);
 
     });
-*/
+
 });
 exports.io = io;
 

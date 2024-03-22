@@ -5,6 +5,10 @@ var whichPlayer;
 var activePlayer="1";
 var myTurn;
 
+window.addEventListener('beforeunload', function (event) {
+    socket.emit("userLeft");
+});
+
 window.addEventListener('load', function() {
     socket.emit('firstConnection');
     socket.on("nbJoueur", (nbJoueur) => {

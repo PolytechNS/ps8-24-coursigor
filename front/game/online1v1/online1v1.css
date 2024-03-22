@@ -28,10 +28,12 @@ html, body {margin: 0; height: 100%; overflow: hidden}
 
 body {
     font-family: system-ui, sans-serif;
-    display: flex;
     justify-content: center;
     height: 100vh;
-    background: black;
+    background-image: url('../../Images/AdobeStock_131734321-scaled-modified.jpeg');
+    background-size: cover;
+    background-position: center; /* Centre l'image */
+
 }
 
 
@@ -113,16 +115,14 @@ header img {
 .left-sidebar,
 .right-sidebar {
     padding: 1rem;
-    text-align: center; /* Ajout pour centrer horizontalement */
-    display: flex; /* Ajout pour aligner verticalement */
-    flex-direction: column; /* Ajout pour aligner verticalement */
-    align-items: center; /* Ajout pour aligner verticalement */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .left-sidebar {
     grid-column: 1 / 2;
-
-
 }
 
 main {
@@ -157,7 +157,7 @@ body {
 }
 
 button {
-    background: #000000;
+    background: rgba(0, 0, 0, 0);
     border: none;
 
 }
@@ -262,4 +262,13 @@ button {
 
 #gameplayExplanation a:hover {
     text-decoration: underline;
+}
+
+#player1, #player2 {
+    width: 80%;
+    height: 90%;
+    background-color: #ffffff40;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
 }
