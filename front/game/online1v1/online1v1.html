@@ -36,14 +36,22 @@
 <!-- Contenu du jeu -->
 <div id="game">
     <header>
-        <button class="button" onclick="showGameplayExplanation()"><img src="../../Images/point-dinterrogation-blanc.png"></button>
+        <button class="button" onclick="showGameplayExplanation()">
+            <span class="box">
+                <img src="../../Images/point-dinterrogation-blanc.png">
+            </span>
+        </button>
         <div class="MiddleHeader">
             <h1 class="gameTitle">
                 COURS IGOR
             </h1>
             <p id="whichTurn"></p>
         </div>
-        <button class="button"><img src="../../Images/engrenage.png"></button>
+        <button class="button">
+            <span class="box">
+                <img src="../../Images/engrenage.png">
+            </span>
+        </button>
     </header>
     <div class="left-sidebar">
         <div id="player1">
@@ -65,7 +73,11 @@
         </div>
     </div>
     <footer>
-        <button id="surrenderButton" onclick="surrender()">Abandonner</button>
+        <button  class="button" onclick="surrender()">
+            <span class="box" id="abandonner">
+                <a id="abandonnerText">Abandonner</a>
+            </span>
+        </button>
     </footer>
 </div>
 
