@@ -1,15 +1,20 @@
 // Fonction pour vérifier la présence du token et activer/désactiver le bouton en conséquence
 function checkTokenAndDisplayLinks() {
     const online1v1Button = document.getElementById('online1v1Button');
+    const loginButton = document.querySelector('.login-button'); // Sélectionne le bouton de connexion
+    const disconnectButton = document.getElementById('disconnect'); // Sélectionne le bouton de déconnexion
 
     if (hasJwtCookie()) {
-        console.log("true");
         online1v1Button.disabled = false;
+        loginButton.style.display = 'none'; // Cache le bouton de connexion
+        disconnectButton.style.display = 'inline'; // Affiche le bouton de déconnexion
     } else {
-        console.log("false");
         online1v1Button.disabled = true;
+        loginButton.style.display = 'inline'; // Affiche le bouton de connexion
+        disconnectButton.style.display = 'none'; // Cache le bouton de déconnexion
     }
 }
+
 
 // Fonction pour vérifier la présence du cookie JWT
 function hasJwtCookie() {
