@@ -4,34 +4,53 @@ var roomName = "";
 var whichPlayer;
 var activePlayer="1";
 var myTurn;
+let InGame="false";
 
 window.addEventListener('beforeunload', function (event) {
     socket.emit("userLeft");
 });
 
 window.addEventListener('load', function() {
-    socket.emit('firstConnection');
-    socket.on("nbJoueur", (nbJoueur) => {
-        console.log("un joueur a rejoint la partie", nbJoueur);
-        if (nbJoueur === 2) {
-            // Enlever l'overlay
-            document.getElementById("overlay").style.display = "none";
+    InGame = localStorage.getItem("InGame");
+    if(InGame === "true") {
+        console.log("J'étais déjà dans une partie");
+        roomName = localStorage.getItem("roomName");
+        whichPlayer = JSON.parse(localStorage.getItem("whichPlayer"));
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("game").style.display = "grid";
+        console.log(roomName);
+        socket.emit('resumeGame', roomName);
 
-            // Afficher le contenu du jeu
-            document.getElementById("game").style.display = "grid";
-        }
+    }else{
+        socket.emit('firstConnection');
+        socket.on("nbJoueur", (nbJoueur) => {
+            console.log("un joueur a rejoint la partie", nbJoueur);
+            if (nbJoueur === 2) {
+                // Enlever l'overlay
+                document.getElementById("overlay").style.display = "none";
+
+                // Afficher le contenu du jeu
+                document.getElementById("game").style.display = "grid";
+
+            }
+        });
 
 
-    });
-    socket.on("whichPlayer", (whichPlayer) => {
+        socket.on("whichPlayer", (whichPlayer) => {
 
-        this.whichPlayer = whichPlayer;
-        console.log("whichPlayer", whichPlayer);
-    });
-    socket.on("roomName", (roomName) => {
-        console.log("roomName", roomName)
-        this.roomName = roomName;
-    });
+            this.whichPlayer = whichPlayer;
+            localStorage.setItem("whichPlayer", this.whichPlayer);
+            console.log("whichPlayer", whichPlayer);
+        });
+        socket.on("roomName", (roomName) => {
+            console.log("roomName", roomName)
+            this.roomName = roomName;
+            localStorage.setItem("roomName",this.roomName);
+        });
+        InGame= "true";
+        localStorage.setItem("InGame", InGame);
+        console.log("Nouvelle partie");
+    }
 
 });
 socket.on("updateGrid", (gameStatus) => {
@@ -56,6 +75,13 @@ socket.on("updateGrid", (gameStatus) => {
 
 });
 
+socket.on("updateGridResume", (gameStatus) => {
+
+
+    createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
+
+});
+
 
 function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, positionPlayer1, positionPlayer2) {
     const WALL_RIGHT =  0b10000000;
@@ -66,6 +92,8 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
     const PLAYER1 =0b100000
     const NEGMASK =0b1000
     const VISIONMASK = 0b111
+
+    console.log("visionBoard",visionBoard);
 
     const svg = document.querySelector('svg');
     //clear the previous cells and walls but keep the placed walls
@@ -119,8 +147,6 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
                 svg.appendChild(circlePlayer2);
             }
             if (visionBoard[j][i]& VISIONMASK){
-
-
                    if (whichPlayer === 1 && (visionBoard[j][i] & NEGMASK)) {
                        if(!casesACote(i,j,positionPlayer1,positionPlayer2, whichPlayer)) {
                            createGridPlayer1(x, y, i, j);
@@ -405,6 +431,14 @@ function updateTimer() {
 updateTimer();
 
 function goBackToMenu(){
+    InGame= "false";
+    localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
 }
 
+function surrender(){
+    InGame= "false";
+    localStorage.setItem("InGame", InGame);
+    window.location.href = "../../index.html";
+    socket.emit("surrender", roomName);
+}

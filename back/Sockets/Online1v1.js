@@ -668,3 +668,12 @@ function userLeft(socket) {
     }
 }
 exports.userLeft = userLeft;
+
+function resumeGame(socket,roomName,nsp) {
+    console.log("resumeGame");
+    console.log(games[roomName]);
+    socket.join(roomName);
+    nsp.to(socket.id).emit('updateGrid', games[roomName]);
+
+}
+exports.resumeGame = resumeGame;
