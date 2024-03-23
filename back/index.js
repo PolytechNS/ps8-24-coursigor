@@ -114,6 +114,11 @@ nsp.on('connection', (socket) => {
 
     });
 
+    socket.on("resumeGame", (roomName) => {
+
+        online1v1.resumeGame(socket,roomName,nsp);
+    });
+
 });
 exports.io = io;
 
