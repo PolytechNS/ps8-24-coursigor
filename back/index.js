@@ -108,7 +108,7 @@ nsp.on('connection', (socket) => {
         let onlineGame = require('./Sockets/Online1v1.js');
         onlineGame.nextMove(nsp, roomName, move);
     });
-    socket.on('userLeft', () => {
+    socket.on('userLeft', (InGame) => {
         console.log("user left");
         online1v1.userLeft(socket);
 

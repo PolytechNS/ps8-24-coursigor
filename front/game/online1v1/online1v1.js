@@ -7,7 +7,9 @@ var myTurn;
 let InGame="false";
 
 window.addEventListener('beforeunload', function (event) {
-    socket.emit("userLeft");
+    console.log("Je quitte la partie");
+    InGame = localStorage.getItem("InGame");
+    socket.emit("userLeft",InGame);
 });
 
 window.addEventListener('load', function() {
@@ -442,3 +444,7 @@ function surrender(){
     window.location.href = "../../index.html";
     socket.emit("surrender", roomName);
 }
+
+socket.on("quitRoom", () => {
+    window.location.href = "../../index.html";
+});
