@@ -156,8 +156,8 @@ function nextMove(nsp,roomName, move) {
             gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
             gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
 
-            let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
-            let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
+            let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1,gameState.visionBoard);
+            let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2,gameState.visionBoard);
 
 
             if (!ncP1 || !ncP2) {
@@ -218,8 +218,8 @@ function nextMove(nsp,roomName, move) {
         gameState.wallsNotToPlace.push(["horizontal", i1, j1]);   //the perpendicular wall to the left
 
 
-        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1);
-        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1, gameState.visionBoard);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2, gameState.visionBoard);
 
 
         if (!ncP1 || !ncP2) {
@@ -390,7 +390,7 @@ function validMove(id, i, j, nsp) {
 }
 
 
-function notCirclesPlayers(alreadyChecked, i, j, player) {
+function notCirclesPlayers(alreadyChecked, i, j, player,visionBoard) {
     // check if the cell has already been checked
     if (alreadyChecked.some(cell => cell[0] === i && cell[1] === j)) {
         return false;
@@ -404,10 +404,10 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
     // store the cell as checked
     alreadyChecked.push([i, j]);
 
-    if ((player == PLAYER1) && j == 0) {
+    if ((player === PLAYER1) && j === 0) {
         return true;
     }
-    if ((player == PLAYER2) && j == 8) {
+    if ((player === PLAYER2) && j === 8) {
         return true;
     }
 
@@ -417,16 +417,16 @@ function notCirclesPlayers(alreadyChecked, i, j, player) {
     let right = false;
 
     if (!(visionBoard[j][i] & WALL_TOP)) {
-        top = notCirclesPlayers(alreadyChecked, i, j - 1, player);
+        top = notCirclesPlayers(alreadyChecked, i, j - 1, player,visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_BOTTOM)) {
-        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player);
+        bottom = notCirclesPlayers(alreadyChecked, i, j + 1, player,visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_LEFT)) {
-        left = notCirclesPlayers(alreadyChecked, i - 1, j, player);
+        left = notCirclesPlayers(alreadyChecked, i - 1, j, player,visionBoard);
     }
     if (!(visionBoard[j][i] & WALL_RIGHT)) {
-        right = notCirclesPlayers(alreadyChecked, i + 1, j, player);
+        right = notCirclesPlayers(alreadyChecked, i + 1, j, player,visionBoard);
     }
 
     return top || bottom || left || right;
