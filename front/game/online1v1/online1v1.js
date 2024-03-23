@@ -378,3 +378,33 @@ function showGameplayExplanation() {
 function closeGameExplanation() {
     document.getElementById('gameplayExplanation').style.display = "none";
 }
+
+function formatTime(time) {
+    let minutes = Math.floor((time % 3600) / 60);
+    let seconds = time % 60;
+
+
+    minutes = String(minutes).padStart(2, '0');
+    seconds = String(seconds).padStart(2, '0');
+
+    return `${minutes}:${seconds}`;
+}
+
+function updateTimer() {
+    // Commencez avec 0 secondes
+    let seconds = 0;
+
+    const timerElement = document.getElementById('timer');
+
+    setInterval(() => {
+        seconds++;
+        timerElement.textContent = formatTime(seconds);
+    }, 1000);
+}
+
+updateTimer();
+
+function goBackToMenu(){
+    window.location.href = "../../index.html";
+}
+
