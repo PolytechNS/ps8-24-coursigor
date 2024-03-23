@@ -448,3 +448,7 @@ function surrender(){
 socket.on("quitRoom", () => {
     window.location.href = "../../index.html";
 });
+
+socket.on("leaveGame", () => {
+    goBackToMenu();
+});

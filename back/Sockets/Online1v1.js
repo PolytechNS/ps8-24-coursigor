@@ -677,3 +677,8 @@ function resumeGame(socket,roomName,nsp) {
 
 }
 exports.resumeGame = resumeGame;
+
+function makePlayersLeave(roomName, nsp) {
+    nsp.to(roomName).emit('leaveGame');
+}
+exports.makePlayersLeave = makePlayersLeave;
