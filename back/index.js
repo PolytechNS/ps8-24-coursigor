@@ -114,6 +114,10 @@ nsp.on('connection', (socket) => {
 
     });
 
+    socket.on("surrender", (roomName) => {
+        online1v1.makePlayersLeave(roomName,nsp);
+    });
+
     socket.on("resumeGame", (roomName) => {
 
         online1v1.resumeGame(socket,roomName,nsp);
