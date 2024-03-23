@@ -290,51 +290,55 @@ function validMove(id, i, j, nsp) {
                     sendGameState(id,nsp);
                 }
             }
+            else {
+                console.log("on bouge le pion au dessus du pion de l'adversaire");
+                let iP2MinusP1= gameState.positionPlayer2[0] - gameState.positionPlayer1[0];
+                let jP2MinusP1= gameState.positionPlayer2[1] - gameState.positionPlayer1[1];
+                if(iP2MinusP1===0){
+                    if(gameState.positionPlayer2[1] + jP2MinusP1 === j){
+                        if(checkPresenceWall(i, j,gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
+                        {
+                            gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                            updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
+                            gameState.positionPlayer1[0] = i;
+                            gameState.positionPlayer1[1] = j;
+                            updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
+                            updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
+                            gameState.activePlayer = PLAYER2;
+                            games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                            sendGameState(id,nsp);
+                        }
+                    }
+                }
+                else if(jP2MinusP1===0){
+                    if(gameState.positionPlayer2[0] + iP2MinusP1 === i){
+                        if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
+                        {
+                            gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
+                            updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
+                            gameState.positionPlayer1[0] = i;
+                            gameState.positionPlayer1[1] = j;
+                            updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
+                            updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
+
+                            gameState.activePlayer = PLAYER2;
+                            games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                            sendGameState(id,nsp);
+                        }
+                    }
+                }
+            }
         }
         //partie pour bouger ton pion au dessus du pion de l'adversaire
-        else {
-            let iP2MinusP1= gameState.positionPlayer2[0] - gameState.positionPlayer1[0];
-            let jP2MinusP1= gameState.positionPlayer2[1] - gameState.positionPlayer1[1];
-            if(iP2MinusP1===0){
-                if(gameState.positionPlayer2[1] + jP2MinusP1 === j){
-                    if(checkPresenceWall(i, j,gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
-                    {
-                        gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
-                        gameState.positionPlayer1[0] = i;
-                        gameState.positionPlayer1[1] = j;
-                        updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
-                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
-                        gameState.activePlayer = PLAYER2;
-                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
-                        sendGameState(id,nsp);
-                    }
-                }
-            }
-            else if(jP2MinusP1===0){
-                if(gameState.positionPlayer2[0] + iP2MinusP1 === i){
-                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
-                    {
-                        gameState.visionBoard[gameState.positionPlayer1[1]][gameState.positionPlayer1[0]] -= PLAYER1;
-                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], -1, gameState.visionBoard);
-                        gameState.positionPlayer1[0] = i;
-                        gameState.positionPlayer1[1] = j;
-                        updatePiecePosition(PLAYER1, gameState.positionPlayer1[0], gameState.positionPlayer1[1], gameState.visionBoard);
-                        updatePlayerVision(gameState.positionPlayer1[1], gameState.positionPlayer1[0], 1, gameState.visionBoard);
 
-                        gameState.activePlayer = PLAYER2;
-                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
-                        sendGameState(id,nsp);
-                    }
-                }
-            }
-        }
     }
     else if(gameState.activePlayer === 16 ) {
         if (gameState.positionPlayer1[0] !== i || gameState.positionPlayer1[1] !== j) {
+            console.log("pas au dessus d'un pion1");
             if (gameState.positionPlayer2[0] === i - 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i + 1 && gameState.positionPlayer2[1] === j || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j - 1 || gameState.positionPlayer2[0] === i && gameState.positionPlayer2[1] === j + 1) {
-
+                console.log("pas au dessus d'un pion2");
                 if (checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2)) {
+                    console.log("pas au dessus d'un pion3");
                     gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
                     updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
                     gameState.positionPlayer2[0] = i;
@@ -347,45 +351,47 @@ function validMove(id, i, j, nsp) {
                     sendGameState(id,nsp);
                 }
             }
-        }
-        else {
-            let iP1MinusP2=gameState.positionPlayer1[0]-gameState.positionPlayer2[0];
-            let jP1MinusP2=gameState.positionPlayer1[1]-gameState.positionPlayer2[1];
-            if(iP1MinusP2===0){
-                if(gameState.positionPlayer1[1]+jP1MinusP2===j){
-                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
-                    {
-                        gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
-                        gameState.positionPlayer2[0] = i;
-                        gameState.positionPlayer2[1] = j;
-                        updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
-                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
+            else {
+                console.log("on bouge le pion au dessus du pion de l'adversaire");
+                let iP1MinusP2=gameState.positionPlayer1[0]-gameState.positionPlayer2[0];
+                let jP1MinusP2=gameState.positionPlayer1[1]-gameState.positionPlayer2[1];
+                if(iP1MinusP2===0){
+                    if(gameState.positionPlayer1[1]+jP1MinusP2===j){
+                        if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
+                        {
+                            gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
+                            updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
+                            gameState.positionPlayer2[0] = i;
+                            gameState.positionPlayer2[1] = j;
+                            updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
+                            updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
 
-                        gameState.activePlayer = PLAYER1;
-                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
-                        sendGameState(id,nsp);
+                            gameState.activePlayer = PLAYER1;
+                            games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                            sendGameState(id,nsp);
+                        }
+                    }
+                }
+                else if(jP1MinusP2===0){
+                    if(gameState.positionPlayer1[0]+iP1MinusP2===i){
+                        if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
+                        {
+                            gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
+                            updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
+                            gameState.positionPlayer2[0] = i;
+                            gameState.positionPlayer2[1] = j;
+                            updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
+                            updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
+
+                            gameState.activePlayer = PLAYER1;
+                            games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+                            sendGameState(id,nsp);
+                        }
                     }
                 }
             }
-            else if(jP1MinusP2===0){
-                if(gameState.positionPlayer1[0]+iP1MinusP2===i){
-                    if(checkPresenceWall(i, j, gameState.activePlayer, gameState.visionBoard, gameState.positionPlayer1, gameState.positionPlayer2))
-                    {
-                        gameState.visionBoard[gameState.positionPlayer2[1]][gameState.positionPlayer2[0]] -= PLAYER2;
-                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], 1, gameState.visionBoard);
-                        gameState.positionPlayer2[0] = i;
-                        gameState.positionPlayer2[1] = j;
-                        updatePiecePosition(PLAYER2, gameState.positionPlayer2[0], gameState.positionPlayer2[1], gameState.visionBoard);
-                        updatePlayerVision(gameState.positionPlayer2[1], gameState.positionPlayer2[0], -1, gameState.visionBoard);
-
-                        gameState.activePlayer = PLAYER1;
-                        games[id].activePlayer = games[id].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
-                        sendGameState(id,nsp);
-                    }
-                }
-            }
         }
+
     }
 }
 
