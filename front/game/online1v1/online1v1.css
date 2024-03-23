@@ -32,7 +32,7 @@ body {
     font-family: system-ui, sans-serif;
     justify-content: center;
     height: 100vh;
-    background-image: url('../../Images/AdobeStock_131734321-scaled-modified.jpeg');
+    background-image: url('../../Images/backgroundnoiretblanc-modified.jpeg');
     background-size: cover;
     background-position: center; /* Centre l'image */
 
@@ -163,10 +163,7 @@ button {
     border: none;
 
 }
-.button:hover{
-    cursor: pointer;
-    background: rgba(193, 35, 35, 0.55);
-}
+
 
 .container {
     width: 70vmin;
@@ -301,4 +298,116 @@ button {
 
 #close:hover {
     color: #ff0000;
+}
+
+#surrenderButton {
+    margin-left: 30px;
+    display: inline-block;
+    padding: 0.9rem 1.8rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    border: 3px solid rgb(255, 0, 42);
+    cursor: pointer;
+    position: relative;
+    background-color: transparent;
+    text-decoration: none;
+    overflow: hidden;
+    z-index: 1;
+    font-family: inherit;
+}
+#surrenderButton::before {
+     content: "";
+     position: absolute;
+     left: 0;
+     top: 0;
+     width: 100%;
+     height: 100%;
+     background-color: rgb(255, 0, 42);
+     transform: translateX(-100%);
+     transition: all .3s;
+     z-index: -1;
+ }
+
+#surrenderButton:hover::before {
+    transform: translateX(0);
+}
+
+.box {
+    border-radius: 4px;
+    height: auto;
+    float: left;
+    transition: .5s linear;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 15px;
+    text-align: center;
+    margin: 0 5px;
+    text-transform: uppercase;
+    font-weight: 900;
+    background: rgb(183, 0, 0);
+    font-family: inherit;
+    font-size: 18px;
+    box-shadow: 0.1em 0.1em;
+    cursor: pointer;
+    grid-row: 2/2;
+}
+
+.box:before {
+    position: absolute;
+    content: '';
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 100%;
+    border-bottom: 4px solid transparent;
+    border-left: 4px solid transparent;
+    box-sizing: border-box;
+    transform: translateX(100%);
+}
+
+.box:after {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    border-top: 4px solid transparent;
+    border-right: 4px solid transparent;
+    box-sizing: border-box;
+    transform: translateX(-100%);
+}
+
+.box:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    background: rgba(229, 0, 0, 0.62);
+}
+
+.box:hover:before {
+    border-color: black;
+    height: 100%;
+    transform: translateX(0);
+    transition: .3s transform linear, .3s height linear .3s;
+}
+
+.box:hover:after {
+    border-color: black;
+    height: 100%;
+    transform: translateX(0);
+    transition: .3s transform linear, .3s height linear .5s;
+}
+
+.button {
+    color: black;
+    background-color: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    background: transparent;
+}
+#abandonnerText{
+    color:white;
 }
