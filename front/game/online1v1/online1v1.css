@@ -452,3 +452,73 @@ button {
     font-size: 30px;
     font-weight: bold;
 }
+
+#gameover {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #000;
+    padding: 20px;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    max-width: 1300px;
+    color: white;
+}
+
+#gameover p {
+    color: #6c757d;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+#backToMenu {
+    display: inline-block;
+    padding: 0.9rem 1.8rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    border: 3px solid rgb(255, 0, 42);
+    cursor: pointer;
+    position: relative;
+    background-color: transparent;
+    text-decoration: none;
+    overflow: hidden;
+    z-index: 1;
+    font-family: inherit;
+}
+
+#backToMenu::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 0, 42);
+    transform: translateX(-100%);
+    transition: all .3s;
+    z-index: -1;
+}
+
+#backToMenu:hover::before {
+    transform: translateX(0);
+}
+
+#gameover h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+#gameover-content {
+    display: flex;
+    flex-direction: column; /* Arrange le contenu en colonne */
+    align-items: center; /* Centre horizontalement le contenu */
+    text-align: center; /* Centre le texte */
+}
+#gameover-message {
+    margin-bottom: 20px; /* Ajoute de l'espace entre le texte et le bouton */
+}

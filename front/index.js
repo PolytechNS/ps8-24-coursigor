@@ -1,17 +1,17 @@
 // Fonction pour vérifier la présence du token et activer/désactiver le bouton en conséquence
 function checkTokenAndDisplayLinks() {
     const online1v1Button = document.getElementById('online1v1Button');
-    const loginButton = document.querySelector('.login-button'); // Sélectionne le bouton de connexion
-    const disconnectButton = document.getElementById('disconnect'); // Sélectionne le bouton de déconnexion
+    const loginButton = document.querySelector('.login-button');
+    const disconnectButton = document.getElementById('disconnect');
 
     if (hasJwtCookie()) {
         online1v1Button.disabled = false;
-        loginButton.style.display = 'none'; // Cache le bouton de connexion
-        disconnectButton.style.display = 'inline'; // Affiche le bouton de déconnexion
+        loginButton.style.display = 'none';
+        disconnectButton.style.display = 'inline';
     } else {
         online1v1Button.disabled = true;
-        loginButton.style.display = 'inline'; // Affiche le bouton de connexion
-        disconnectButton.style.display = 'none'; // Cache le bouton de déconnexion
+        loginButton.style.display = 'inline';
+        disconnectButton.style.display = 'none';
     }
 }
 
@@ -23,7 +23,7 @@ function hasJwtCookie() {
     for (const cookie of cookies) {
         const [name, value] = cookie.split('=');
         console.log(name + "= " + value);
-        if (name.trim() === 'token') { // Assurez-vous de mettre le bon nom de cookie ici
+        if (name.trim() === 'token') {
             return true;
         }
     }
@@ -35,12 +35,6 @@ function hasJwtCookie() {
 function redirectToOnline1v1() {
     window.location.href = "game/online1v1/online1v1.html";
 
-    /*const socket = io("/api/1v1Online");
-    const token = getToken();
-    if (token) {
-        socket.emit('joinOrCreate1v1', { token: token });
-        window.location.href = "game/onlineGame/online1v1.html?token=${token}";
-    }*/
 }
 
 // Fonction pour obtenir le token depuis les cookies
