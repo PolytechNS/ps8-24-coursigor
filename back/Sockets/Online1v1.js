@@ -37,10 +37,12 @@ updatePlayerVision(positionPlayer1[1], positionPlayer1[0], 1, visionBoard);
 updatePlayerVision(positionPlayer2[1], positionPlayer2[0], -1, visionBoard);
 
 let numberOfTurns = 0;
+let lastTurn = false;
+let endOfGame = false;
 
 
 class GameState {
-    constructor(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, activePlayer, wallsLeftP1, wallsLeftP2, numberOfTurns) {
+    constructor(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, activePlayer, wallsLeftP1, wallsLeftP2, numberOfTurns,lastTurn, endOfGame) {
         // Utilisation de l'opérateur spread pour créer des clones des propriétés passées
         this.wallsNotToPlace = [...wallsNotToPlace];
         this.placedWalls = [...placedWalls];
@@ -51,6 +53,8 @@ class GameState {
         this.wallsLeftP1 = wallsLeftP1;
         this.wallsLeftP2 = wallsLeftP2;
         this.numberOfTurns = numberOfTurns;
+        this.lastTurn = lastTurn;
+        this.endOfGame = endOfGame;
     }
 }
 
@@ -74,7 +78,7 @@ function handleStartGame(nsp, socket) {
         nsp.to(socket.id).emit("whichPlayer", 2);
         console.log("roomName", roomName);
         nsp.to(playerInQueue.roomName).emit("roomName", playerInQueue.roomName);
-        games[playerInQueue.roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
+        games[playerInQueue.roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns, lastTurn,endOfGame);
         nsp.to(playerInQueue.roomName).emit('updateGrid', games[playerInQueue.roomName]);
         //add the player to the room
         playerInQueue.players.push(socket.id);
@@ -120,6 +124,9 @@ function generateRoomName() {
 }
 
 function nextMove(nsp,roomName, move) {
+    if(games[roomName].endOfGame){
+        return;
+    }
     console.log("\nthis move is made in the room: "+ roomName+"\n");
     console.log("activePlayer: " + games[roomName].activePlayer);
     // move contains the type of move as a string and a pair of coordinates
@@ -441,9 +448,13 @@ function notCirclesPlayers(alreadyChecked, i, j, player,visionBoard) {
 
 
 
-function sendEndOfGameP1(roomName, player, nsp) {
+function sendEndOfGameP1MayWin(roomName, player, nsp) {
     console.log("P1win nsp.to");
     console.log(roomName);
+    games[roomName].lastTurn = true;
+    nsp.to(roomName).emit('usaMayWin', player);
+}
+function sendEndOfGameP1Win(roomName, player, nsp) {
     nsp.to(roomName).emit('usaWin', player);
 }
 
@@ -554,7 +565,9 @@ function sendGameState(roomName,nsp) {
     games[roomName].activePlayer = games[roomName].activePlayer === PLAYER1 ? PLAYER2 : PLAYER1;
     //console.log("activePlayer now: " + games[roomName].activePlayer);
 
-
+    if(games[roomName].lastTurn===true){
+        games[roomName].endOfGame = true;
+    }
     nsp.to(roomName).emit('updateGrid', games[roomName]);
     checkVictoryCondition(roomName, games[roomName].positionPlayer1, games[roomName].positionPlayer2, nsp);
 }
@@ -640,6 +653,11 @@ function updatePiecePosition(player, i, j, visionBoard) {
     }
 }
 function checkVictoryCondition(roomName, positionPlayer1, positionPlayer2, nsp) {
+    if(positionPlayer1[1]===0 && games[roomName].endOfGame===true){
+        console.log("player 1 wins");
+        sendEndOfGameP1Win(roomName, PLAYER1, nsp);
+        return;
+    }
     if(positionPlayer2[1]===8 && positionPlayer1[1]===0){
         console.log("Draw");
         sendEndOfGameDraw(roomName, PLAYER2, nsp);
@@ -647,7 +665,7 @@ function checkVictoryCondition(roomName, positionPlayer1, positionPlayer2, nsp) 
     }
     if(positionPlayer1[1]===0){
         console.log("player 1 wins");
-        sendEndOfGameP1(roomName, PLAYER1, nsp);
+        sendEndOfGameP1MayWin(roomName, PLAYER1, nsp);
         return;
     }
     if(positionPlayer2[1]===8 && positionPlayer1[1]!==0){
