@@ -128,6 +128,9 @@ nsp.on('connection', (socket) => {
 
         online1v1.resumeGame(socket,roomName,nsp);
     });
+    socket.on("myElo", (elo,roomName) => {
+        online1v1.getAndSendElo(nsp,elo,roomName,socket);
+    });
 
 
 });
