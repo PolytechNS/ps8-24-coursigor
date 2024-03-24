@@ -471,8 +471,15 @@ function sendInvalidMove(id, message, nsp) {
 
 }
 
+function getAndSendElo(nsp,elo, roomName,socket) {
+    //quel the socket id of the other player in the same room
+    let player1 = rooms.find(room => room.roomName === roomName).players.find(player => player !== socket.id);
+    //send the elo to the other player
 
+    nsp.to(player1).emit('elo', elo);
 
+}
+exports.getAndSendElo = getAndSendElo;
 
 
 function isMatchingWall(wall, type, i, j) {

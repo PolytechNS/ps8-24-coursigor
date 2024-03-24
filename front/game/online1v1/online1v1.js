@@ -43,18 +43,47 @@ window.addEventListener('load', function() {
             this.whichPlayer = whichPlayer;
             localStorage.setItem("whichPlayer", this.whichPlayer);
             console.log("whichPlayer", whichPlayer);
+
         });
         socket.on("roomName", (roomName) => {
             console.log("roomName", roomName)
             this.roomName = roomName;
             localStorage.setItem("roomName",this.roomName);
+            if(whichPlayer===1){
+                const elo=getCookie("elo");
+
+                document.getElementById('EloP1').textContent = "Elo: "+ elo;
+                socket.emit("myElo",elo,roomName);
+            }
+            else{
+                const elo=getCookie("elo");
+                document.getElementById('EloP2').textContent = "Elo: "+ elo;
+                socket.emit("myElo",elo, roomName);
+            }
         });
         InGame= "true";
         localStorage.setItem("InGame", InGame);
         console.log("Nouvelle partie");
     }
+    socket.on("elo", (elo) => {
+        if(whichPlayer===1){
+            console.log("elo du joueur 1",elo);
+            document.getElementById('EloP2').textContent = "Elo: "+ elo;
+        }else{
+            console.log("elo du joueur 2",elo);
+            document.getElementById('EloP1').textContent = "Elo: "+ elo;
+        }
+
+    });
 
 });
+
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    const cookie = cookies.find(cookie => cookie.trim().startsWith(`${name}=`));
+    return cookie ? cookie.split('=')[1] : null;
+}
+
 socket.on("updateGrid", (gameStatus) => {
     document.getElementById("wallLeftP1").textContent= gameStatus.wallsLeftP1;
     document.getElementById("wallLeftP2").textContent= gameStatus.wallsLeftP2;
