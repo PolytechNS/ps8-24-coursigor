@@ -382,13 +382,14 @@ socket.on("invalidMove", (msg) => {
     console.log(msg);
 });
 
-socket.on("P1Win", (player) => {
+
+socket.on("usaWin", (player) => {
     console.log("P1 va gagner"+player);
     //get by id whichTurn
     document.getElementById('Winning').textContent = "Dernier tour pour Staline";
 });
 
-socket.on("P2Win", () => {
+socket.on("urssWin", () => {
     console.log("P2 a gagné");
     //get by id whichTurn
     document.getElementById('Winning').textContent = "Staline a gagné";
@@ -396,8 +397,11 @@ socket.on("P2Win", () => {
 
 socket.on("draw", () => {
     console.log("Match nul");
-    //get by id whichTurn
-    document.getElementById('Winning').textContent = "Match nul";
+    //pop up de draw
+    document.getElementById("gameover-message").textContent = "Match nul";
+    document.getElementById('gameover').style.display = "block";
+
+
 });
 
 function showGameplayExplanation() {

@@ -72,13 +72,14 @@ function handleStartGame(nsp, socket) {
         //console.log("you are not alone in the room");
         nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
         nsp.to(socket.id).emit("whichPlayer", 2);
-        nsp.to(roomName).emit("roomName", roomName);
-        games[roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
-        nsp.to(roomName).emit('updateGrid', games[roomName]);
+        console.log("roomName", roomName);
+        nsp.to(playerInQueue.roomName).emit("roomName", playerInQueue.roomName);
+        games[playerInQueue.roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns);
+        nsp.to(playerInQueue.roomName).emit('updateGrid', games[playerInQueue.roomName]);
         //add the player to the room
         playerInQueue.players.push(socket.id);
         console.log("vision board de ref : ", visionBoard);
-        console.log(games[roomName].visionBoard);
+        console.log(games[playerInQueue.roomName].visionBoard);
 
 
     }else{
@@ -440,18 +441,18 @@ function notCirclesPlayers(alreadyChecked, i, j, player,visionBoard) {
 
 
 
-function sendEndOfGameP1(id, player, nsp) {
+function sendEndOfGameP1(roomName, player, nsp) {
     console.log("P1win nsp.to");
-    console.log(id);
-    nsp.to(id).emit("P1win", player);
+    console.log(roomName);
+    nsp.to(roomName).emit('usaWin', player);
 }
 
 function sendEndOfGameP2(id, player, nsp) {
-    nsp.to(id).emit("P2win", player);
+    nsp.to(id).emit("urssWin", player);
 }
 
 function sendEndOfGameDraw(id, player, nsp) {
-    nsp.to(id).emit("Draw", player);
+    nsp.to(id).emit("draw", player);
 }
 
 function sendInvalidMove(id, message, nsp) {
@@ -638,22 +639,23 @@ function updatePiecePosition(player, i, j, visionBoard) {
         visionBoard[j][i] += PLAYER2;
     }
 }
-function checkVictoryCondition(id, positionPlayer1, positionPlayer2, nsp) {
+function checkVictoryCondition(roomName, positionPlayer1, positionPlayer2, nsp) {
+    if(positionPlayer2[1]===8 && positionPlayer1[1]===0){
+        console.log("Draw");
+        sendEndOfGameDraw(roomName, PLAYER2, nsp);
+        return;
+    }
     if(positionPlayer1[1]===0){
         console.log("player 1 wins");
-        sendEndOfGameP1(id, PLAYER1, nsp);
+        sendEndOfGameP1(roomName, PLAYER1, nsp);
         return;
     }
     if(positionPlayer2[1]===8 && positionPlayer1[1]!==0){
         console.log("player 2 wins");
-        sendEndOfGameP2(id, PLAYER2, nsp);
+        sendEndOfGameP2(roomName, PLAYER2, nsp);
         return;
     }
-    if(positionPlayer2[1]===8 && positionPlayer1[1]===0){
-        console.log("Draw");
-        sendEndOfGameDraw(id, PLAYER2, nsp);
-        return;
-    }
+
 }
 
 

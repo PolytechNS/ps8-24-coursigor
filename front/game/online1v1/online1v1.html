@@ -32,6 +32,13 @@
 
     Bonne chance et amusez-vous bien !
 </div>
+<div id="gameover">
+    <div id="gameover-content">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="gameover-message"></p>
+        <button id="backToMenu" onclick="goBackToMenu()">Retour au menu</button>
+    </div>
+</div>
 
 <!-- Contenu du jeu -->
 <div id="game">
@@ -79,11 +86,14 @@
         </div>
     </div>
     <footer>
-        <button  class="button" onclick="surrender()">
-            <span class="box" id="abandonner">
-                <a id="abandonnerText">Abandonner</a>
-            </span>
-        </button>
+        <div>
+            <button  class="button" onclick="surrender()">
+                <span class="box" id="abandonner">
+                    <a id="abandonnerText">Abandonner</a>
+                </span>
+            </button>
+            <p id="Winning"></p>
+        </div>
     </footer>
 </div>
 
