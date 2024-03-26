@@ -1,3 +1,4 @@
+
 const http = require('http');
 const mongo = require('mongodb');
 const cors = require('cors'); // Ajout du module cors
@@ -5,9 +6,6 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
-const onlineGame = require("./logic/onlineGame");
-const online1v1 = require("./Sockets/Online1v1");
-const onlineGame = require("./Sockets/Online1v1");
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
@@ -94,7 +92,6 @@ io.of("/api/onlineGame").on('connection', (socket) => {
         console.log('user disconnected');
     });
 
-
 });
 
 
@@ -130,12 +127,6 @@ nsp.on('connection', (socket) => {
     });
 
 
-
 });
 exports.io = io;
 
-
-
-// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-//     const namespace = socket.nsp;
-// });

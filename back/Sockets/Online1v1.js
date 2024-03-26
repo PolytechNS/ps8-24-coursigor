@@ -656,16 +656,17 @@ function updatePiecePosition(player, i, j, visionBoard) {
     }
 }
 function checkVictoryCondition(roomName, positionPlayer1, positionPlayer2, nsp) {
-    if(positionPlayer1[1]===0 && games[roomName].endOfGame===true){
-        console.log("player 1 wins");
-        sendEndOfGameP1Win(roomName, PLAYER1, nsp);
-        return;
-    }
     if(positionPlayer2[1]===8 && positionPlayer1[1]===0){
         console.log("Draw");
         sendEndOfGameDraw(roomName, PLAYER2, nsp);
         return;
     }
+    if(positionPlayer1[1]===0 && games[roomName].endOfGame===true){
+        console.log("player 1 wins");
+        sendEndOfGameP1Win(roomName, PLAYER1, nsp);
+        return;
+    }
+
     if(positionPlayer1[1]===0){
         console.log("player 1 wins");
         sendEndOfGameP1MayWin(roomName, PLAYER1, nsp);
