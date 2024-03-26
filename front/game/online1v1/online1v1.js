@@ -5,11 +5,14 @@ var whichPlayer;
 var activePlayer="1";
 var myTurn;
 let InGame="false";
+let eloUSA;
+let eloURSS;
 
 window.addEventListener('beforeunload', function (event) {
     console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
     socket.emit("userLeft",InGame);
+    displayElo();
 });
 
 window.addEventListener('load', function() {
@@ -22,9 +25,14 @@ window.addEventListener('load', function() {
         document.getElementById("game").style.display = "grid";
         console.log(roomName);
         socket.emit('resumeGame', roomName);
+        displayElo();
+
+
+
 
     }else{
-        socket.emit('firstConnection');
+        let eloToSend=getCookie("elo");
+        socket.emit('firstConnection',eloToSend);
         socket.on("nbJoueur", (nbJoueur) => {
             console.log("un joueur a rejoint la partie", nbJoueur);
             if (nbJoueur === 2) {
@@ -45,38 +53,32 @@ window.addEventListener('load', function() {
             console.log("whichPlayer", whichPlayer);
 
         });
-        socket.on("roomName", (roomName) => {
+        socket.on("roomName", (roomName,eloP1,eloP2) => {
             console.log("roomName", roomName)
             this.roomName = roomName;
             localStorage.setItem("roomName",this.roomName);
-            if(whichPlayer===1){
-                const elo=getCookie("elo");
+            localStorage.setItem("eloP1",eloP1);
+            localStorage.setItem("eloP2",eloP2);
+            console.log("eloP1",eloP1);
+            console.log("eloP2",eloP2);
+            displayElo();
 
-                document.getElementById('EloP1').textContent = "Elo: "+ elo;
-                socket.emit("myElo",elo,roomName);
-            }
-            else{
-                const elo=getCookie("elo");
-                document.getElementById('EloP2').textContent = "Elo: "+ elo;
-                socket.emit("myElo",elo, roomName);
-            }
+
         });
         InGame= "true";
         localStorage.setItem("InGame", InGame);
         console.log("Nouvelle partie");
     }
-    socket.on("elo", (elo) => {
-        if(whichPlayer===1){
-            console.log("elo du joueur 1",elo);
-            document.getElementById('EloP2').textContent = "Elo: "+ elo;
-        }else{
-            console.log("elo du joueur 2",elo);
-            document.getElementById('EloP1').textContent = "Elo: "+ elo;
-        }
 
-    });
 
 });
+function displayElo(){
+    eloUSA = localStorage.getItem("eloP1");
+    eloURSS = localStorage.getItem("eloP2");
+    document.getElementById("EloP1").textContent = "Elo: "+ eloUSA;
+    document.getElementById("EloP2").textContent = "Elo: "+ eloURSS;
+
+}
 
 function getCookie(name) {
     const cookies = document.cookie.split(';');
