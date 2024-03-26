@@ -173,8 +173,8 @@ function nextMove(id, move) {
             placedWallsP2.push([(placedWalls[i][1]).toString() + (placedWalls[i][2]).toString(), direction]);
         }
     }
-    console.log("Placed walls P1: ", placedWallsP1);
-    console.log("Placed walls P2: ", placedWallsP2);
+    // console.log("Placed walls P1: ", placedWallsP1);
+    // console.log("Placed walls P2: ", placedWallsP2);
     let aiGameState = new AIGameState(placedWallsP1, placedWallsP2, games[id].visionBoard);
 
 
@@ -413,7 +413,7 @@ function notCirclesPlayers(alreadyChecked, i, j, player, visionBoard) {
     let left = false;
     let right = false;
 
-    console.log(visionBoard);
+    // console.log(visionBoard);
 
     if (!(visionBoard[j][i] & WALL_TOP)) {
         top = notCirclesPlayers(alreadyChecked, i, j - 1, player, visionBoard);
@@ -448,7 +448,7 @@ function updateVisionWall(visionBoard, i1, j1,i2,j2, value) {
         calculateVision(visionBoard, j2, i2+2, value);
         calculateVision(visionBoard, j1, i1-1, value);
         calculateVision(visionBoard, j2, i2-1, value);
-        console.log(visionBoard);
+        // console.log(visionBoard);
 
     }
     else {
