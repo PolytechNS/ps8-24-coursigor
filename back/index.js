@@ -1,3 +1,4 @@
+
 const http = require('http');
 const mongo = require('mongodb');
 const cors = require('cors'); // Ajout du module cors
@@ -86,6 +87,8 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.removeSocket(socket.id);
         console.log('user disconnected');
     });
 
@@ -127,8 +130,3 @@ nsp.on('connection', (socket) => {
 });
 exports.io = io;
 
-
-
-// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-//     const namespace = socket.nsp;
-// });
