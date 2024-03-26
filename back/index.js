@@ -1,3 +1,4 @@
+
 const http = require('http');
 const mongo = require('mongodb');
 const cors = require('cors'); // Ajout du module cors
@@ -7,9 +8,9 @@ const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
 
 
-
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
+
 
 
 const app = http.createServer(async function (request, response) {
@@ -52,6 +53,8 @@ DBClient.connect()
     });
 
 const io = new Server(app);
+// Pour l'espace de noms '/api/onlineGame'
+
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
 
@@ -91,22 +94,39 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
-io.of("/api/1v1Online").on('connection', (socket) => {
 
-    socket.on('joinOrCreate1v1', (data) => {
-        console.log("joinOrCreate1v1");
-        console.log(data);
-        let online1v1 = require('./Sockets/Online1v1.js');
-        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
-        online1v1.handleStartGame(socket, data);
+let nsp = io.of("/api/1v1Online");
+nsp.on('connection', (socket) => {
+    console.log('a user connected');
+
+    let online1v1 = require('./Sockets/Online1v1.js');
+    socket.on("firstConnection", (eloToSend) => {
+        console.log("first connection");
+        online1v1.handleStartGame(nsp, socket,eloToSend);
+    });
+
+    socket.on('nextMove' , (move,roomName) => {
+        console.log('nextMove: ' + move);
+        console.log("salle associée au move : " + roomName);
+        let onlineGame = require('./Sockets/Online1v1.js');
+        onlineGame.nextMove(nsp, roomName, move);
+    });
+    socket.on('userLeft', (InGame) => {
+        console.log("user left");
+        online1v1.userLeft(socket);
 
     });
+
+    socket.on("surrender", (roomName) => {
+        online1v1.makePlayersLeave(roomName,nsp);
+    });
+
+    socket.on("resumeGame", (roomName) => {
+
+        online1v1.resumeGame(socket,roomName,nsp);
+    });
+
 
 });
 exports.io = io;
 
-
-
-// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-//     const namespace = socket.nsp;
-// });
