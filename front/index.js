@@ -59,6 +59,11 @@ window.onload = function () {
     printCookies();
 };
 
+
+function loadAIGame() {
+    window.location.href = 'game/onlineGame/onlineGame.html';
+}
+
 //waits for the page to load
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("onlineGame").addEventListener('click', function () {

@@ -45,7 +45,20 @@ class GameState {
 
 
 
+function retrieveGame(token) {
+    let game = [];
+    game.push(games[token]);
+    game.push(ais[token]);
 
+    return game;
+}
+exports.retrieveGame = retrieveGame;
+
+function loadGame(token, game) {
+    // load the game from the database
+
+}
+exports.loadGame = loadGame;
 
 function newGame(socketId, token) {
     console.log('new game: socket : ' + socketId + " token : " + token);

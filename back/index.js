@@ -7,9 +7,10 @@ const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
 
 
-
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
+
+let socketToToken = new Map();
 
 
 const app = http.createServer(async function (request, response) {
@@ -61,6 +62,8 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
     socket.on('newGame', (cookieToken) => {
         console.log('new game: ' + cookieToken);
+        socketToToken.set(socket.id, cookieToken);
+
         socket.emit('message', 'Starting new game...');
         let onlineGame = require('./logic/onlineGame.js');
 
@@ -84,8 +87,14 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        socketToToken.delete(socket.id);
+
         let onlineGame = require('./logic/onlineGame.js');
         onlineGame.removeSocket(socket.id);
+
+        let saves = require('./EndPoints/Saves.js');
+        saves.saveAIGame(DBClient, socketToToken.get(socket.id));
+
         console.log('user disconnected');
     });
 
