@@ -59,7 +59,7 @@ class GameState {
 }
 
 let games = {};
-function handleStartGame(nsp, socket) {
+function handleStartGame(nsp, socket,eloToSend) {
     //console.log("handleStartGame\n");
     let playerInQueue = rooms.find((room) => room.players.length === 1);
     //console.log("que vaut playerInQueue :", playerInQueue);
@@ -77,13 +77,15 @@ function handleStartGame(nsp, socket) {
         nsp.to(playerInQueue.roomName).emit("nbJoueur", 2);
         nsp.to(socket.id).emit("whichPlayer", 2);
         console.log("roomName", roomName);
-        nsp.to(playerInQueue.roomName).emit("roomName", playerInQueue.roomName);
+        playerInQueue.eloP2=eloToSend;
+        nsp.to(playerInQueue.roomName).emit("roomName", playerInQueue.roomName, playerInQueue.eloP1, playerInQueue.eloP2);
         games[playerInQueue.roomName]= new GameState(wallsNotToPlace, placedWalls, visionBoard, positionPlayer1, positionPlayer2, PLAYER1, 10, 10, numberOfTurns, lastTurn,endOfGame);
         nsp.to(playerInQueue.roomName).emit('updateGrid', games[playerInQueue.roomName]);
         //add the player to the room
         playerInQueue.players.push(socket.id);
-        console.log("vision board de ref : ", visionBoard);
-        console.log(games[playerInQueue.roomName].visionBoard);
+        //push the elo of as P2elo in room
+
+        console.log("room", playerInQueue);
 
 
     }else{
@@ -99,7 +101,9 @@ function handleStartGame(nsp, socket) {
         //création de l'objet room
         const room = {
             players: [socket.id],
-            roomName: roomName
+            roomName: roomName,
+            eloP1:eloToSend,
+            eloP2:0
         }
         //ajout de l'objet room dans le tableau rooms
         rooms.push(room);
@@ -471,15 +475,7 @@ function sendInvalidMove(id, message, nsp) {
 
 }
 
-function getAndSendElo(nsp,elo, roomName,socket) {
-    //quel the socket id of the other player in the same room
-    let player1 = rooms.find(room => room.roomName === roomName).players.find(player => player !== socket.id);
-    //send the elo to the other player
 
-    nsp.to(player1).emit('elo', elo);
-
-}
-exports.getAndSendElo = getAndSendElo;
 
 
 function isMatchingWall(wall, type, i, j) {

@@ -97,9 +97,9 @@ nsp.on('connection', (socket) => {
     console.log('a user connected');
 
     let online1v1 = require('./Sockets/Online1v1.js');
-    socket.on("firstConnection", () => {
+    socket.on("firstConnection", (eloToSend) => {
         console.log("first connection");
-        online1v1.handleStartGame(nsp, socket);
+        online1v1.handleStartGame(nsp, socket,eloToSend);
     });
 
     socket.on('nextMove' , (move,roomName) => {
@@ -122,9 +122,7 @@ nsp.on('connection', (socket) => {
 
         online1v1.resumeGame(socket,roomName,nsp);
     });
-    socket.on("myElo", (elo,roomName) => {
-        online1v1.getAndSendElo(nsp,elo,roomName,socket);
-    });
+
 
 });
 exports.io = io;
