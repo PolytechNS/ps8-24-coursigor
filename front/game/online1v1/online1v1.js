@@ -422,6 +422,8 @@ socket.on("usaMayWin", (player) => {
 
 socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
     console.log("P1 a gagné"+player);
+    const id= getCookie("id");
+    socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
 
     document.getElementById("gameover-message").textContent = "Kenedy a gagné";
@@ -436,6 +438,8 @@ socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
 
 socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
     console.log("P2 a gagné");
+    const id= getCookie("id");
+    socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
     document.getElementById("gameover-message").textContent = "Staline a gagné";
     if(whichPlayer===1){

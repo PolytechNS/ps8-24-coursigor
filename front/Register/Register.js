@@ -78,8 +78,10 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); //expiration 1h
                     document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}; path=/`;
                     const elo = data.elo;
+                    const id = data.id;
                     console.log("elo",elo);
                     document.cookie = `elo=${elo}; path=/`;
+                    document.cookie = `id=${id}; path=/`;
                     //window.location.href = "../index.html";
                 }
                 console.log('Connexion réussie:', data.message);
