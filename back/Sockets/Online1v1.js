@@ -458,12 +458,19 @@ function sendEndOfGameP1MayWin(roomName, player, nsp) {
     games[roomName].lastTurn = true;
     nsp.to(roomName).emit('usaMayWin', player);
 }
+//TODO appeler une méthode de calcul de gain d'elo
 function sendEndOfGameP1Win(roomName, player, nsp) {
-    nsp.to(roomName).emit('usaWin', player);
+    var newElos= calculElo(rooms.find(room => room.roomName === roomName).eloP1, rooms.find(room => room.roomName === roomName).eloP2, 1);
+
+    nsp.to(roomName).emit('usaWin', player, newElos[0], newElos[1]);
 }
 
 function sendEndOfGameP2(id, player, nsp) {
-    nsp.to(id).emit("urssWin", player);
+
+    var newElos= calculElo(rooms.find(room => room.roomName === id).eloP1, rooms.find(room => room.roomName === id).eloP2, 0);
+    nsp.to(id).emit("urssWin", player, newElos[0], newElos[1]);
+    console.log("eloP1 après calcul: " + newElos[0]);
+    console.log("eloP2 après calcul: " + newElos[1]);
 }
 
 function sendEndOfGameDraw(id, player, nsp) {
@@ -473,6 +480,27 @@ function sendEndOfGameDraw(id, player, nsp) {
 function sendInvalidMove(id, message, nsp) {
     nsp.to(id).emit('invalidMove', message);
 
+}
+
+
+function calculElo(eloP1, eloP2, result) {
+    var K = 50; // Coefficient de pondération
+
+    console.log(typeof elo1);
+    console.log(typeof elo2);
+    var E1 = 1 / (1 + Math.pow(10, (eloP2 - eloP1) / 400));
+    var E2 = 1 / (1 + Math.pow(10, (eloP1 - eloP2) / 400));
+    console.log("elo récupéré de P1", E1);
+    console.log("elo récupéré de P2", E2);
+    var newEloP1 = K * (result - E1);
+    var newnewEloP1 = parseInt(eloP1) + parseInt(newEloP1);
+    var newEloP2 =  K * ((1 - result) - E2);
+    console.log("newEloP2", newEloP2);
+    var newnewEloP2 = parseInt(eloP2) + parseInt(newEloP2);
+    console.log("eloP1 après calcul dans fct: " + newnewEloP1);
+    console.log("eloP2 après calcul dans fct: " + newnewEloP2);
+
+    return [newnewEloP1, newnewEloP2];
 }
 
 

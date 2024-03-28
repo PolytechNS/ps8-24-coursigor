@@ -14,6 +14,9 @@ function checkTokenAndDisplayLinks() {
         disconnectButton.style.display = 'none';
     }
 }
+function redirectToLeaderboard() {
+    window.location.href = 'leaderboard/leaderboard.html';
+}
 
 
 // Fonction pour vérifier la présence du cookie JWT
