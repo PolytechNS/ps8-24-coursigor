@@ -34,7 +34,7 @@ const app = http.createServer(async function (request, response) {
                     SignUp.manage(DBClient,request,response);
                 }
                 if(filePath[2] === "leaderboard"){
-                    leader.updateTopPlayers(DBClient,request,response);
+                    leader.manageRequestLB(DBClient,request,response);
                 }
                 //apiQuery.manage(request, response);
             } else {
