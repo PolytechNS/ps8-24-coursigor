@@ -28,9 +28,6 @@ socket.on("message", (msg) => {
 
 socket.on("updateGrid", (gameStatus) => {
     console.log("updateGrid", gameStatus);
-
-
-
     closeOverlay();
     createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
 })

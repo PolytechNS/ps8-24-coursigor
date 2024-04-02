@@ -91,3 +91,9 @@ window.addEventListener('load', checkTokenAndDisplayLinks);
 function connect() {
     window.location.href = 'Register/Register.html';
 }
+function localGame() {
+    window.location.href = 'game/localGame.html';
+}
+function onlineGame() {
+    window.location.href = 'game/onlineGame/onlineGame.html';
+}
