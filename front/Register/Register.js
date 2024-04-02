@@ -9,7 +9,7 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
     const postData = {"username": username, "password": password, "email": email}
 
     // Send POST request
-    fetch('http://localhost:8000/api/Register', {
+    fetch('/api/Register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
