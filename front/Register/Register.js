@@ -70,6 +70,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
 
                 // Gérez l'affichage ou la manipulation de l'erreur côté client
             } else {
+                window.location.href = "../index.html";
                 document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
@@ -82,7 +83,6 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     console.log("elo",elo);
                     document.cookie = `elo=${elo}; path=/`;
                     document.cookie = `id=${id}; path=/`;
-                    //window.location.href = "../index.html";
                 }
                 console.log('Connexion réussie:', data.message);
             }
@@ -123,4 +123,7 @@ function displayCookies() {
     });
 
     alert(cookieString);
+}
+function goBackToMenu() {
+    window.location.href = '/';
 }

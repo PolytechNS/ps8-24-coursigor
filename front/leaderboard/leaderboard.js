@@ -1,25 +1,27 @@
 window.addEventListener("load", async function () {
     try {
         const response = await fetch('/api/leaderboard', {
-            method: 'GET',  // Spécification de la méthode GET
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
-        // Vérifier la réponse de la requête
         if (response.ok) {
             const data = await response.json();
             console.log('Réponse de la requête GET:', data);
 
-            // Récupérer la référence de l'élément de tableau dans le DOM
             const tableBody = document.getElementById('table-body');
+            let rank = 1; // Commencez le classement à 1
 
-            // Parcourir les données et créer les lignes de tableau
             data.data.forEach(player => {
                 const row = document.createElement('tr');
 
-                // Créer les cellules de tableau pour chaque propriété du joueur
+                // Créez la cellule de classement
+                const rankCell = document.createElement('td');
+                rankCell.textContent = '#' + rank; // Ajoutez le numéro de classement
+                row.appendChild(rankCell);
+
                 const playerNameCell = document.createElement('td');
                 playerNameCell.textContent = player.username;
                 row.appendChild(playerNameCell);
@@ -28,8 +30,9 @@ window.addEventListener("load", async function () {
                 playerScoreCell.textContent = player.elo;
                 row.appendChild(playerScoreCell);
 
-                // Attacher la ligne au corps du tableau
                 tableBody.appendChild(row);
+
+                rank++; // Incrémentez le classement pour le prochain joueur
             });
         } else {
             console.error('Erreur lors de la requête GET:', response.status, response.statusText);
@@ -38,3 +41,7 @@ window.addEventListener("load", async function () {
         console.error('Erreur lors de la requête GET:', error);
     }
 });
+
+function goBackToMenu() {
+    window.location.href = '/';
+}
