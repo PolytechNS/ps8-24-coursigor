@@ -99,10 +99,11 @@ async function hashPassword(password) {
     const data = encoder.encode(password);
 
     // Utilise l'API Web Crypto pour hasher le mot de passe avec l'algorithme SHA-256
-    const buffer = await crypto.subtle.digest('SHA-256', data);
+    //TODO fix le hashage
+    //const buffer = await crypto.subtle.digest('SHA-256', data);
 
     // Convertit le buffer en une chaîne hexadécimale
-    const hashedPassword = Array.from(new Uint8Array(buffer)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+    const hashedPassword = Array.from(new Uint8Array(data)).map(byte => byte.toString(16).padStart(2, '0')).join('');
 
     return hashedPassword;
 }
