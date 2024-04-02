@@ -63,10 +63,11 @@ const signInAndGenerateToken = async (DBClient,username, password) => {
 
         console.log('Connexion réussie !');
         const elo = utilisateur.elo;
+        const id = utilisateur._id;
         // Génération du token JWT
         const token = generateToken(username, password);
         console.log("elo"   ,elo);
-        return { message: 'Connexion réussie.', token, elo };
+        return { message: 'Connexion réussie.', token, elo, id};
     } catch (error) {
         console.error('Erreur lors de l\'opération de connexion :', error);
         return { error: 'Erreur lors de la connexion.' };

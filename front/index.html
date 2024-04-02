@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>TEST</title>
@@ -7,20 +9,18 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <a href="game/localGame.html">Local game</a>
-    <br/>
-<!--    <a href="game/onlineGame/onlineGame.html">Online game</a>-->
-    <button id="onlineGame">Online game</button>
-    <br/>
-    <button id="online1v1Button" disabled onclick="redirectToOnline1v1()">
-        Online 1v1
-    </button>
-    <br/>
-
-    <a href="Register/Register.html" class="login-button">Login</a>
-    <button id="disconnect" onclick="disconnect()">
-        Disconnect
-    </button>
-    <br/>
-    TEST1
+<div class="container">
+    <div class="header">
+        <h1>CoursIgor</h1>
+    </div>
+    <div class="main">
+        <button class="btn">Local Game</button>
+        <button class="btn">Online Game</button>
+        <button id="online1v1Button" class="btn" onclick="redirectToOnline1v1()">Online 1v1</button>
+        <button id="loginButton" class="login-button" onclick="connect()">Login</button>
+        <button id="leaderboard" class="btn" onclick="redirectToLeaderboard()">Leaderboard</button>
+        <button id="disconnect" class="btn" onclick="disconnect()">Disconnect</button>
+    </div>
+</div>
 </body>
+</html>

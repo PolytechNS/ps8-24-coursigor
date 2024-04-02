@@ -5,14 +5,17 @@ function checkTokenAndDisplayLinks() {
     const disconnectButton = document.getElementById('disconnect');
 
     if (hasJwtCookie()) {
-        online1v1Button.disabled = false;
+        online1v1Button.style.display = 'inline';
         loginButton.style.display = 'none';
         disconnectButton.style.display = 'inline';
     } else {
-        online1v1Button.disabled = true;
+        online1v1Button.style.display = 'none';
         loginButton.style.display = 'inline';
         disconnectButton.style.display = 'none';
     }
+}
+function redirectToLeaderboard() {
+    window.location.href = 'leaderboard/leaderboard.html';
 }
 
 
@@ -84,3 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 // Appeler la fonction lors du chargement de la page
 window.addEventListener('load', checkTokenAndDisplayLinks);
+
+function connect() {
+    window.location.href = 'Register/Register.html';
+}

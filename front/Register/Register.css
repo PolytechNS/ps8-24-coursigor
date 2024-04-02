@@ -55,3 +55,16 @@ body {
     background-size: contain;
     background-repeat: round;
 }
+
+.btnBack {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 5%;
+    height: auto;
+    background: #ff000085;
+}
+.btnBack img {
+    max-width: 100%;
+    max-height: 100%;
+}

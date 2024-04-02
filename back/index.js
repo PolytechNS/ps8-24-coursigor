@@ -5,6 +5,7 @@ const cors = require('cors'); // Ajout du module cors
 const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
+const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
 
 
@@ -31,6 +32,9 @@ const app = http.createServer(async function (request, response) {
             if (filePath[1] === "api") {
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
                     SignUp.manage(DBClient,request,response);
+                }
+                if(filePath[2] === "leaderboard"){
+                    leader.manageRequestLB(DBClient,request,response);
                 }
                 //apiQuery.manage(request, response);
             } else {
@@ -102,7 +106,7 @@ nsp.on('connection', (socket) => {
     let online1v1 = require('./Sockets/Online1v1.js');
     socket.on("firstConnection", (eloToSend) => {
         console.log("first connection");
-        online1v1.handleStartGame(nsp, socket,eloToSend);
+        online1v1.handleStartGame(nsp, socket,eloToSend, DBClient);
     });
 
     socket.on('nextMove' , (move,roomName) => {
@@ -124,6 +128,12 @@ nsp.on('connection', (socket) => {
     socket.on("resumeGame", (roomName) => {
 
         online1v1.resumeGame(socket,roomName,nsp);
+    });
+
+    socket.on("eloChange",(roomName,id,whichPlayer)=>{
+        console.log("elo change");
+        online1v1.putNewEloInDB(roomName,DBClient,id,whichPlayer);
+
     });
 
 

@@ -420,17 +420,38 @@ socket.on("usaMayWin", (player) => {
     document.getElementById('whichTurn').textContent = "Dernier tour pour Staline";
 });
 
-socket.on("usaWin", (player) => {
+socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
     console.log("P1 a gagné"+player);
+    const id= getCookie("id");
+    socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
+
     document.getElementById("gameover-message").textContent = "Kenedy a gagné";
+    if(whichPlayer===1){
+        document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
+    }
+    else{
+        document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
+    }
     document.getElementById('gameover').style.display = "block";
 });
 
-socket.on("urssWin", () => {
+socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
     console.log("P2 a gagné");
+    const id= getCookie("id");
+    socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
     document.getElementById("gameover-message").textContent = "Staline a gagné";
+    if(whichPlayer===1){
+        document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
+        console.log("elo URSS",newEloURSS);
+        console.log("elo USA",newEloUSA);
+    }
+    else{
+        document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
+        console.log("elo URSS",newEloURSS);
+        console.log("elo USA",newEloUSA);
+    }
     document.getElementById('gameover').style.display = "block";
 });
 

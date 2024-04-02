@@ -1,6 +1,5 @@
 const rooms = [];
 
-
 const WALL_RIGHT =  0b10000000;
 const WALL_BOTTOM = 0b1000000000;
 const WALL_LEFT =   0b100000000000;
@@ -104,6 +103,7 @@ function handleStartGame(nsp, socket,eloToSend) {
             roomName: roomName,
             eloP1:eloToSend,
             eloP2:0
+
         }
         //ajout de l'objet room dans le tableau rooms
         rooms.push(room);
@@ -458,12 +458,27 @@ function sendEndOfGameP1MayWin(roomName, player, nsp) {
     games[roomName].lastTurn = true;
     nsp.to(roomName).emit('usaMayWin', player);
 }
+//TODO appeler une méthode de calcul de gain d'elo
 function sendEndOfGameP1Win(roomName, player, nsp) {
-    nsp.to(roomName).emit('usaWin', player);
+
+    var room= rooms.find(room => room.roomName === id);
+    var newElos= calculElo(room.eloP1, room.eloP2, 1);
+    room.eloP1=newElos[0];
+    room.eloP2=newElos[1];
+
+    nsp.to(roomName).emit('usaWin', player, newElos[0], newElos[1]);
 }
 
 function sendEndOfGameP2(id, player, nsp) {
-    nsp.to(id).emit("urssWin", player);
+    var room= rooms.find(room => room.roomName === id);
+
+    var newElos= calculElo(room.eloP1, room.eloP2, 0);
+    room.eloP1=newElos[0];
+    room.eloP2=newElos[1];
+    console.log("eloP1 après calcul dans fct: " + newElos[0]);
+    console.log("eloP2 après calcul dans fct: " + newElos[1]);
+    nsp.to(id).emit("urssWin", player, newElos[0], newElos[1]);
+
 }
 
 function sendEndOfGameDraw(id, player, nsp) {
@@ -474,6 +489,70 @@ function sendInvalidMove(id, message, nsp) {
     nsp.to(id).emit('invalidMove', message);
 
 }
+
+
+
+
+function calculElo(eloP1, eloP2, result) {
+    var K = 50; // Coefficient de pondération
+
+    console.log(typeof elo1);
+    console.log(typeof elo2);
+    var E1 = 1 / (1 + Math.pow(10, (eloP2 - eloP1) / 400));
+    var E2 = 1 / (1 + Math.pow(10, (eloP1 - eloP2) / 400));
+    console.log("elo récupéré de P1", E1);
+    console.log("elo récupéré de P2", E2);
+    var newEloP1 = K * (result - E1);
+    var newnewEloP1 = parseInt(eloP1) + parseInt(newEloP1);
+    var newEloP2 =  K * ((1 - result) - E2);
+    console.log("newEloP2", newEloP2);
+    var newnewEloP2 = parseInt(eloP2) + parseInt(newEloP2);
+    console.log("eloP1 après calcul dans fct: " + newnewEloP1);
+    console.log("eloP2 après calcul dans fct: " + newnewEloP2);
+
+    return [newnewEloP1, newnewEloP2];
+}
+
+const { ObjectId } = require('mongodb');
+
+async function putNewEloInDB(roomName, DBClient, id, whichPlayer) {
+    try {
+        // Connexion à la base de données
+        await DBClient.connect();
+        const db = DBClient.db('ma_base_de_donnees');
+        const utilisateursCollection = db.collection('utilisateurs');
+        var room= rooms.find(room => room.roomName === roomName);
+        const eloToSend = whichPlayer === 1 ? room.eloP1 : room.eloP2;
+        console.log("eloToSendP1", room.eloP1);
+        console.log("eloToSendP2", room.eloP2);
+        // Récupérer l'utilisateur avec l'ID spécifié
+        const utilisateur = await utilisateursCollection.findOne({ _id: new ObjectId(id) });
+
+        if (utilisateur) {
+            // Sélectionner le score ELO du joueur approprié
+            console.log("Score ELO à mettre à jour :", eloToSend);
+
+            // Mettre à jour le score ELO de l'utilisateur dans la base de données
+            const result = await utilisateursCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { elo: eloToSend } }
+            );
+
+            if (result.modifiedCount > 0) {
+                console.log("Score ELO mis à jour avec succès pour l'utilisateur avec l'ID :", id);
+            } else {
+                console.log("Aucune modification apportée au score ELO pour l'utilisateur avec l'ID :", id);
+            }
+        } else {
+            console.log("Utilisateur avec l'ID spécifié non trouvé.");
+        }
+    } catch (error) {
+        console.error('Erreur lors de la connexion à la base de données:', error);
+    }
+}
+
+exports.putNewEloInDB = putNewEloInDB;
+
 
 
 
