@@ -32,6 +32,11 @@
 
     Bonne chance et amusez-vous bien !
 </div>
+
+<div id="emote">
+    <img src="">
+</div>
+
 <div id="gameover">
     <div id="gameover-content">
         <h2 id="gameover-title">Game Over</h2>
@@ -88,14 +93,31 @@
     </div>
     <footer>
         <div>
-            <button  class="button" onclick="surrender()">
-                <span class="box" id="abandonner">
-                    <a id="abandonnerText">Abandonner</a>
-                </span>
+            <button class="button" onclick="surrender()">
+            <span class="box" id="abandonner">
+                <a id="abandonnerText">Abandonner</a>
+            </span>
             </button>
             <p id="Winning"></p>
         </div>
+        <div class="footer-buttons-container">
+            <button class="footer-button" id="emote1" onclick="triggerEmote('happy')">
+                <img src="../../Images/happyURSS.png" alt="Image 1">
+            </button>
+            <button class="footer-button" id="emote2" onclick="triggerEmote('sad')">
+                <img src="../../Images/sadURSS.png" alt="Image 2" >
+            </button>
+            <button class="footer-button" id="emote3" onclick="triggerEmote('angry')">
+                <img src="../../Images/angryURSS.png" alt="Image 3" >
+            </button>
+            <button class="footer-button" id="emote4" onclick="triggerEmote('hi')">
+                <img src="../../Images/hiURSS.png" alt="Image 4" >
+            </button>
+        </div>
     </footer>
+
+
+
 </div>
 
 <script src="../../js/socket.io.js"></script>

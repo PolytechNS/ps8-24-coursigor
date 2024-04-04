@@ -12,6 +12,7 @@ window.addEventListener('beforeunload', function (event) {
     console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
     socket.emit("userLeft",InGame);
+
     displayElo();
 });
 
@@ -26,6 +27,9 @@ window.addEventListener('load', function() {
         console.log(roomName);
         socket.emit('resumeGame', roomName);
         displayElo();
+        //methode pour changer le path de l'image des boutons
+        console.log("loadEmote")
+        loadEmote();
 
 
 
@@ -51,6 +55,7 @@ window.addEventListener('load', function() {
             this.whichPlayer = whichPlayer;
             localStorage.setItem("whichPlayer", this.whichPlayer);
             console.log("whichPlayer", whichPlayer);
+            loadEmote();
 
         });
         socket.on("roomName", (roomName,eloP1,eloP2) => {
@@ -68,6 +73,7 @@ window.addEventListener('load', function() {
         InGame= "true";
         localStorage.setItem("InGame", InGame);
         console.log("Nouvelle partie");
+
     }
 
 
@@ -498,6 +504,7 @@ function goBackToMenu(){
     InGame= "false";
     localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
+    socket.emit("disconnect");
 }
 
 function surrender(){
@@ -505,12 +512,94 @@ function surrender(){
     localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
     socket.emit("surrender", roomName);
+
 }
 
 socket.on("quitRoom", () => {
+
     window.location.href = "../../index.html";
 });
 
 socket.on("leaveGame", () => {
     goBackToMenu();
+});
+
+function loadEmote(){
+    console.log("whichPlayer EMOTE",whichPlayer);
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    if(whichPlayer===1) {
+        button1.querySelector('img').src = "../../Images/happyUSA.png";
+        button2.querySelector('img').src = "../../Images/sadUSA.png";
+        button3.querySelector('img').src = "../../Images/angryUSA.png";
+        button4.querySelector('img').src = "../../Images/hiUSA.png";
+    }
+    else {
+        button1.querySelector('img').src = "../../Images/happyURSS.png";
+        button2.querySelector('img').src = "../../Images/sadURSS.png";
+        button3.querySelector('img').src = "../../Images/angryURSS.png";
+        button4.querySelector('img').src = "../../Images/hiURSS.png";
+    }
+}
+
+function triggerEmote(emote){
+    //disable buttons for 5 seconds
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    button1.disabled = true;
+    button2.disabled = true;
+    button3.disabled = true;
+    button4.disabled = true;
+    setTimeout(function(){
+        button1.disabled = false;
+        button2.disabled = false;
+        button3.disabled = false;
+        button4.disabled = false;
+    }, 5000);
+
+    if(whichPlayer===1){
+        if(emote==="happy"){
+            emote="happyUSA";
+        }
+        if(emote==="sad"){
+            emote="sadUSA";
+        }
+        if(emote==="angry"){
+            emote="angryUSA";
+        }
+        if(emote==="hi"){
+            emote="hiUSA";
+        }
+    }
+    else{
+        if(emote==="happy"){
+            emote="happyURSS";
+        }
+        if(emote==="sad"){
+            emote="sadURSS";
+        }
+        if(emote==="angry"){
+            emote="angryURSS";
+        }
+        if(emote==="hi"){
+            emote="hiURSS";
+        }
+    }
+    socket.emit("emote",roomName,emote);
+}
+
+socket.on("emoteDisplay",(emote)=>{
+    console.log("emoteDisplay",emote);
+    const emoteDisplay = document.getElementById("emote");
+    emoteDisplay.style.display = "block";
+    emoteDisplay.classList.add("shake");
+    emoteDisplay.querySelector('img').src = "../../Images/"+emote+".png";
+    setTimeout(function(){
+        emoteDisplay.style.display = "none";
+        emoteDisplay.classList.remove("shake");
+    }, 2000);
 });

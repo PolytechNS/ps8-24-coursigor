@@ -136,7 +136,10 @@ nsp.on('connection', (socket) => {
 
     });
 
-
+    socket.on("emote",(roomName,emote)=>{
+        console.log("emote", emote);
+        online1v1.sendEmote(roomName,emote,nsp);
+    });
 });
 exports.io = io;
 

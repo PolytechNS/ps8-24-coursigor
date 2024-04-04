@@ -791,3 +791,8 @@ function makePlayersLeave(roomName, nsp) {
     nsp.to(roomName).emit('leaveGame');
 }
 exports.makePlayersLeave = makePlayersLeave;
+
+function sendEmote(roomName, emote, nsp) {
+    nsp.to(roomName).emit('emoteDisplay', emote);
+}
+exports.sendEmote = sendEmote;
