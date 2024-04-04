@@ -12,6 +12,7 @@ window.addEventListener('beforeunload', function (event) {
     console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
     socket.emit("userLeft",InGame);
+
     displayElo();
 });
 
@@ -503,6 +504,7 @@ function goBackToMenu(){
     InGame= "false";
     localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
+    socket.emit("disconnect");
 }
 
 function surrender(){
@@ -510,9 +512,11 @@ function surrender(){
     localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
     socket.emit("surrender", roomName);
+
 }
 
 socket.on("quitRoom", () => {
+
     window.location.href = "../../index.html";
 });
 
