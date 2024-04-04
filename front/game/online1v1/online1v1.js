@@ -539,3 +539,63 @@ function loadEmote(){
         button4.querySelector('img').src = "../../Images/hiURSS.png";
     }
 }
+
+function triggerEmote(emote){
+    //disable buttons for 5 seconds
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    button1.disabled = true;
+    button2.disabled = true;
+    button3.disabled = true;
+    button4.disabled = true;
+    setTimeout(function(){
+        button1.disabled = false;
+        button2.disabled = false;
+        button3.disabled = false;
+        button4.disabled = false;
+    }, 5000);
+
+    if(whichPlayer===1){
+        if(emote==="happy"){
+            emote="happyUSA";
+        }
+        if(emote==="sad"){
+            emote="sadUSA";
+        }
+        if(emote==="angry"){
+            emote="angryUSA";
+        }
+        if(emote==="hi"){
+            emote="hiUSA";
+        }
+    }
+    else{
+        if(emote==="happy"){
+            emote="happyURSS";
+        }
+        if(emote==="sad"){
+            emote="sadURSS";
+        }
+        if(emote==="angry"){
+            emote="angryURSS";
+        }
+        if(emote==="hi"){
+            emote="hiURSS";
+        }
+    }
+    socket.emit("emote",roomName,emote);
+}
+
+socket.on("emoteDisplay",(emote)=>{
+    console.log("emoteDisplay",emote);
+    const emoteDisplay = document.getElementById("emote");
+    emoteDisplay.style.display = "block";
+    emoteDisplay.classList.add("shake");
+    emoteDisplay.querySelector('img').src = "../../Images/"+emote+".png";
+    setTimeout(function(){
+        emoteDisplay.style.display = "none";
+        emoteDisplay.classList.remove("shake");
+    }, 2000);
+});
