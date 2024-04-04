@@ -26,6 +26,9 @@ window.addEventListener('load', function() {
         console.log(roomName);
         socket.emit('resumeGame', roomName);
         displayElo();
+        //methode pour changer le path de l'image des boutons
+        console.log("loadEmote")
+        loadEmote();
 
 
 
@@ -51,6 +54,7 @@ window.addEventListener('load', function() {
             this.whichPlayer = whichPlayer;
             localStorage.setItem("whichPlayer", this.whichPlayer);
             console.log("whichPlayer", whichPlayer);
+            loadEmote();
 
         });
         socket.on("roomName", (roomName,eloP1,eloP2) => {
@@ -68,6 +72,7 @@ window.addEventListener('load', function() {
         InGame= "true";
         localStorage.setItem("InGame", InGame);
         console.log("Nouvelle partie");
+
     }
 
 
@@ -514,3 +519,23 @@ socket.on("quitRoom", () => {
 socket.on("leaveGame", () => {
     goBackToMenu();
 });
+
+function loadEmote(){
+    console.log("whichPlayer EMOTE",whichPlayer);
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    if(whichPlayer===1) {
+        button1.querySelector('img').src = "../../Images/happyUSA.png";
+        button2.querySelector('img').src = "../../Images/sadUSA.png";
+        button3.querySelector('img').src = "../../Images/angryUSA.png";
+        button4.querySelector('img').src = "../../Images/hiUSA.png";
+    }
+    else {
+        button1.querySelector('img').src = "../../Images/happyURSS.png";
+        button2.querySelector('img').src = "../../Images/sadURSS.png";
+        button3.querySelector('img').src = "../../Images/angryURSS.png";
+        button4.querySelector('img').src = "../../Images/hiURSS.png";
+    }
+}
