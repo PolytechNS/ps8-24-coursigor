@@ -9,32 +9,37 @@ let eloUSA;
 let eloURSS;
 
 window.addEventListener('beforeunload', function (event) {
-    console.log("Je quitte la partie");
+    //console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
     socket.emit("userLeft",InGame);
+
     displayElo();
 });
 
 window.addEventListener('load', function() {
     InGame = localStorage.getItem("InGame");
     if(InGame === "true") {
-        console.log("J'étais déjà dans une partie");
+        //console.log("J'étais déjà dans une partie");
         roomName = localStorage.getItem("roomName");
         whichPlayer = JSON.parse(localStorage.getItem("whichPlayer"));
         document.getElementById("overlay").style.display = "none";
         document.getElementById("game").style.display = "grid";
-        console.log(roomName);
+        //console.log(roomName);
         socket.emit('resumeGame', roomName);
         displayElo();
+        //methode pour changer le path de l'image des boutons
+        //console.log("loadEmote")
+        loadEmote();
 
 
 
 
     }else{
+        document.getElementById("btnAbandonner").disabled = false;
         let eloToSend=getCookie("elo");
         socket.emit('firstConnection',eloToSend);
         socket.on("nbJoueur", (nbJoueur) => {
-            console.log("un joueur a rejoint la partie", nbJoueur);
+            //console.log("un joueur a rejoint la partie", nbJoueur);
             if (nbJoueur === 2) {
                 // Enlever l'overlay
                 document.getElementById("overlay").style.display = "none";
@@ -50,24 +55,26 @@ window.addEventListener('load', function() {
 
             this.whichPlayer = whichPlayer;
             localStorage.setItem("whichPlayer", this.whichPlayer);
-            console.log("whichPlayer", whichPlayer);
+            //console.log("whichPlayer", whichPlayer);
+            loadEmote();
 
         });
         socket.on("roomName", (roomName,eloP1,eloP2) => {
-            console.log("roomName", roomName)
+            //console.log("roomName", roomName)
             this.roomName = roomName;
             localStorage.setItem("roomName",this.roomName);
             localStorage.setItem("eloP1",eloP1);
             localStorage.setItem("eloP2",eloP2);
-            console.log("eloP1",eloP1);
-            console.log("eloP2",eloP2);
+            //console.log("eloP1",eloP1);
+            //console.log("eloP2",eloP2);
             displayElo();
 
 
         });
         InGame= "true";
         localStorage.setItem("InGame", InGame);
-        console.log("Nouvelle partie");
+        //console.log("Nouvelle partie");
+
     }
 
 
@@ -89,7 +96,7 @@ function getCookie(name) {
 socket.on("updateGrid", (gameStatus) => {
     document.getElementById("wallLeftP1").textContent= gameStatus.wallsLeftP1;
     document.getElementById("wallLeftP2").textContent= gameStatus.wallsLeftP2;
-    console.log("GamesState reçu");
+    //console.log("GamesState reçu");
     if(gameStatus.activePlayer===32){
         activePlayer=1;
     }else {
@@ -126,7 +133,7 @@ function createGrid(visionBoard, activePlayer, placedWalls, wallsNotToPlace, pos
     const NEGMASK =0b1000
     const VISIONMASK = 0b111
 
-    console.log("visionBoard",visionBoard);
+    //console.log("visionBoard",visionBoard);
 
     const svg = document.querySelector('svg');
     //clear the previous cells and walls but keep the placed walls
@@ -307,7 +314,7 @@ function createGridPlayer2(x,y, i, j) {
 
 
 function handlePlayerClick(i, j) {
-    console.log(myTurn)
+    //console.log(myTurn)
     if (!myTurn) {
         // Ne rien faire si ce n'est pas votre tour
         return;
@@ -323,11 +330,11 @@ function handleWallClick(i1, j1, i2, j2) {
 
     if (i1 === i2) {
         // Vertical wall
-        console.log("vertical", i1, j1);
+        //console.log("vertical", i1, j1);
         socket.emit("nextMove", "vertical," + i1 + "," + j1,roomName);
     } else {
         // Horizontal wall
-        console.log("horizontal", i1, j1)
+        //console.log("horizontal", i1, j1)
         socket.emit("nextMove", "horizontal," + i1 + "," + j1,roomName);
     }
 }
@@ -410,18 +417,19 @@ function verticalWallHandleHover(event) {
 }
 
 socket.on("invalidMove", (msg) => {
-    console.log(msg);
+    //console.log(msg);
 });
 
 
 socket.on("usaMayWin", (player) => {
-    console.log("P1 va gagner"+player);
+    //console.log("P1 va gagner"+player);
     //get by id whichTurn
     document.getElementById('whichTurn').textContent = "Dernier tour pour Staline";
 });
 
 socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
-    console.log("P1 a gagné"+player);
+    document.getElementById("btnAbandonner").disabled = true;
+    //console.log("P1 a gagné"+player);
     const id= getCookie("id");
     socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
@@ -429,34 +437,57 @@ socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
     document.getElementById("gameover-message").textContent = "Kenedy a gagné";
     if(whichPlayer===1){
         document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
+        //delete cookie elo
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        //edit elo cookie as newEloUSA
+
+        document.cookie = "elo="+newEloUSA;
+        //display cookie
+        //console.log("cookie elo",getCookie("elo"));
+
     }
     else{
         document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        document.cookie = "elo="+newEloURSS;
+        //display cookie
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        //console.log("cookie elo",getCookie("elo"));
     }
     document.getElementById('gameover').style.display = "block";
 });
 
 socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
-    console.log("P2 a gagné");
+    document.getElementById("btnAbandonner").disabled = true;
+    //console.log("P2 a gagné");
     const id= getCookie("id");
     socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
     document.getElementById("gameover-message").textContent = "Staline a gagné";
     if(whichPlayer===1){
         document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
-        console.log("elo URSS",newEloURSS);
-        console.log("elo USA",newEloUSA);
+        //delete cookie elo
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        //edit elo cookie as newEloUSA
+
+        document.cookie = "elo="+newEloUSA;
+        //display cookie
+        //console.log("cookie elo",getCookie("elo"));
+
     }
     else{
         document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
-        console.log("elo URSS",newEloURSS);
-        console.log("elo USA",newEloUSA);
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        document.cookie = "elo="+newEloURSS;
+        //display cookie
+        document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        //console.log("cookie elo",getCookie("elo"));
     }
     document.getElementById('gameover').style.display = "block";
 });
 
 socket.on("draw", () => {
-    console.log("Match nul");
+    //console.log("Match nul");
     //pop up de draw
     document.getElementById("gameover-message").textContent = "Match nul";
     document.getElementById('gameover').style.display = "block";
@@ -498,19 +529,102 @@ function goBackToMenu(){
     InGame= "false";
     localStorage.setItem("InGame", InGame);
     window.location.href = "../../index.html";
+    socket.emit("disconnect");
 }
 
 function surrender(){
+    document.getElementById("btnAbandonner").disabled = true;
+    socket.emit("surrender", roomName);
     InGame= "false";
     localStorage.setItem("InGame", InGame);
-    window.location.href = "../../index.html";
-    socket.emit("surrender", roomName);
+    //window.location.href = "../../index.html";
 }
 
 socket.on("quitRoom", () => {
+
     window.location.href = "../../index.html";
 });
 
 socket.on("leaveGame", () => {
     goBackToMenu();
+});
+
+function loadEmote(){
+    //console.log("whichPlayer EMOTE",whichPlayer);
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    if(whichPlayer===1) {
+        button1.querySelector('img').src = "../../Images/happyUSA.png";
+        button2.querySelector('img').src = "../../Images/sadUSA.png";
+        button3.querySelector('img').src = "../../Images/angryUSA.png";
+        button4.querySelector('img').src = "../../Images/hiUSA.png";
+    }
+    else {
+        button1.querySelector('img').src = "../../Images/happyURSS.png";
+        button2.querySelector('img').src = "../../Images/sadURSS.png";
+        button3.querySelector('img').src = "../../Images/angryURSS.png";
+        button4.querySelector('img').src = "../../Images/hiURSS.png";
+    }
+}
+
+function triggerEmote(emote){
+    //disable buttons for 5 seconds
+    const button1 = document.getElementById('emote1');
+    const button2 = document.getElementById('emote2');
+    const button3 = document.getElementById('emote3');
+    const button4 = document.getElementById('emote4');
+    button1.disabled = true;
+    button2.disabled = true;
+    button3.disabled = true;
+    button4.disabled = true;
+    setTimeout(function(){
+        button1.disabled = false;
+        button2.disabled = false;
+        button3.disabled = false;
+        button4.disabled = false;
+    }, 5000);
+
+    if(whichPlayer===1){
+        if(emote==="happy"){
+            emote="happyUSA";
+        }
+        if(emote==="sad"){
+            emote="sadUSA";
+        }
+        if(emote==="angry"){
+            emote="angryUSA";
+        }
+        if(emote==="hi"){
+            emote="hiUSA";
+        }
+    }
+    else{
+        if(emote==="happy"){
+            emote="happyURSS";
+        }
+        if(emote==="sad"){
+            emote="sadURSS";
+        }
+        if(emote==="angry"){
+            emote="angryURSS";
+        }
+        if(emote==="hi"){
+            emote="hiURSS";
+        }
+    }
+    socket.emit("emote",roomName,emote);
+}
+
+socket.on("emoteDisplay",(emote)=>{
+    //console.log("emoteDisplay",emote);
+    const emoteDisplay = document.getElementById("emote");
+    emoteDisplay.style.display = "block";
+    emoteDisplay.classList.add("shake");
+    emoteDisplay.querySelector('img').src = "../../Images/"+emote+".png";
+    setTimeout(function(){
+        emoteDisplay.style.display = "none";
+        emoteDisplay.classList.remove("shake");
+    }, 2000);
 });

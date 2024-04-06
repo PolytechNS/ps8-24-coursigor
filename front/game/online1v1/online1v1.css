@@ -80,7 +80,53 @@ header {
     align-items: center;
     grid-column: 1 / 4;
     padding: 10px;
+    height: 60px;
+    margin-top: 10px;
 }
+footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    text-align: center;
+    grid-column: 1 / 4;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+}
+
+footer > div {
+    display: flex;
+    align-items: center;
+}
+
+#abandonner {
+    margin-right: auto;
+}
+
+.footer-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 10px; /* Ajoutez de la marge entre les boutons si nécessaire */
+}
+
+.footer-button img {
+    width: 90px;
+    height: auto;
+}
+
+
+
+
 
 header img {
     height: 3rem;
@@ -452,6 +498,27 @@ button {
     font-size: 30px;
     font-weight: bold;
 }
+#emote {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    max-width: 1300px;
+    animation-duration: 0.5s;
+    animation-name: shake;
+    animation-iteration-count: 1;
+}
+
+@keyframes shake {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(-50%, -50%) rotate(-5deg); }
+    50% { transform: translate(-50%, -50%) rotate(5deg); }
+    75% { transform: translate(-50%, -50%) rotate(-5deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
 
 #gameover {
     display: none;
