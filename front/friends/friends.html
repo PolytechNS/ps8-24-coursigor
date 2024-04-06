@@ -3,16 +3,39 @@
 <head>
     <title>Friends</title>
     <link rel="stylesheet" type="text/css" href="friends.css">
+    <script src="friends.js"></script>
 </head>
 <body>
     <h1>Comrades</h1>
     <h2>Here are your Comrades:</h2>
-    <div id="comrades">
-        <div class="comrade">
-            <h3>Comrade 1</h3>
-            <button>Remove</button>
-        </div>
+    <div id="ComradeContainer ">
+        <table id="Comrades">
+            <thead>
+            <tr>
+                <td>usernames</td>
+                <td>remove?</td>
+            </tr>
+            </thead>
+            <tbody id="ComradesBody">
+
+            </tbody>
+        </table>
+    </div>
     <h2>Comrades in waiting:</h2>
+    <div id="ComradeContainer ">
+        <table id="ComradesWait">
+            <thead>
+            <tr>
+                <td>usernames</td>
+                <td>add</td>
+                <td>deny</td>
+            </tr>
+            </thead>
+            <tbody id="ComradesWaitBody">
+
+            </tbody>
+        </table>
+
     <h2>Search for Comrades:</h2>
 </body>
 </html>

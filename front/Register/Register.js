@@ -79,6 +79,8 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}; path=/`;
 
                 }
+                console.log(data.username)
+                localStorage["username"]= data.username;
                 console.log('Connexion réussie:', data.message);
             }
         })

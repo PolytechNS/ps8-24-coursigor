@@ -5,11 +5,13 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
-
-
+const friends = require('./EndPoints/friends.js');
 
 const DBuri = "mongodb://{$mongodbuser}:{$mongodbpassword}@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
+/*
+
+
 
 
 DBClient.connect()
@@ -20,6 +22,7 @@ DBClient.connect()
     console.log("db connect error");
     throw err;
 });
+*/
 
 
 const app = http.createServer(async function (request, response) {
@@ -38,8 +41,13 @@ const app = http.createServer(async function (request, response) {
             response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
             // Si le URL commence par /api, alors c'est une requête REST.
             if (filePath[1] === "api") {
+                console.log('start');
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
                     SignUp.manage(DBClient,request,response);
+                }
+                else if (filePath[2]==="friends"){
+                    console.log('oi')
+                    friends.manageRequest(DBClient,request,response);
                 }
                 //apiQuery.manage(request, response);
             } else {
@@ -53,13 +61,7 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
-DBClient.connect()
-    .then(()=>{
-        console.log("db connect success");
-    })
-    .catch((err)=>{
-        throw err;
-    });
+
 
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
