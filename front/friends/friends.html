@@ -13,7 +13,8 @@
             <thead>
             <tr>
                 <td>usernames</td>
-                <td>remove?</td>
+                <td>defy</td>
+                <td>remove</td>
             </tr>
             </thead>
             <tbody id="ComradesBody">
@@ -36,6 +37,17 @@
             </tbody>
         </table>
 
-    <h2>Search for Comrades:</h2>
+    
+    <div class="search-wrapper">
+        <h2><label for="search">Search for Comrades:</label>
+        <input type="search" id="search" data-search>
+        <div class="user-cards" data-user-cards-container></div>
+        <template data-user-template>
+            <div class="card">
+            <div class="header" data-header></div>
+            <div class="body" data-body></div>
+            </div>
+        </template>
+      </div>
 </body>
 </html>

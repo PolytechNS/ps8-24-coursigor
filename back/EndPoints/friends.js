@@ -235,7 +235,21 @@ function manageRequest(DBClient,req, res) {
       res.statusCode = 401;
       res.end(JSON.stringify({ error: error.message }));
     }
- } else {
+ }else if (method==="GET" && filePath[3]==='allUsers'){
+    try {
+      const urlParams = new URLSearchParams(filePath[4]);
+      const userName = urlParams.get('username');
+      const users = usersData.users.filter(user => user.username !== userName).map(user => user.username);
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(users));
+    } catch (error) {
+      res.setHeader('Content-Type', 'application/json');
+      res.statusCode = 401;
+      res.end(JSON.stringify({ error: error.message }));
+    }
+
+ }
+  else {
     res.setHeader('Content-Type', 'application/json');
     res.statusCode = 404;
     res.end(JSON.stringify({ error: 'Invalid endpoint' }));
