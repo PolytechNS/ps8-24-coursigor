@@ -25,6 +25,7 @@ function fetchFriends() {
             // Iterate over the friends and create table rows
             data.forEach(friend => {
                 let row = document.createElement("tr");
+                row.setAttribute("id", "friend"+friend);
                 let nameCell = document.createElement("td");
                 let defyCell = document.createElement("td");
                 let removeCell = document.createElement("td");
@@ -68,6 +69,7 @@ function fetchFriendsWaiting() {
             // Iterate over the friends and create table rows
             data.forEach(friend => {
                 let row = document.createElement("tr");
+                row.setAttribute("id", "waiting"+friend);
                 let nameCell = document.createElement("td");
                 let addCell = document.createElement("td");
                 let refuseCell = document.createElement("td");
@@ -115,7 +117,27 @@ function addAskingFriend(id) {
             return response.json();
         })
         .then(data => {
-            console.log('Friend removed:', data);
+            let row = document.querySelector(`#waiting${added}`);
+            if (row) {
+                row.remove();
+                
+                const table = document.getElementById("Comrades");
+                const tablebody = document.getElementById("ComradesBody");
+                row = document.createElement("tr");
+                row.setAttribute("id", "friend"+added);
+                let nameCell = document.createElement("td");
+                let defyCell = document.createElement("td");
+                let removeCell = document.createElement("td");
+                nameCell.innerText = added;
+                defyCell.innerHTML = `<button onclick="defyFriend('${added}')">Defy</button>`;
+                removeCell.innerHTML = `<button onclick="removeFriend('${added}')">Remove</button>`;
+                row.appendChild(nameCell); 
+                row.appendChild(removeCell);
+                row.appendChild(defyCell);
+                tablebody.appendChild(row);
+                table.appendChild(tablebody);
+            }
+            console.log('Friend added:', data);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -142,6 +164,10 @@ function removeFriend(id) {
             return response.json();
         })
         .then(data => {
+            const row = document.querySelector(`#friend${removed}`);
+            if (row) {
+                row.remove();
+            }
             console.log('Friend removed:', data);
         })
         .catch(error => {
@@ -170,6 +196,10 @@ function refuseFriend(id) {
             return response.json();
         })
         .then(data => {
+            const row = document.querySelector(`#waiting${removed}`);
+            if (row) {
+                row.remove();
+            }
             console.log('Friend removed:', data);
         })
         .catch(error => {
@@ -193,6 +223,7 @@ function addNewFriend(id) {
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
+
             }
             return response.json();
         })
