@@ -32,26 +32,6 @@ body {
 .btn {
     margin: 10px auto; /* Centre les boutons horizontalement */
     display: block;
-}
-
-.btn:not(:last-child) {
-    margin-bottom: 10px; /* Ajouter de l'espace entre chaque bouton */
-}
-
-#disconnect,
-#leaderboard {
-    margin: 10px auto; /* Centre les boutons de déconnexion et de tableau de bord horizontalement */
-    display: block;
-}
-
-#disconnect {
-    position: relative; /* Positionnement relatif pour le bouton de déconnexion */
-}
-
-.btn,
-#disconnect,
-#leaderboard,
-#loginButton {
     width: 100%;
     background-color: #ff0000;
     color: #fff;
@@ -65,9 +45,40 @@ body {
     font-size: 18px;
 }
 
-.btn:hover,
-#disconnect:hover,
-#leaderboard:hover,
-#loginButton:hover {
-    background-color: #b90000;
+.btn:not(:last-child) {
+    margin-bottom: 10px; /* Ajouter de l'espace entre chaque bouton */
+}
+
+.login-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.login-wrapper .login-button,
+.login-wrapper #disconnect {
+    display: block;
+    width: 120px;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff0000; /* conserve la même couleur de fond */
+    color: #fff; /* conserve la même couleur de texte */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-wrapper .login-button:hover,
+.login-wrapper #disconnect:hover {
+    background-color: #b90000; /* effet hover */
+}
+
+#disconnect {
+    display: none; /* Par défaut, le bouton Disconnect est caché */
+}
+
+#disconnect.show {
+    display: block; /* Le bouton Disconnect est affiché lorsque nécessaire */
 }

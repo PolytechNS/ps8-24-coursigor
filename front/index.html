@@ -17,9 +17,11 @@
         <button class="btn" onclick="localGame()">Local Game</button>
         <button class="btn" onclick="onlineGame()">Online Game</button>
         <button id="online1v1Button" class="btn" onclick="redirectToOnline1v1()">Online 1v1</button>
-        <button id="loginButton" class="login-button" onclick="connect()">Login</button>
+        <div class="login-wrapper">
+            <button id="loginButton" class="login-button" onclick="connect()">Login</button>
+            <button id="disconnect" class="btn" onclick="disconnect()">Disconnect</button>
+        </div>
         <button id="leaderboard" class="btn" onclick="redirectToLeaderboard()">Leaderboard</button>
-        <button id="disconnect" class="btn" onclick="disconnect()">Disconnect</button>
     </div>
 </div>
 </body>
