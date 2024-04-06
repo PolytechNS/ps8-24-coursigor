@@ -145,66 +145,66 @@ function nextMove(nsp,roomName, move) {
         validMove(roomName, moves[1], moves[2],nsp);
 
     }
-        else if (moves[0] === "horizontal") {
+    else if (moves[0] === "horizontal") {
 
-            console.log('horizontal', moves[1], moves[2]);
-            let gameState = games[roomName];
-            let i1 = moves[1];
-            let j1 = moves[2];
-            let i2 = i1 + 1;
-            let j2 = j1;
-            if(gameState.activePlayer===PLAYER1 && gameState.wallsLeftP1===0 || gameState.activePlayer===PLAYER2 && gameState.wallsLeftP2===0) {
-                sendInvalidMove(roomName, "No more walls left", nsp);
-                return;
-            }
-            gameState.visionBoard[j1][i1] += WALL_BOTTOM;
-            gameState.visionBoard[j2][i2] += WALL_BOTTOM;
+        console.log('horizontal', moves[1], moves[2]);
+        let gameState = games[roomName];
+        let i1 = moves[1];
+        let j1 = moves[2];
+        let i2 = i1 + 1;
+        let j2 = j1;
+        if(gameState.activePlayer===PLAYER1 && gameState.wallsLeftP1===0 || gameState.activePlayer===PLAYER2 && gameState.wallsLeftP2===0) {
+            sendInvalidMove(roomName, "No more walls left", nsp);
+            return;
+        }
+        gameState.visionBoard[j1][i1] += WALL_BOTTOM;
+        gameState.visionBoard[j2][i2] += WALL_BOTTOM;
 
-            gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
-            gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
+        gameState.visionBoard[j1 + 1][i1] += WALL_TOP;
+        gameState.visionBoard[j2 + 1][i2] += WALL_TOP;
 
-            gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
-            gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
-            gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
-            gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
+        gameState.placedWalls.push(["horizontal", i1, j1, gameState.activePlayer]);
+        gameState.wallsNotToPlace.push(["horizontal", i2, j2]);   //the wall to the right
+        gameState.wallsNotToPlace.push(["horizontal", i1 - 1, j1]);   //the wall to the left
+        gameState.wallsNotToPlace.push(["vertical", i1, j1]);     //the perpendicular wall to the top
 
-            let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1,gameState.visionBoard);
-            let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2,gameState.visionBoard);
+        let ncP1 = notCirclesPlayers([], gameState.positionPlayer1[0], gameState.positionPlayer1[1], PLAYER1,gameState.visionBoard);
+        let ncP2 = notCirclesPlayers([], gameState.positionPlayer2[0], gameState.positionPlayer2[1], PLAYER2,gameState.visionBoard);
 
 
-            if (!ncP1 || !ncP2) {
-                //console.log("The player can't reach the end anymore. The move is invalid");
+        if (!ncP1 || !ncP2) {
+            //console.log("The player can't reach the end anymore. The move is invalid");
 
-                gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
-                gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
+            gameState.visionBoard[j1][i1] -= WALL_BOTTOM;
+            gameState.visionBoard[j2][i2] -= WALL_BOTTOM;
 
-                gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
-                gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
+            gameState.visionBoard[j1 + 1][i1] -= WALL_TOP;
+            gameState.visionBoard[j2 + 1][i2] -= WALL_TOP;
 
-                // remove the coordinates from the wallsNotToPlace array
-                removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
-                removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
-                removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
-                removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
+            // remove the coordinates from the wallsNotToPlace array
+            removeMatchingWall(gameState.placedWalls, "horizontal", i1, j1);
+            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i2, j2);
+            removeMatchingWall(gameState.wallsNotToPlace, "horizontal", i1 - 1, j1);
+            removeMatchingWall(gameState.wallsNotToPlace, "vertical", i1, j1);
 
-                sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
-                return;
-            }
+            sendInvalidMove(roomName, "The player can't reach the end anymore. The move is invalid", nsp);
+            return;
+        }
 
-            if (gameState.activePlayer === PLAYER1) {
-                updateVisionWall(i1, j1, i2, j2, 1, gameState.visionBoard);
+        if (gameState.activePlayer === PLAYER1) {
+            updateVisionWall(i1, j1, i2, j2, 1, gameState.visionBoard);
 
-                gameState.wallsLeftP1--;
-                gameState.numberOfTurns++;
+            gameState.wallsLeftP1--;
+            gameState.numberOfTurns++;
 
-            } else {
-                updateVisionWall(i1, j1, i2, j2, -1,gameState.visionBoard);
+        } else {
+            updateVisionWall(i1, j1, i2, j2, -1,gameState.visionBoard);
 
-                gameState.wallsLeftP2--;
-                gameState.numberOfTurns++;
-            }
+            gameState.wallsLeftP2--;
+            gameState.numberOfTurns++;
+        }
 
-            sendGameState(roomName,nsp);
+        sendGameState(roomName,nsp);
 
     }
     else if (moves[0] === "vertical") {
@@ -458,10 +458,10 @@ function sendEndOfGameP1MayWin(roomName, player, nsp) {
     games[roomName].lastTurn = true;
     nsp.to(roomName).emit('usaMayWin', player);
 }
-//TODO appeler une méthode de calcul de gain d'elo
+
 function sendEndOfGameP1Win(roomName, player, nsp) {
 
-    var room= rooms.find(room => room.roomName === id);
+    var room= rooms.find(room => room.roomName === roomName);
     var newElos= calculElo(room.eloP1, room.eloP2, 1);
     room.eloP1=newElos[0];
     room.eloP2=newElos[1];
@@ -518,19 +518,20 @@ const { ObjectId } = require('mongodb');
 async function putNewEloInDB(roomName, DBClient, id, whichPlayer) {
     try {
         // Connexion à la base de données
-        await DBClient.connect();
+        //await DBClient.connect();
         const db = DBClient.db('ma_base_de_donnees');
         const utilisateursCollection = db.collection('utilisateurs');
         var room= rooms.find(room => room.roomName === roomName);
+        console.log("eloToSendP1", roomName);
         const eloToSend = whichPlayer === 1 ? room.eloP1 : room.eloP2;
-        console.log("eloToSendP1", room.eloP1);
-        console.log("eloToSendP2", room.eloP2);
+
         // Récupérer l'utilisateur avec l'ID spécifié
+        console.log("Recherche de l'utilisateur avec l'ID :", id);
         const utilisateur = await utilisateursCollection.findOne({ _id: new ObjectId(id) });
 
         if (utilisateur) {
             // Sélectionner le score ELO du joueur approprié
-            console.log("Score ELO à mettre à jour :", eloToSend);
+            console.log("Utilisateur trouvé. Score ELO à mettre à jour :", eloToSend);
 
             // Mettre à jour le score ELO de l'utilisateur dans la base de données
             const result = await utilisateursCollection.updateOne(
@@ -550,6 +551,7 @@ async function putNewEloInDB(roomName, DBClient, id, whichPlayer) {
         console.error('Erreur lors de la connexion à la base de données:', error);
     }
 }
+
 
 exports.putNewEloInDB = putNewEloInDB;
 
@@ -787,8 +789,22 @@ function resumeGame(socket,roomName,nsp) {
 }
 exports.resumeGame = resumeGame;
 
-function makePlayersLeave(roomName, nsp) {
-    nsp.to(roomName).emit('leaveGame');
+function makePlayersLeave(roomName, nsp,socket) {
+
+    //get players in the room
+    let room = rooms.find(room => room.roomName === roomName);
+    console.log("room", room);
+    let players = room.players;
+    //get which is the first in the tab
+    let player1 = players[0];
+    let player2 = players[1];
+    if(socket.id === player1){
+        sendEndOfGameP2(roomName, PLAYER2, nsp);
+    }else {
+        sendEndOfGameP1Win(roomName, PLAYER1, nsp);
+    }
+    //nsp.to(roomName).emit('leaveGame');
+
 }
 exports.makePlayersLeave = makePlayersLeave;
 
