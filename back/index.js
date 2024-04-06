@@ -102,6 +102,7 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 let nsp = io.of("/api/1v1Online");
 nsp.on('connection', (socket) => {
     console.log('a user connected');
+    DBClient.connect();
 
     let online1v1 = require('./Sockets/Online1v1.js');
     socket.on("firstConnection", (eloToSend) => {
@@ -122,7 +123,7 @@ nsp.on('connection', (socket) => {
     });
 
     socket.on("surrender", (roomName) => {
-        online1v1.makePlayersLeave(roomName,nsp);
+        online1v1.makePlayersLeave(roomName,nsp,socket);
     });
 
     socket.on("resumeGame", (roomName) => {
@@ -132,6 +133,7 @@ nsp.on('connection', (socket) => {
 
     socket.on("eloChange",(roomName,id,whichPlayer)=>{
         console.log("elo change");
+
         online1v1.putNewEloInDB(roomName,DBClient,id,whichPlayer);
 
     });
