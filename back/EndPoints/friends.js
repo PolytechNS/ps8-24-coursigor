@@ -95,7 +95,7 @@ const getAllUsers = async (DBClient,userName) => {
   const allUsers = await db.collection('utilisateurs');
   const users = allUsers.find({username: {$ne: userName}});
   const userNames = users.map(user => user.username);
-  return users;
+  return userNames;
 }
 
 function manageRequest(DBClient,req, res) {
