@@ -62,7 +62,8 @@ const getFriends = async (DBClient,userName) => {
   const db = DBClient.db('ma_base_de_donnees');
   await db.createCollection('friends');
   const allUsers = db.collection('friends');
-  const userFriends = allUsers.filter(friend => friend.user1 === userName || friend.user2 === userName);
+  const allUsersArray = allUsers.find().toArray();
+  const userFriends = allUsersArray.filter(friend => friend.user1 === userName || friend.user2 === userName);
   const friendNames = userFriends.map(friend => {
     if (friend.user1 === userName) {
       return friend.user2;
@@ -79,7 +80,8 @@ const getFriendsWait = async (DBClient,userName) => {
   const db = DBClient.db('ma_base_de_donnees');
   await db.createCollection('demandingFriends');
   const allUsers = db.collection('demandingFriends');
-  const userFriends = allUsers.filter(friend => friend.demandee===userName);
+  const allUsersArray = allUsers.find().toArray();
+  const userFriends = allUsersArray.filter(friend => friend.demandee===userName);
   const friendNames = userFriends.map(friend => {
     return friend.demander;
   });
@@ -93,8 +95,8 @@ const getAllUsers = async (DBClient,userName) => {
 
   // Récupération de l'utilisateur par son nom d'utilisateur et mot de passe
   const allUsers = await db.collection('utilisateurs');
-
-  const users = allUsers.filter(user => user.username !== userName).map(user => user.username);
+  const allUsersArray = allUsers.find().toArray();
+  const users = allUsersArray.filter(user => user.username !== userName).map(user => user.username);
   return users;
 }
 
