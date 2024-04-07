@@ -1,112 +1,68 @@
-let friendsData = {
-    "friends": [
-      {
-        "user1": "user1",
-        "user2": "user2"
-      },
-      {
-        "user1": "user2",
-        "user2": "user3"
-      },
-      {
-        "user1": "user1",
-        "user2": "user3"
-      },
-      {
-        "user1": "user3",
-        "user2": "user4"
-      },
-      {
-        "user1": "user4",
-        "user2": "user5"
-      }
-    ]
-  };
-let demandData = {
-  "futureFriends": [
-    {
-      demander:"user1",
-      demandee:"user2"
-    },
-    {
-      demander:"user3",
-      demandee:"user1"
-    }
-  ]
-}
-let usersData = {
-    "users": [
-        {
-          "username": "user1",
-          "email": "user1@example.com",
-          "password": "password1"
-        },
-        {
-          "username": "user2",
-          "email": "user2@example.com",
-          "password": "password2"
-        },
-        {
-          "username": "user3",
-          "email": "user3@example.com",
-          "password": "password3"
-        },
-        {
-          "username": "user4",
-          "email": "user4@example.com",
-          "password": "password4"
-        },
-        {
-          "username": "user5",
-          "email": "user5@example.com",
-          "password": "password5"
-        }
-    ]
-};
-
 const http = require('http');
 const cors = require('cors');
-const mongo = require('mongodb');
+const { MongoClient } = require("mongodb");
+const DBuri = "mongodb://root:example@172.20.0.2:27017/";
+const DBClient = new MongoClient(DBuri);
 
-const addFriend = async (UserToAdd,userName) => {
+const addFriend = async (DBClient,UserToAdd,userName) => {
         const newDemand = {
           demander: userName,
           demandee: UserToAdd
         };
-        demandData.futureFriends.push(newDemand);
+        DBClient.connect();
+        db = DBClient.db('ma_base_de_donnees');
+        const demandingFriends = db.collection('demandingFriends');
+        demandingFriends.insertOne(newDemand);
         return { message: 'Friend demand added', data: newDemand };
       }
 
 
-const acceptFriend = async (userNameToAccept,userName) => {
+const acceptFriend = async (DBClient,userNameToAccept,userName) => {
       const newFriend = {
         user1: userName,
         user2: userNameToAccept
       };
-      friendsData.friends.push(newFriend);
-      demandData.futureFriends = demandData.futureFriends.filter(f => f.demander !== userNameToAccept && f.demandee !== userName);
+      DBClient.connect();
+      const db = DBClient.db('ma_base_de_donnees');
+      const allFriends = db.collection('friends');
+
+      allFriends.insertOne(newFriend);
+      const demandingFriends = db.collection('demandingFriends');
+      demandingFriends.deleteOne({ demander: userNameToAccept, demandee: userName });
       return { message: 'Friend added', data: newFriend };
     }
 
 
-const removeFriend = async (userNameToDelete,userName) => {
-    console.log(userNameToDelete);
-    const friend = friendsData.friends.find(friend => ((friend.user1 === userNameToDelete || friend.user2 === userNameToDelete) && (friend.user1===userName || friend.user2 === userName)));
+const removeFriend = async (DBClient,userNameToDelete,userName) => {
+    DBClient.connect();
+    const db = DBClient.db('ma_base_de_donnees');
+    const allFriends = db.collection('friends');
+
+    const friend =allFriends.findOne( { user1: userName, user2: userNameToDelete }, { user1: userNameToDelete, user2: userName });
     if (friend) {
-        friendsData.friends = friendsData.friends.filter(f => f !== friend );
-        console.log (friendsData.friends);
+        allFriends.deleteOne({ user1: userName, user2: userNameToDelete }, { user1: userNameToDelete, user2: userName });
+        console.log (allFriends);
         return { message: 'Friend removed', data: friend };
     } else {
         throw new Error('Friend not found');
     }
 }
-const denyFriend = async (UserToDeny,userName) => {
-  demandData.futureFriends = demandData.futureFriends.filter(f => f.demander !== UserToDeny && f.demandee !== userName);
+const denyFriend = async (DBClient,UserToDeny,userName) => {
+  DBClient.connect();
+  const db = DBClient.db('ma_base_de_donnees');
+  const demandingFriends = db.collection('demandingFriends');
+  demandingFriends.updateOne({ $pull:{ demander: UserToDeny, demandee: userName }});
+  console.log(demandingFriends);
+  return { message: 'Friend demand denied' };
     
 }
 
-const getFriends = (userName) => {
-  const userFriends = friendsData.friends.filter(friend => friend.user1 === userName || friend.user2 === userName);
+const getFriends = async (DBClient,userName) => {
+  DBClient.connect();
+  const db = DBClient.db('ma_base_de_donnees');
+  await db.createCollection('friends');
+  const allUsers = db.collection('friends');
+  const userFriends = allUsers.filter(friend => friend.user1 === userName || friend.user2 === userName);
   const friendNames = userFriends.map(friend => {
     if (friend.user1 === userName) {
       return friend.user2;
@@ -118,14 +74,29 @@ const getFriends = (userName) => {
 };
 
 
-const getFriendsWait = (userName) => {
-  const userFriends = demandData.futureFriends.filter(friend => friend.demandee===userName);
+const getFriendsWait = async (DBClient,userName) => {
+  DBClient.connect();
+  const db = DBClient.db('ma_base_de_donnees');
+  await db.createCollection('demandingFriends');
+  const allUsers = db.collection('demandingFriends');
+  const userFriends = allUsers.filter(friend => friend.demandee===userName);
   const friendNames = userFriends.map(friend => {
     return friend.demander;
   });
   return friendNames;
 };
 
+const getAllUsers = async (DBClient,userName) => {
+  DBClient.connect();
+  // Sélection de la base de données
+  const db = DBClient.db('ma_base_de_donnees');
+
+  // Récupération de l'utilisateur par son nom d'utilisateur et mot de passe
+  const allUsers = await db.collection('utilisateurs');
+
+  const users = allUsers.filter(user => user.username !== userName).map(user => user.username);
+  return users;
+}
 
 function manageRequest(DBClient,req, res) {
   const url = req.url;
@@ -145,7 +116,7 @@ function manageRequest(DBClient,req, res) {
         console.log(requestBody);
         const postData = JSON.parse(requestBody);
         console.log(postData);
-        const result = await removeFriend(postData.removed,postData.username);
+        const result = await removeFriend(DBClient,postData.removed,postData.username);
         console.log("done");
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
@@ -165,7 +136,7 @@ function manageRequest(DBClient,req, res) {
       try {
         const postData = JSON.parse(requestBody);
         console.log(requestBody);
-        const result = await addFriend(postData.user);
+        const result = await addFriend(DBClient,postData.user);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
       } catch (error) {
@@ -183,7 +154,7 @@ function manageRequest(DBClient,req, res) {
       try {
         const postData = JSON.parse(requestBody);
         console.log(requestBody);
-        const result = await acceptFriend(postData.user);
+        const result = await acceptFriend(DBClient,postData.user);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
       } catch (error) {
@@ -201,7 +172,7 @@ function manageRequest(DBClient,req, res) {
       try {
         const postData = JSON.parse(requestBody);
         console.log(requestBody);
-        const result = await denyFriend(postData.removed,postData.username);
+        const result = await denyFriend(DBClient,postData.removed,postData.username);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
       } catch (error) {
@@ -215,7 +186,7 @@ function manageRequest(DBClient,req, res) {
       try {
         const urlParams = new URLSearchParams(filePath[4]);
         const userName = urlParams.get('username');
-        const friends = getFriends(userName);
+        const friends = getFriends(DBClient,userName);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(friends));
       } catch (error) {
@@ -227,7 +198,7 @@ function manageRequest(DBClient,req, res) {
     try {
       const urlParams = new URLSearchParams(filePath[4]);
       const userName = urlParams.get('username');
-      const friends = getFriendsWait(userName);
+      const friends = getFriendsWait(DBClient, userName);
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(friends));
     } catch (error) {
@@ -239,7 +210,7 @@ function manageRequest(DBClient,req, res) {
     try {
       const urlParams = new URLSearchParams(filePath[4]);
       const userName = urlParams.get('username');
-      const users = usersData.users.filter(user => user.username !== userName).map(user => user.username);
+      const users = getAllUsers(DBClient,userName);
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(users));
     } catch (error) {

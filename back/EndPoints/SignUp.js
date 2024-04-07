@@ -2,8 +2,8 @@ const { MongoClient } = require("mongodb");
 const jwt = require('jsonwebtoken');
 
 
-//const DBuri = "mongodb://root:example@172.20.0.2:27017/";
-//const DBClient = new MongoClient(DBuri);
+const DBuri = "mongodb://root:example@172.20.0.2:27017/";
+const DBClient = new MongoClient(DBuri);
 const http = require('http');
 const cors = require('cors');
 
@@ -48,7 +48,7 @@ const signUpAndPrintDatabase = async (DBClient,mail, username, password) => {
 
 const signInAndGenerateToken = async (DBClient,username, password) => {
     try {
-        /*
+        
         // Connexion à la base de données MongoDB
         await DBClient.connect();
 
@@ -65,7 +65,7 @@ const signInAndGenerateToken = async (DBClient,username, password) => {
         }
 
         console.log('Connexion réussie !');
-        */
+        
         // Génération du token JWT
         const token = generateToken(username, password);
 

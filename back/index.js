@@ -9,7 +9,7 @@ const friends = require('./EndPoints/friends.js');
 
 const DBuri = "mongodb://{$mongodbuser}:{$mongodbpassword}@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
-/*
+
 
 
 
@@ -22,7 +22,7 @@ DBClient.connect()
     console.log("db connect error");
     throw err;
 });
-*/
+
 
 
 const app = http.createServer(async function (request, response) {
