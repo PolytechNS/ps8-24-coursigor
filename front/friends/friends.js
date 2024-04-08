@@ -34,8 +34,9 @@ function fetchFriends() {
                 removeCell.innerHTML = `<button onclick="removeFriend('${friend}')">Remove</button>`;
 
                 row.appendChild(nameCell);
-                row.appendChild(removeCell);
                 row.appendChild(defyCell);
+                
+                row.appendChild(removeCell);
                 tablebody.appendChild(row);
             });
             table.appendChild(tablebody);
@@ -282,4 +283,9 @@ document.addEventListener("DOMContentLoaded", e => {
 
 function defyFriend(id) {
     //todo : use the function to start a one on one fight with the friend
+}
+
+
+function goBackToMenu() {
+    window.location.href = '/';
 }
