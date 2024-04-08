@@ -3,15 +3,18 @@ function checkTokenAndDisplayLinks() {
     const online1v1Button = document.getElementById('online1v1Button');
     const loginButton = document.querySelector('.login-button');
     const disconnectButton = document.getElementById('disconnect');
+    const aiGameButton = document.getElementById('aiGameButton');
 
     if (hasJwtCookie()) {
         online1v1Button.style.display = 'inline';
         loginButton.style.display = 'none';
         disconnectButton.style.display = 'inline';
+        aiGameButton.style.display = 'inline';
     } else {
         online1v1Button.style.display = 'none';
         loginButton.style.display = 'inline';
         disconnectButton.style.display = 'none';
+        aiGameButton.style.display = 'none';
     }
 }
 function redirectToLeaderboard() {
