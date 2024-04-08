@@ -230,6 +230,10 @@ function addNewFriend(id) {
         })
         .then(data => {
             console.log('Friend added:', data);
+            const card = document.querySelector(`#${added}card`);
+            if (card) {
+                card.remove();
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -257,6 +261,7 @@ function fetchUsers() {
             const card = userCardTemplate.content.cloneNode(true).children[0]
             const header = card.querySelector("[data-header]")
             const body = card.querySelector("[data-body]")
+            card.id = user + "card";
             header.textContent = user
             body.innerHTML = `<button onclick="addNewFriend('${user}')">Add</button>`
             userCardContainer.append(card)

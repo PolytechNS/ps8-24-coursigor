@@ -5,6 +5,7 @@ function checkTokenAndDisplayLinks() {
     const disconnectButton = document.getElementById('disconnect');
     const aiGameButton = document.getElementById('aiGameButton');
     const loadAiGameButton = document.getElementById('loadAIGame');
+    const friendsButton = document.getElementById('friendsButton');
 
     if (hasJwtCookie()) {
         online1v1Button.style.display = 'inline';
@@ -12,12 +13,14 @@ function checkTokenAndDisplayLinks() {
         disconnectButton.style.display = 'inline';
         aiGameButton.style.display = 'inline';
         loadAiGameButton.style.display = 'inline';
+        friendsButton.style.display = 'inline';
     } else {
         online1v1Button.style.display = 'none';
         loginButton.style.display = 'inline';
         disconnectButton.style.display = 'none';
         aiGameButton.style.display = 'none';
         loadAiGameButton.style.display = 'none';
+        friendsButton.style.display = 'none';
     }
 }
 function redirectToLeaderboard() {
@@ -102,4 +105,7 @@ function onlineGame() {
 }
 function loadAIGame() {
     window.location.href = 'game/onlineGame/onlineGame.html';
+}
+function redirectToFriends() {
+    window.location.href = 'friends/friends.html';
 }
