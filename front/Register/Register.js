@@ -1,48 +1,48 @@
-document.getElementById('RegisterBtn').addEventListener('click', async function() {
-    console.log('Bouton de connexion clique.');
+    document.getElementById('RegisterBtn').addEventListener('click', async function() {
+        console.log('Bouton de connexion clique.');
 
-    // Get input values
-    const email = document.getElementById('email').value;
-    const username = document.getElementById('username').value;
-    const password = await hashPassword(document.getElementById('password').value);
+        // Get input values
+        const email = document.getElementById('email').value;
+        const username = document.getElementById('username').value;
+        const password = await hashPassword(document.getElementById('password').value);
 
-    const postData = {"username": username, "password": password, "email": email}
+        const postData = {"username": username, "password": password, "email": email}
 
-    // Send POST request
-    fetch('/api/Register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postData)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const contentType = response.headers.get('content-type');
-
-            if (contentType && contentType.includes('application/json')) {
-                return response.json(); // Si le type de contenu est JSON, parse la réponse
-            } else {
-                return response.text(); // Sinon, récupère le texte brut de la réponse
-            }
+        // Send POST request
+        fetch('/api/Register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
         })
-        .then(data => {
-            // Traitez la réponse ici
-            document.getElementById('successMessage').textContent = 'You are now Registered!!';
-            console.log('Data reçue:', data);
-        })
-        .catch(error => {
-            // Gérer les erreurs ici
-            console.error('Erreur lors de la demande:', error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json(); // Si le type de contenu est JSON, parse la réponse
+                } else {
+                    return response.text(); // Sinon, récupère le texte brut de la réponse
+                }
+            })
+            .then(data => {
+                // Traitez la réponse ici
+                document.getElementById('successMessage').textContent = 'You are now Registered!!';
+                console.log('Data reçue:', data);
+            })
+            .catch(error => {
+                // Gérer les erreurs ici
+                console.error('Erreur lors de la demande:', error);
+            });
 
 
 
 
-});
+    });
 document.getElementById('LoginBtn').addEventListener('click', async function() {
     console.log('Bouton de login clique.');
     const usernameLogin = document.getElementById('usernameLogin').value;
@@ -83,6 +83,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     console.log("elo",elo);
                     document.cookie = `elo=${elo}; path=/`;
                     document.cookie = `id=${id}; path=/`;
+                    localStorage.setItem('username', usernameLogin);
                 }
                 console.log('Connexion réussie:', data.message);
             }

@@ -8,7 +8,8 @@ const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
 const online1v1 = require("./Sockets/Online1v1");
 const onlineGame = require("./Sockets/Online1v1");
-
+const friends = require('./EndPoints/friends.js');
+const leader = require('./DataBase/leaderBoard.js');
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
@@ -33,11 +34,12 @@ const app = http.createServer(async function (request, response) {
             if (filePath[1] === "api") {
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
                     SignUp.manage(DBClient,request,response);
-                }
-                if(filePath[2] === "leaderboard"){
+                } else if (filePath[2]==="friends"){
+                    console.log('oi')
+                    friends.manageRequest(DBClient,request,response);
+                } if(filePath[2] === "leaderboard"){
                     leader.manageRequestLB(DBClient,request,response);
                 }
-                //apiQuery.manage(request, response);
             } else {
                 fileQuery.manage(request, response);
             }
@@ -144,4 +146,3 @@ ai_io.on('connection', (socket) => {
 
 });
 exports.io = io;
-
