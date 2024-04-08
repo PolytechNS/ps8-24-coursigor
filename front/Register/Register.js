@@ -9,7 +9,7 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
     const postData = {"username": username, "password": password, "email": email}
 
     // Send POST request
-    fetch('http://localhost:8000/api/Register', {
+    fetch('/api/Register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -70,6 +70,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
 
                 // Gérez l'affichage ou la manipulation de l'erreur côté client
             } else {
+                window.location.href = "../index.html";
                 document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
@@ -77,7 +78,11 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     const expirationDate = new Date();
                     expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); //expiration 1h
                     document.cookie = `token=${data.token}; expires=${expirationDate.toUTCString()}; path=/`;
-
+                    const elo = data.elo;
+                    const id = data.id;
+                    console.log("elo",elo);
+                    document.cookie = `elo=${elo}; path=/`;
+                    document.cookie = `id=${id}; path=/`;
                 }
                 console.log('Connexion réussie:', data.message);
             }
@@ -96,10 +101,11 @@ async function hashPassword(password) {
     const data = encoder.encode(password);
 
     // Utilise l'API Web Crypto pour hasher le mot de passe avec l'algorithme SHA-256
-    const buffer = await crypto.subtle.digest('SHA-256', data);
+    //TODO fix le hashage
+    //const buffer = await crypto.subtle.digest('SHA-256', data);
 
     // Convertit le buffer en une chaîne hexadécimale
-    const hashedPassword = Array.from(new Uint8Array(buffer)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+    const hashedPassword = Array.from(new Uint8Array(data)).map(byte => byte.toString(16).padStart(2, '0')).join('');
 
     return hashedPassword;
 }
@@ -118,4 +124,7 @@ function displayCookies() {
     });
 
     alert(cookieString);
+}
+function goBackToMenu() {
+    window.location.href = '/';
 }

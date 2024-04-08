@@ -4,13 +4,15 @@ const cors = require('cors'); // Ajout du module cors
 const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
+const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
+const onlineGame = require("./logic/onlineGame");
+const saves = require("./EndPoints/Saves");
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
 
-let socketToToken = new Map();
 
 
 const app = http.createServer(async function (request, response) {
@@ -32,6 +34,9 @@ const app = http.createServer(async function (request, response) {
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
                     SignUp.manage(DBClient,request,response);
                 }
+                if(filePath[2] === "leaderboard"){
+                    leader.manageRequestLB(DBClient,request,response);
+                }
                 //apiQuery.manage(request, response);
             } else {
                 fileQuery.manage(request, response);
@@ -51,6 +56,8 @@ DBClient.connect()
     .catch((err)=>{
         throw err;
     });
+
+// Pour l'espace de noms '/api/onlineGame'
 
 const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
@@ -100,22 +107,49 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 });
 
-io.of("/api/1v1Online").on('connection', (socket) => {
 
-    socket.on('joinOrCreate1v1', (data) => {
-        console.log("joinOrCreate1v1");
-        console.log(data);
-        let online1v1 = require('./Sockets/Online1v1.js');
-        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
-        online1v1.handleStartGame(socket, data);
+let nsp = io.of("/api/1v1Online");
+nsp.on('connection', (socket) => {
+    console.log('a user connected');
+    DBClient.connect();
+
+    let online1v1 = require('./Sockets/Online1v1.js');
+    socket.on("firstConnection", (eloToSend) => {
+        console.log("first connection");
+        online1v1.handleStartGame(nsp, socket,eloToSend, DBClient);
+    });
+
+    socket.on('nextMove' , (move,roomName) => {
+        console.log('nextMove: ' + move);
+        console.log("salle associée au move : " + roomName);
+        let onlineGame = require('./Sockets/Online1v1.js');
+        onlineGame.nextMove(nsp, roomName, move);
+    });
+    socket.on('userLeft', (InGame) => {
+        console.log("user left");
+        online1v1.userLeft(socket);
 
     });
 
+    socket.on("surrender", (roomName) => {
+        online1v1.makePlayersLeave(roomName,nsp,socket);
+    });
+
+    socket.on("resumeGame", (roomName) => {
+
+        online1v1.resumeGame(socket,roomName,nsp);
+    });
+
+    socket.on("eloChange",(roomName,id,whichPlayer)=>{
+        console.log("elo change");
+
+        online1v1.putNewEloInDB(roomName,DBClient,id,whichPlayer);
+
+    });
+
+    socket.on("emote",(roomName,emote)=>{
+        console.log("emote", emote);
+        online1v1.sendEmote(roomName,emote,nsp);
+    });
 });
 exports.io = io;
-
-
-
-// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-//     const namespace = socket.nsp;
-// });

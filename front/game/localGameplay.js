@@ -765,3 +765,14 @@ function checkVictoryCondition() {
         return;
     }
 }
+
+function goBackToMenu() {
+    window.location.href = "../index.html";
+}
+
+function showGameplayExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "block";
+}
+function closeGameExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "none";
+}
