@@ -7,17 +7,54 @@
     <script src="onlineGame.js" type="module"></script>
 </head>
 <body>
+
+<div id="gameplayExplanation">
+    <button id="closeButton" onclick="closeGameExplanation()">&times;</button>
+    <h2 id="titleExplanation"> Bienvenue dans Cours Igor</h2>
+    Dans Quorridor, vous incarnez un joueur qui cherche à atteindre le côté opposé du plateau de jeu avant votre adversaire. Mais attention, le brouillard limite votre vision et rend la navigation plus difficile ! <br><br>
+
+    Comment jouer :<br>
+    Chaque joueur commence à un bord opposé du plateau.<br>
+    À chaque tour, vous pouvez vous déplacer ou placer un mur pour bloquer le chemin de votre adversaire.<br>
+    Utilisez stratégiquement vos murs pour ouvrir des passages pour vous-même tout en bloquant votre adversaire. Il vous permettent également de gagner de la vision<br>
+    Le premier joueur à atteindre le bord opposé gagne la partie.<br><br>
+    Le Brouillard :<br>
+    Le brouillard limite votre vision, vous empêchant de voir les cases du plateau au-delà de votre champ de vision immédiat. Planifiez soigneusement vos déplacements et utilisez votre intuition pour naviguer à travers le brouillard et atteindre la victoire !<br>
+
+    Bonne chance et amusez-vous bien !
+</div>
+
+
+<div id="gameover">
+    <div id="gameover-content">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="gameover-message"></p>
+        <p id="eloChange"></p>
+        <button id="backToMenu" onclick="goBackToMenu()">Retour au menu</button>
+    </div>
+</div>
+
+
+
 <header>
-    <button class="button" ><img src="../images/point-dinterrogation-blanc.png"></button>
+    <button class="button" onclick="showGameplayExplanation()">
+            <span class="box">
+                <img  src="../../Images/point-dinterrogation-blanc.png">
+            </span>
+    </button>
     <div class="MiddleHeader">
         <h1 class="gameTitle">
             COURS IGOR
         </h1>
-        <button id="StartGame" onclick="closeOverlay()" > Start Game </button>
-
+        <p id="whichTurn"></p>
     </div>
-    <button class="button" ><img src="../images/engrenage.png"></button>
+    <button class="button">
+            <span class="box">
+                <img src="../../Images/engrenage.png">
+            </span>
+    </button>
 </header>
+
 <div class="left-sidebar">D
     <p>Murs restants pour le Joueur 1 : <span id="wallLeftP1">10</span></p>
     Left Sidebar

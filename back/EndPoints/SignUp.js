@@ -7,7 +7,7 @@ const DBClient = new MongoClient(DBuri);
 const http = require('http');
 const cors = require('cors');
 
-const signUpAndPrintDatabase = async (DBClient,mail, username, password) => {
+const signUpAndPrintDatabase = async (DBClient,mail, username, password, elo) => {
     try {
         // Connexion à la base de données MongoDB
         
@@ -24,14 +24,14 @@ const signUpAndPrintDatabase = async (DBClient,mail, username, password) => {
 
         // Ajout de l'utilisateur à la collection
         const utilisateursCollection = db.collection('utilisateurs');
-        await utilisateursCollection.insertOne({ mail, username, password });
+        await utilisateursCollection.insertOne({ mail, username, password, elo });
 
         console.log('Utilisateur ajouté avec succès !');
 
         // Affichage de tous les utilisateurs dans la collection
         const users = await utilisateursCollection.find().toArray();
         console.log('Utilisateurs dans la collection :', users);
-
+        console.log("elo",elo);
         // Retournez la réponse sous forme d'objet JSON
         return { message: 'Inscription réussie' };
     } catch (error) {
@@ -65,11 +65,12 @@ const signInAndGenerateToken = async (DBClient,username, password) => {
         }
 
         console.log('Connexion réussie !');
-        
+        const elo = utilisateur.elo;
+        const id = utilisateur._id;
         // Génération du token JWT
         const token = generateToken(username, password);
-
-        return { message: 'Connexion réussie.', token, username };
+        console.log("elo"   ,elo);
+        return { message: 'Connexion réussie.', token, elo, id};
     } catch (error) {
         console.error('Erreur lors de l\'opération de connexion :', error);
         return { error: 'Erreur lors de la connexion.' };
@@ -112,7 +113,7 @@ function manageRequest(DBClient,req, res) {
             try {
                 const postData = JSON.parse(requestBody);
                 console.log(requestBody);
-                const result = await signUpAndPrintDatabase(DBClient, postData.email, postData.username, postData.password);
+                const result = await signUpAndPrintDatabase(DBClient, postData.email, postData.username, postData.password, 800);
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify({ message: 'Inscription réussie', data: result }));
             } catch (error) {

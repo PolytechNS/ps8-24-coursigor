@@ -8,23 +8,10 @@ const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
 const onlineGame = require("./logic/onlineGame");
 const saves = require("./EndPoints/Saves");
-const friends = require("./EndPoints/friends");
-
+const friends = require("./EndPoints/Friends");
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
-
-
-
-
-DBClient.connect()
-.then(()=>{
-    console.log("db connect success");
-})
-.catch((err)=>{
-    console.log("db connect error");
-    throw err;
-});
 
 
 
@@ -52,6 +39,9 @@ const app = http.createServer(async function (request, response) {
                     console.log('oi')
                     friends.manageRequest(DBClient,request,response);
                 }
+                if(filePath[2] === "leaderboard"){
+                    leader.manageRequestLB(DBClient,request,response);
+                }
                 //apiQuery.manage(request, response);
             } else {
                 fileQuery.manage(request, response);
@@ -64,10 +54,19 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
+DBClient.connect()
+    .then(()=>{
+        console.log("db connect success");
+    })
+    .catch((err)=>{
+        throw err;
+    });
 
+// Pour l'espace de noms '/api/onlineGame'
 
 const io = new Server(app);
-io.of("/api/onlineGame").on('connection', (socket) => {
+let ai_io = io.of("/api/onlineGame")
+ai_io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on('message', (msg) => {
@@ -76,9 +75,11 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
     socket.on('newGame', (cookieToken) => {
         console.log('new game: ' + cookieToken);
-        socket.emit('message', 'Starting new game...');
-        let onlineGame = require('./logic/onlineGame.js');
+        // socketToToken.set(socket.id, cookieToken);
 
+        socket.emit('message', 'Starting new game...');
+
+        let onlineGame = require('./logic/onlineGame.js');
         onlineGame.newGame(socket.id, cookieToken);
 
     });
@@ -99,29 +100,62 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        // socketToToken.delete(socket.id);
+
         let onlineGame = require('./logic/onlineGame.js');
         onlineGame.removeSocket(socket.id);
+
+        let saves = require('./EndPoints/Saves.js');
+        // saves.saveAIGame(DBClient, socketToToken.get(socket.id));
+
         console.log('user disconnected');
     });
 
 });
 
-io.of("/api/1v1Online").on('connection', (socket) => {
 
-    socket.on('joinOrCreate1v1', (data) => {
-        console.log("joinOrCreate1v1");
-        console.log(data);
-        let online1v1 = require('./Sockets/Online1v1.js');
-        online1v1.afficherMessage(socket.id, "joinOrCreate1v1");
-        online1v1.handleStartGame(socket, data);
+let nsp = io.of("/api/1v1Online");
+nsp.on('connection', (socket) => {
+    console.log('a user connected');
+    DBClient.connect();
+
+    let online1v1 = require('./Sockets/Online1v1.js');
+    socket.on("firstConnection", (eloToSend) => {
+        console.log("first connection");
+        online1v1.handleStartGame(nsp, socket,eloToSend, DBClient);
+    });
+
+    socket.on('nextMove' , (move,roomName) => {
+        console.log('nextMove: ' + move);
+        console.log("salle associée au move : " + roomName);
+        let onlineGame = require('./Sockets/Online1v1.js');
+        onlineGame.nextMove(nsp, roomName, move);
+    });
+    socket.on('userLeft', (InGame) => {
+        console.log("user left");
+        online1v1.userLeft(socket);
 
     });
 
+    socket.on("surrender", (roomName) => {
+        online1v1.makePlayersLeave(roomName,nsp,socket);
+    });
+
+    socket.on("resumeGame", (roomName) => {
+
+        online1v1.resumeGame(socket,roomName,nsp);
+    });
+
+    socket.on("eloChange",(roomName,id,whichPlayer)=>{
+        console.log("elo change");
+
+        online1v1.putNewEloInDB(roomName,DBClient,id,whichPlayer);
+
+    });
+
+    socket.on("emote",(roomName,emote)=>{
+        console.log("emote", emote);
+        online1v1.sendEmote(roomName,emote,nsp);
+    });
 });
 exports.io = io;
-
-
-
-// io.of(/^\/dynamic-\d+$/).on("connection", (socket) => {
-//     const namespace = socket.nsp;
-// });

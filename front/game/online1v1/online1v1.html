@@ -1,12 +1,126 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="online1v1.js"></script>
+    <link rel="stylesheet" href="online1v1.css">
 </head>
 <body>
-    <script src="../../js/socket.io.js"></script>
-    <script src="online1v1.js"></script>
+
+<!-- Overlay initial -->
+<div id="overlay" class="active">
+    <div id="chronometer">
+        <h3><span id="timer">00:00</span> <span id="close" onclick="goBackToMenu()">&#10006;</span></h3>
+
+    </div>
+    <div class="overlay-message">
+        <h2>En attente d'un joueur</h2>
+    </div>
+</div>
+
+<div id="gameplayExplanation">
+    <button id="closeButton" onclick="closeGameExplanation()">&times;</button>
+    <h2 id="titleExplanation"> Bienvenue dans Cours Igor</h2>
+    Dans Quorridor, vous incarnez un joueur qui cherche à atteindre le côté opposé du plateau de jeu avant votre adversaire. Mais attention, le brouillard limite votre vision et rend la navigation plus difficile ! <br><br>
+
+    Comment jouer :<br>
+    Chaque joueur commence à un bord opposé du plateau.<br>
+    À chaque tour, vous pouvez vous déplacer ou placer un mur pour bloquer le chemin de votre adversaire.<br>
+    Utilisez stratégiquement vos murs pour ouvrir des passages pour vous-même tout en bloquant votre adversaire. Il vous permettent également de gagner de la vision<br>
+    Le premier joueur à atteindre le bord opposé gagne la partie.<br><br>
+    Le Brouillard :<br>
+    Le brouillard limite votre vision, vous empêchant de voir les cases du plateau au-delà de votre champ de vision immédiat. Planifiez soigneusement vos déplacements et utilisez votre intuition pour naviguer à travers le brouillard et atteindre la victoire !<br>
+
+    Bonne chance et amusez-vous bien !
+</div>
+
+<div id="emote">
+    <img src="">
+</div>
+
+<div id="gameover">
+    <div id="gameover-content">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="gameover-message"></p>
+        <p id="eloChange"></p>
+        <button id="backToMenu" onclick="goBackToMenu()">Retour au menu</button>
+    </div>
+</div>
+
+<!-- Contenu du jeu -->
+<div id="game">
+    <header>
+        <button class="button" onclick="showGameplayExplanation()">
+            <span class="box">
+                <img  src="../../Images/point-dinterrogation-blanc.png">
+            </span>
+        </button>
+        <div class="MiddleHeader">
+            <h1 class="gameTitle">
+                COURS IGOR
+            </h1>
+            <p id="whichTurn"></p>
+        </div>
+        <button class="button">
+            <span class="box">
+                <img src="../../Images/engrenage.png">
+            </span>
+        </button>
+    </header>
+    <div class="left-sidebar">
+        <div id="player1">
+            <div id="USA">
+                <h2><img class="flag" src="../../Images/USA_Flag.png"> USA</h2>
+            </div>
+            <p><img class="mur" src="../../Images/mur2-removebg-preview.png"> x<span id="wallLeftP1">10</span></p>
+            <p id="EloP1"> Elo: </p>
+        </div>
+    </div>
+    <main class="container">
+        <div class="child">
+            <svg viewBox="0 0 44 44">
+                <rect x="0" y="0" width="100%" height="100%" fill="white"/>
+            </svg>
+        </div>
+    </main>
+    <div class="right-sidebar">
+        <div id="player2">
+            <div id="URSS">
+                <h2><img class="flag" src="../../Images/Soviet_Flag.png"> URSS</h2>
+            </div>
+            <p><img class="mur" src="../../Images/mur2-removebg-preview.png"> x <span id="wallLeftP2">10</span></p>
+            <p id="EloP2"> Elo: </p>
+        </div>
+    </div>
+    <footer>
+        <div>
+            <button class="button" id="btnAbandonner" onclick="surrender()">
+            <span class="box" id="abandonner">
+                <a id="abandonnerText">Abandonner</a>
+            </span>
+            </button>
+            <p id="Winning"></p>
+        </div>
+        <div class="footer-buttons-container">
+            <button class="footer-button" id="emote1" onclick="triggerEmote('happy')">
+                <img src="../../Images/happyURSS.png" alt="Image 1">
+            </button>
+            <button class="footer-button" id="emote2" onclick="triggerEmote('sad')">
+                <img src="../../Images/sadURSS.png" alt="Image 2" >
+            </button>
+            <button class="footer-button" id="emote3" onclick="triggerEmote('angry')">
+                <img src="../../Images/angryURSS.png" alt="Image 3" >
+            </button>
+            <button class="footer-button" id="emote4" onclick="triggerEmote('hi')">
+                <img src="../../Images/hiURSS.png" alt="Image 4" >
+            </button>
+        </div>
+    </footer>
+
+
+
+</div>
+
+<script src="../../js/socket.io.js"></script>
+<script src="online1v1.js"></script>
 </body>
 </html>
