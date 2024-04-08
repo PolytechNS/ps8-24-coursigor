@@ -83,6 +83,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     console.log("elo",elo);
                     document.cookie = `elo=${elo}; path=/`;
                     document.cookie = `id=${id}; path=/`;
+                    localStorage.setItem('username', usernameLogin);
                 }
                 console.log('Connexion réussie:', data.message);
             }

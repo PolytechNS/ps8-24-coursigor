@@ -8,7 +8,7 @@ const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
 const onlineGame = require("./logic/onlineGame");
 const saves = require("./EndPoints/Saves");
-const friends = require("./EndPoints/Friends");
+const friends = require("./EndPoints/friends");
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);

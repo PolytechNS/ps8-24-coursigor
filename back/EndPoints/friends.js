@@ -71,7 +71,7 @@ const getFriends = async (DBClient,userName) => {
   const allUsers = db.collection('friends');
   const userFriends = allUsers.find({ $or: [{ user1: userName }, { user2: userName }] });
   const userFriendsArray = await userFriends.toArray();
-  console.log(userFriendsArray);
+  // console.log(userFriendsArray);
   const friendNames = userFriendsArray.map(friend => {
     if (friend.user1 === userName) {
       return friend.user2;
@@ -84,16 +84,18 @@ const getFriends = async (DBClient,userName) => {
 
 
 const getFriendsWait = async (DBClient,userName) => {
-  DBClient.connect();
-  const db = DBClient.db('ma_base_de_donnees');
-  await db.createCollection('demandingFriends');
-  const allUsers = db.collection('demandingFriends');
-  const userFriends = allUsers.find({ demandee: userName });
-  const friendNames = userFriends.map(friend => {
-    return friend.demander;
-  });
-  const friendNamesArray = await friendNames.toArray();
-  return friendNamesArray;
+    DBClient.connect();
+    const db = DBClient.db('ma_base_de_donnees');
+    await db.createCollection('demandingFriends');
+    const allUsers = db.collection('demandingFriends');
+    let allUsersArray = await allUsers.find().toArray();
+    console.log("allUsersArray", allUsersArray);
+    const userFriends = allUsersArray.filter(friend => friend.demandee === userName);
+    console.log("userFriends", userFriends);
+    const friendNames = userFriends.map(friend => {
+        return friend.demander;
+    });
+    return friendNames;
 };
 
 const getAllUsers = async (DBClient,userName) => {
@@ -211,6 +213,7 @@ async function manageRequest(DBClient, req, res) {
         try {
             const urlParams = new URLSearchParams(filePath[4]);
             const userName = urlParams.get('username');
+            console.log("PATATE ---------------------------------------------");
             const friends = await getFriendsWait(DBClient, userName);
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(friends));
