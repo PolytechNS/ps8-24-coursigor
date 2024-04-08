@@ -1,48 +1,48 @@
-document.getElementById('RegisterBtn').addEventListener('click', async function() {
-    console.log('Bouton de connexion clique.');
+    document.getElementById('RegisterBtn').addEventListener('click', async function() {
+        console.log('Bouton de connexion clique.');
 
-    // Get input values
-    const email = document.getElementById('email').value;
-    const username = document.getElementById('username').value;
-    const password = await hashPassword(document.getElementById('password').value);
+        // Get input values
+        const email = document.getElementById('email').value;
+        const username = document.getElementById('username').value;
+        const password = await hashPassword(document.getElementById('password').value);
 
-    const postData = {"username": username, "password": password, "email": email}
+        const postData = {"username": username, "password": password, "email": email}
 
-    // Send POST request
-    fetch('/api/Register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postData)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const contentType = response.headers.get('content-type');
-
-            if (contentType && contentType.includes('application/json')) {
-                return response.json(); // Si le type de contenu est JSON, parse la réponse
-            } else {
-                return response.text(); // Sinon, récupère le texte brut de la réponse
-            }
+        // Send POST request
+        fetch('/api/Register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
         })
-        .then(data => {
-            // Traitez la réponse ici
-            document.getElementById('successMessage').textContent = 'Connexion réussie!';
-            console.log('Data reçue:', data);
-        })
-        .catch(error => {
-            // Gérer les erreurs ici
-            console.error('Erreur lors de la demande:', error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json(); // Si le type de contenu est JSON, parse la réponse
+                } else {
+                    return response.text(); // Sinon, récupère le texte brut de la réponse
+                }
+            })
+            .then(data => {
+                // Traitez la réponse ici
+                document.getElementById('successMessage').textContent = 'You are now Registered!!';
+                console.log('Data reçue:', data);
+            })
+            .catch(error => {
+                // Gérer les erreurs ici
+                console.error('Erreur lors de la demande:', error);
+            });
 
 
 
 
-});
+    });
 document.getElementById('LoginBtn').addEventListener('click', async function() {
     console.log('Bouton de login clique.');
     const usernameLogin = document.getElementById('usernameLogin').value;
@@ -64,14 +64,14 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
         })
         .then(data => {
             if (data.error) {
-                document.getElementById('successMessageLogin').textContent = 'Erreur d\'identification';
+                document.getElementById('successMessageLogin').textContent = 'Problem with Username or Password';
 
                 console.error('Erreur lors de la connexion:', data.error);
 
                 // Gérez l'affichage ou la manipulation de l'erreur côté client
             } else {
                 window.location.href = "../index.html";
-                document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
+                document.getElementById('successMessageLogin').textContent = 'You are now connected!';
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
                     console.log('Token reçu:', data.token);
