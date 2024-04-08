@@ -31,7 +31,7 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
         })
         .then(data => {
             // Traitez la réponse ici
-            document.getElementById('successMessage').textContent = 'Connexion réussie!';
+            document.getElementById('successMessage').textContent = 'You are now Registered!!';
             console.log('Data reçue:', data);
         })
         .catch(error => {
@@ -64,14 +64,14 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
         })
         .then(data => {
             if (data.error) {
-                document.getElementById('successMessageLogin').textContent = 'Erreur d\'identification';
+                document.getElementById('successMessageLogin').textContent = 'Problem with Username or Password';
 
                 console.error('Erreur lors de la connexion:', data.error);
 
                 // Gérez l'affichage ou la manipulation de l'erreur côté client
             } else {
                 window.location.href = "../index.html";
-                document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
+                document.getElementById('successMessageLogin').textContent = 'You are now connected!';
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
                     console.log('Token reçu:', data.token);

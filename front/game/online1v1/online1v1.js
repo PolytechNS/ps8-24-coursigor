@@ -82,8 +82,8 @@ window.addEventListener('load', function() {
 function displayElo(){
     eloUSA = localStorage.getItem("eloP1");
     eloURSS = localStorage.getItem("eloP2");
-    document.getElementById("EloP1").textContent = "Elo: "+ eloUSA;
-    document.getElementById("EloP2").textContent = "Elo: "+ eloURSS;
+    document.getElementById("EloP1").textContent = "Military Power: "+ eloUSA;
+    document.getElementById("EloP2").textContent = "Military Power: "+ eloURSS;
 
 }
 
@@ -104,11 +104,11 @@ socket.on("updateGrid", (gameStatus) => {
     }
     if(activePlayer!==whichPlayer){
         myTurn=false;
-        document.getElementById('whichTurn').textContent = "Tour Adverse";
+        document.getElementById('whichTurn').textContent = "Opponent Turn";
     }else
     {
         myTurn=true;
-        document.getElementById('whichTurn').textContent = "Votre tour";
+        document.getElementById('whichTurn').textContent = "Your turn";
     }
 
     createGrid(gameStatus.visionBoard, gameStatus.activePlayer, gameStatus.placedWalls, gameStatus.wallsNotToPlace, gameStatus.positionPlayer1, gameStatus.positionPlayer2);
@@ -434,9 +434,9 @@ socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
     socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
 
-    document.getElementById("gameover-message").textContent = "Kenedy a gagné";
+    document.getElementById("gameover-message").textContent = "Kenedy won";
     if(whichPlayer===1){
-        document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
+        document.getElementById("eloChange").textContent = "Military Power: "+newEloUSA;
         //delete cookie elo
         document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         //edit elo cookie as newEloUSA
@@ -447,7 +447,7 @@ socket.on("usaWin", (player,newEloUSA,newEloURSS) => {
 
     }
     else{
-        document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
+        document.getElementById("eloChange").textContent = "Military Power: "+newEloURSS;
         document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         document.cookie = "elo="+newEloURSS;
         //display cookie
@@ -463,9 +463,9 @@ socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
     const id= getCookie("id");
     socket.emit("eloChange",roomName,id, whichPlayer);
     //get by id whichTurn
-    document.getElementById("gameover-message").textContent = "Staline a gagné";
+    document.getElementById("gameover-message").textContent = "Staline Won";
     if(whichPlayer===1){
-        document.getElementById("eloChange").textContent = "Elo: "+newEloUSA;
+        document.getElementById("eloChange").textContent = "Military Power: "+newEloUSA;
         //delete cookie elo
         document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         //edit elo cookie as newEloUSA
@@ -476,7 +476,7 @@ socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
 
     }
     else{
-        document.getElementById("eloChange").textContent = "Elo: "+newEloURSS;
+        document.getElementById("eloChange").textContent = "Military Power: "+newEloURSS;
         document.cookie = "elo=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
         document.cookie = "elo="+newEloURSS;
         //display cookie
@@ -489,7 +489,7 @@ socket.on("urssWin", (player,newEloUSA,newEloURSS) => {
 socket.on("draw", () => {
     //console.log("Match nul");
     //pop up de draw
-    document.getElementById("gameover-message").textContent = "Match nul";
+    document.getElementById("gameover-message").textContent = "Draw";
     document.getElementById('gameover').style.display = "block";
 });
 
