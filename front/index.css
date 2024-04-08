@@ -75,6 +75,19 @@ body {
     background-color: #b90000; /* effet hover */
 }
 
+.aiGameWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.aiGameWrapper button:nth-child(1) {
+    flex: 4;
+    margin-right: 10px;
+}
+.aiGameWrapper button:nth-child(2) {
+    flex: 1;
+}
+
 #disconnect {
     display: none; /* Par défaut, le bouton Disconnect est caché */
 }
