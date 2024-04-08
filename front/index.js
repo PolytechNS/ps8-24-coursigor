@@ -4,17 +4,20 @@ function checkTokenAndDisplayLinks() {
     const loginButton = document.querySelector('.login-button');
     const disconnectButton = document.getElementById('disconnect');
     const aiGameButton = document.getElementById('aiGameButton');
+    const loadAiGameButton = document.getElementById('loadAIGame');
 
     if (hasJwtCookie()) {
         online1v1Button.style.display = 'inline';
         loginButton.style.display = 'none';
         disconnectButton.style.display = 'inline';
         aiGameButton.style.display = 'inline';
+        loadAiGameButton.style.display = 'inline';
     } else {
         online1v1Button.style.display = 'none';
         loginButton.style.display = 'inline';
         disconnectButton.style.display = 'none';
         aiGameButton.style.display = 'none';
+        loadAiGameButton.style.display = 'none';
     }
 }
 function redirectToLeaderboard() {
@@ -82,5 +85,21 @@ function localGame() {
     window.location.href = 'game/localGame.html';
 }
 function onlineGame() {
+    const cookies = document.cookie.split(';');
+    let cookieString = "Cookies:\n";
+    cookies.forEach(cookie => {
+        cookieString += cookie.trim() + '\n';
+    });
+
+    console.log(cookieString);
+    const socket = io('/api/onlineGame');
+    socket.emit('newGame', cookieString);
+
+
+    socket.on('message', (msg) => {
+        window.location.href = 'game/onlineGame/onlineGame.html';
+    });
+}
+function loadAIGame() {
     window.location.href = 'game/onlineGame/onlineGame.html';
 }

@@ -9,7 +9,6 @@ const {Server} = require("socket.io");
 const onlineGame = require("./logic/onlineGame");
 const saves = require("./EndPoints/Saves");
 
-
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
 
@@ -60,7 +59,8 @@ DBClient.connect()
 // Pour l'espace de noms '/api/onlineGame'
 
 const io = new Server(app);
-io.of("/api/onlineGame").on('connection', (socket) => {
+let ai_io = io.of("/api/onlineGame")
+ai_io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on('message', (msg) => {
@@ -69,11 +69,11 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
     socket.on('newGame', (cookieToken) => {
         console.log('new game: ' + cookieToken);
-        socketToToken.set(socket.id, cookieToken);
+        // socketToToken.set(socket.id, cookieToken);
 
         socket.emit('message', 'Starting new game...');
-        let onlineGame = require('./logic/onlineGame.js');
 
+        let onlineGame = require('./logic/onlineGame.js');
         onlineGame.newGame(socket.id, cookieToken);
 
     });
@@ -94,13 +94,13 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
-        socketToToken.delete(socket.id);
+        // socketToToken.delete(socket.id);
 
         let onlineGame = require('./logic/onlineGame.js');
         onlineGame.removeSocket(socket.id);
 
         let saves = require('./EndPoints/Saves.js');
-        saves.saveAIGame(DBClient, socketToToken.get(socket.id));
+        // saves.saveAIGame(DBClient, socketToToken.get(socket.id));
 
         console.log('user disconnected');
     });
