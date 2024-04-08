@@ -210,7 +210,7 @@ function refuseFriend(id) {
 function addNewFriend(id) {
     console.log("add");
     const added = id;
-    const adding = {"added": added,  "username": username};
+    const adding = {"demandee": added,  "demander": username};
     let tmp = JSON.stringify(adding);
     console.log(tmp);
     fetch(`http://localhost:8000/api/friends/add`, {
@@ -228,7 +228,7 @@ function addNewFriend(id) {
             return response.json();
         })
         .then(data => {
-            console.log('Friend removed:', data);
+            console.log('Friend added:', data);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -251,6 +251,7 @@ function fetchUsers() {
     .then(data => {
         const userCardTemplate = document.querySelector("[data-user-template]");
         const userCardContainer = document.querySelector("[data-user-cards-container]");
+        console.log(data);
         users = data.map(user => {
             const card = userCardTemplate.content.cloneNode(true).children[0]
             const header = card.querySelector("[data-header]")

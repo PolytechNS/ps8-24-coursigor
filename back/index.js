@@ -4,12 +4,15 @@ const cors = require('cors'); // Ajout du module cors
 const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
+const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
-const friends = require('./EndPoints/friends.js');
+const onlineGame = require("./logic/onlineGame");
+const saves = require("./EndPoints/Saves");
+const friends = require("./EndPoints/friends");
 
-const DBuri = "mongodb://{$mongodbuser}:{$mongodbpassword}@mongodb:27017/";
+
+const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
-
 
 
 
