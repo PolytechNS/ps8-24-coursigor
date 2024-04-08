@@ -5,10 +5,11 @@ const fileQuery = require('./queryManagers/front.js');
 const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const {Server} = require("socket.io");
-const onlineGame = require("./logic/onlineGame");
-const saves = require("./EndPoints/Saves");
-const friends = require("./EndPoints/friends");
 const online1v1 = require("./Sockets/Online1v1");
+const onlineGame = require("./Sockets/Online1v1");
+const friends = require('./EndPoints/friends.js');
+const leader = require('./DataBase/leaderBoard.js');
+
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
 const DBClient = new mongo.MongoClient(DBuri);
@@ -22,26 +23,22 @@ const app = http.createServer(async function (request, response) {
         });
 
         try {
-            
 
             // Ajout des en-têtes CORS manuellement
             response.setHeader('Access-Control-Allow-Origin', '*');
             response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
             response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
             // Si le URL commence par /api, alors c'est une requête REST.
             if (filePath[1] === "api") {
-                console.log('start');
                 if(filePath[2] === "Register" || filePath[2] === "Login"){
                     SignUp.manage(DBClient,request,response);
-                }
-                else if (filePath[2]==="friends"){
+                } else if (filePath[2]==="friends"){
                     console.log('oi')
                     friends.manageRequest(DBClient,request,response);
-                }
-                if(filePath[2] === "leaderboard"){
+                } if(filePath[2] === "leaderboard"){
                     leader.manageRequestLB(DBClient,request,response);
                 }
-                //apiQuery.manage(request, response);
             } else {
                 fileQuery.manage(request, response);
             }
@@ -148,4 +145,3 @@ ai_io.on('connection', (socket) => {
 
 });
 exports.io = io;
-
