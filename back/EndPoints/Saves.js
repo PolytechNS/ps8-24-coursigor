@@ -1,48 +1,60 @@
 const { MongoClient } = require("mongodb");
 const jwt = require('jsonwebtoken');
-
-//const DBuri = "mongodb://root:example@172.20.0.2:27017/";
-//const DBClient = new MongoClient(DBuri);
 const http = require('http');
 const cors = require('cors');
 
-const saveAI = async (DBSaves, userName,ai)=>{
+// MongoDB connection URI
+const DBuri = "mongodb://root:example@localhost:27017/";
+const DBClient = new MongoClient(DBuri);
+
+// Function to save AI game
+async function saveAIGame(token) {
     try {
-        // Connexion à la base de données MongoDB
-        await DBSaves.connect();
+        // Establish MongoDB connection
+        await DBClient.connect();
+        console.log('Connected to the database');
 
-        console.log('Connexion à la base de données réussie !');
+        // Retrieve game
+        let game = JSON.stringify(retrieveGame(token));
 
-        // Sélection de la base de données
-        const db = DBSaves.db('ma_base_de_donnees');
+        // Save the game
+        await DB_saveAIGame(DBClient, JSON.stringify(token), game);
 
-        // Création de la collection (si elle n'existe pas déjà)
-        await db.createCollection('gamesSaved');
-
-        // Ajout de la partie dans la collection
-        const gamesSavedCollection = db.collection('gamesSaved');
-        await gamesSavedCollection.insertOne({ userName, ai });
-
-        console.log('sauvegarde ajoutée avec succès !');
-
-        // Affichage de toutes les parties sauvegardées
-        const saves = await gamesSavedCollection.find().toArray();
-        console.log('Sauvegardes dans la collection :', saves);
-
-        // Retournez la réponse sous forme d'objet JSON
-        return { message: 'Sauvegarde réussie' };
+        console.log("Game saved !");
     } catch (error) {
-        console.log('Erreur lors de l\'opération de sauvegarde :', error);
-        console.error('Erreur lors de l\'opération de sauvegarde :', error);
-
-        // Retournez une réponse d'erreur sous forme d'objet JSON
-        throw { error: error.message };
+        console.error('Error saving game:', error);
     } finally {
-        // Fermeture de la connexion à la base de données
-        await DBSaves.close();
+        // Close the MongoDB connection
+        await DBClient.close();
+        console.log('Database connection closed');
     }
 }
+exports.saveAIGame = saveAIGame;
 
-const savePlayers=(username1, username2)=>{
-
+// Function to retrieve game
+function retrieveGame(token) {
+    let onlineGame = require('../logic/onlineGame.js');
+    let game = onlineGame.retrieveGame(token);
+    return game;
 }
+
+// Function to save game to MongoDB
+const DB_saveAIGame = async (DBClient, userName, game) => {
+    try {
+        console.log('Saving game...');
+
+        // Select database
+        const db = DBClient.db('ma_base_de_donnees');
+
+        // Create or access the collection
+        const partiesCollection = db.collection('parties');
+
+        // Add the game to the collection
+        await partiesCollection.insertOne({ userName, game });
+
+        console.log('Game added successfully!');
+    } catch (error) {
+        console.error('Error saving game to database:', error);
+        throw error;
+    }
+};
