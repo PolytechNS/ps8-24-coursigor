@@ -129,3 +129,4 @@ function displayCookies() {
 function goBackToMenu() {
     window.location.href = '/';
 }
+
