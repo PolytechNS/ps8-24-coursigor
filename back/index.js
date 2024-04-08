@@ -1,4 +1,3 @@
-
 const http = require('http');
 const mongo = require('mongodb');
 const cors = require('cors'); // Ajout du module cors
@@ -7,6 +6,8 @@ const apiQuery = require('./queryManagers/api.js');
 const SignUp = require('./EndPoints/SignUp.js');
 const leader = require('./DataBase/leaderBoard.js');
 const {Server} = require("socket.io");
+const onlineGame = require("./logic/onlineGame");
+const saves = require("./EndPoints/Saves");
 
 
 const DBuri = "mongodb://root:example@mongodb:27017/";
@@ -56,9 +57,9 @@ DBClient.connect()
         throw err;
     });
 
-const io = new Server(app);
 // Pour l'espace de noms '/api/onlineGame'
 
+const io = new Server(app);
 io.of("/api/onlineGame").on('connection', (socket) => {
     console.log('a user connected');
 
@@ -68,6 +69,8 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
     socket.on('newGame', (cookieToken) => {
         console.log('new game: ' + cookieToken);
+        socketToToken.set(socket.id, cookieToken);
+
         socket.emit('message', 'Starting new game...');
         let onlineGame = require('./logic/onlineGame.js');
 
@@ -91,8 +94,14 @@ io.of("/api/onlineGame").on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
+        socketToToken.delete(socket.id);
+
         let onlineGame = require('./logic/onlineGame.js');
         onlineGame.removeSocket(socket.id);
+
+        let saves = require('./EndPoints/Saves.js');
+        saves.saveAIGame(DBClient, socketToToken.get(socket.id));
+
         console.log('user disconnected');
     });
 
@@ -144,4 +153,3 @@ nsp.on('connection', (socket) => {
     });
 });
 exports.io = io;
-

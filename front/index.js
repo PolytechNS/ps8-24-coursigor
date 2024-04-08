@@ -1,102 +1,155 @@
-// Fonction pour vérifier la présence du token et activer/désactiver le bouton en conséquence
-function checkTokenAndDisplayLinks() {
-    const online1v1Button = document.getElementById('online1v1Button');
-    const loginButton = document.querySelector('.login-button');
-    const disconnectButton = document.getElementById('disconnect');
-    const aiGameButton = document.getElementById('aiGameButton');
-
-    if (hasJwtCookie()) {
-        online1v1Button.style.display = 'inline';
-        loginButton.style.display = 'none';
-        disconnectButton.style.display = 'inline';
-        aiGameButton.style.display = 'inline';
-    } else {
-        online1v1Button.style.display = 'none';
-        loginButton.style.display = 'inline';
-        disconnectButton.style.display = 'none';
-        aiGameButton.style.display = 'none';
-    }
-}
-function redirectToLeaderboard() {
-    window.location.href = 'leaderboard/leaderboard.html';
-}
+const http = require('http');
+const mongo = require('mongodb');
+const cors = require('cors'); // Ajout du module cors
+const fileQuery = require('./queryManagers/front.js');
+const apiQuery = require('./queryManagers/api.js');
+const SignUp = require('./EndPoints/SignUp.js');
+const leader = require('./DataBase/leaderBoard.js');
+const {Server} = require("socket.io");
+const onlineGame = require("./logic/onlineGame");
+const saves = require("./EndPoints/Saves");
 
 
-// Fonction pour vérifier la présence du cookie JWT
-function hasJwtCookie() {
-    const cookies = document.cookie.split(';');
+const DBuri = "mongodb://root:example@mongodb:27017/";
+const DBClient = new mongo.MongoClient(DBuri);
 
-    for (const cookie of cookies) {
-        const [name, value] = cookie.split('=');
-        console.log(name + "= " + value);
-        if (name.trim() === 'token') {
-            return true;
-        }
-    }
 
-    return false;
-}
 
-// Fonction pour rediriger vers la page "Online 1v1" si le token est présent
-function redirectToOnline1v1() {
-    window.location.href = "game/online1v1/online1v1.html";
-
-}
-
-// Fonction pour obtenir le token depuis les cookies
-function getToken() {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith('token=')) {
-            return cookie.substring('token='.length);
-        }
-    }
-    return null;
-}
-
-function disconnect() {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    window.location.href = 'index.html';
-}
-
-// Appel de la fonction pour imprimer les cookies lorsque la page est chargée
-window.onload = function () {
-    printCookies();
-};
-
-//waits for the page to load
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById("onlineGame").addEventListener('click', function () {
-        //socket emits a new game event with the cookie token
-        const cookies = document.cookie.split(';');
-        let cookieString = "Cookies:\n";
-        cookies.forEach(cookie => {
-            cookieString += cookie.trim() + '\n';
+const app = http.createServer(async function (request, response) {
+    // Utilisation du middleware cors
+    cors()(request, response, function() {
+        let filePath = request.url.split("/").filter(function(elem) {
+            return elem !== "..";
         });
 
-        console.log(cookieString);
-        const socket = io('/api/onlineGame');
-        socket.emit('newGame', cookieString);
+        try {
 
+            // Ajout des en-têtes CORS manuellement
+            response.setHeader('Access-Control-Allow-Origin', '*');
+            response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET, PUT, DELETE');
+            response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-        //loads the game page on message event
-        socket.on('message', (msg) => {
-            window.location.href = 'game/onlineGame/onlineGame.html';
-        });
+            // Si le URL commence par /api, alors c'est une requête REST.
+            if (filePath[1] === "api") {
+                if(filePath[2] === "Register" || filePath[2] === "Login"){
+                    SignUp.manage(DBClient,request,response);
+                }
+                if(filePath[2] === "leaderboard"){
+                    leader.manageRequestLB(DBClient,request,response);
+                }
+                //apiQuery.manage(request, response);
+            } else {
+                fileQuery.manage(request, response);
+            }
+        } catch(error) {
+            console.log(`error while processing ${request.url}: ${error}`);
+            response.statusCode = 400;
+            response.end(`Something in your request (${request.url}) is strange...`);
+        }
+    });
+}).listen(8000);
 
+DBClient.connect()
+    .then(()=>{
+        console.log("db connect success");
+    })
+    .catch((err)=>{
+        throw err;
+    });
+
+// Pour l'espace de noms '/api/onlineGame'
+
+const io = new Server(app);
+io.of("/api/onlineGame").on('connection', (socket) => {
+    console.log('a user connected');
+
+    socket.on('message', (msg) => {
+        console.log('message: ' + msg);
+    });
+
+    socket.on('newGame', (cookieToken) => {
+        console.log('new game: ' + cookieToken);
+        socketToToken.set(socket.id, cookieToken);
+
+        socket.emit('message', 'Starting new game...');
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.newGame(socket.id, cookieToken);
 
     });
-});
-// Appeler la fonction lors du chargement de la page
-window.addEventListener('load', checkTokenAndDisplayLinks);
 
-function connect() {
-    window.location.href = 'Register/Register.html';
-}
-function localGame() {
-    window.location.href = 'game/localGame.html';
-}
-function onlineGame() {
-    window.location.href = 'game/onlineGame/onlineGame.html';
-}
+    socket.on('loadGame', (cookieToken) => {
+        console.log('load game: ' + cookieToken);
+        let onlineGame = require('./logic/onlineGame.js');
+
+        onlineGame.loadGame(socket.id, cookieToken);
+    });
+
+    socket.on('nextMove' , (move) => {
+        console.log('nextMove: ' + move);
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.nextMove(socket.id, move);
+    });
+
+
+
+    socket.on('disconnect', () => {
+        socketToToken.delete(socket.id);
+
+        let onlineGame = require('./logic/onlineGame.js');
+        onlineGame.removeSocket(socket.id);
+
+        let saves = require('./EndPoints/Saves.js');
+        saves.saveAIGame(DBClient, socketToToken.get(socket.id));
+
+        console.log('user disconnected');
+    });
+
+});
+
+
+let nsp = io.of("/api/1v1Online");
+nsp.on('connection', (socket) => {
+    console.log('a user connected');
+    DBClient.connect();
+
+    let online1v1 = require('./Sockets/Online1v1.js');
+    socket.on("firstConnection", (eloToSend) => {
+        console.log("first connection");
+        online1v1.handleStartGame(nsp, socket,eloToSend, DBClient);
+    });
+
+    socket.on('nextMove' , (move,roomName) => {
+        console.log('nextMove: ' + move);
+        console.log("salle associée au move : " + roomName);
+        let onlineGame = require('./Sockets/Online1v1.js');
+        onlineGame.nextMove(nsp, roomName, move);
+    });
+    socket.on('userLeft', (InGame) => {
+        console.log("user left");
+        online1v1.userLeft(socket);
+
+    });
+
+    socket.on("surrender", (roomName) => {
+        online1v1.makePlayersLeave(roomName,nsp,socket);
+    });
+
+    socket.on("resumeGame", (roomName) => {
+
+        online1v1.resumeGame(socket,roomName,nsp);
+    });
+
+    socket.on("eloChange",(roomName,id,whichPlayer)=>{
+        console.log("elo change");
+
+        online1v1.putNewEloInDB(roomName,DBClient,id,whichPlayer);
+
+    });
+
+    socket.on("emote",(roomName,emote)=>{
+        console.log("emote", emote);
+        online1v1.sendEmote(roomName,emote,nsp);
+    });
+});
+exports.io = io;
