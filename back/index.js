@@ -49,13 +49,18 @@ const app = http.createServer(async function (request, response) {
     });
 }).listen(8000);
 
+/*
+
 DBClient.connect()
     .then(()=>{
         console.log("db connect success");
     })
     .catch((err)=>{
+        console.log("db connect error");
         throw err;
     });
+
+    */
 
 const io = new Server(app);
 

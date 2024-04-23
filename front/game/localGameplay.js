@@ -218,9 +218,23 @@ function nextToPlayer(i, j) {
 function closeOverlay() {
     // Masquer l'overlay
     document.getElementById('overlay').classList.remove('active');
+    // Supprimer l'overlay
+    const svg = document.querySelector('svg');
+    const rect = document.getElementById('overlayRect');
+    svg.removeChild(rect);
 }
 function displayOverlay() {
     // Afficher l'overlay
+    svg = document.querySelector('svg');
+    rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", "0");
+    rect.setAttribute("y", "0");
+    rect.setAttribute("width", "100%");
+    rect.setAttribute("height", "100%");
+    rect.setAttribute("fill", "rgb(37,37,37)");
+    rect.setAttribute("id", "overlayRect");
+    svg.appendChild(rect);
+
     document.getElementById('overlay').classList.add('active');
 }
 
