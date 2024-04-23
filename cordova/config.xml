@@ -5,9 +5,12 @@
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
     </author>
+    <!--
     <content src="http://coursigor.ps8.academy/index.html" />
+    -->
+    <content src="index.html" />
     <access origin="http://coursigor.ps8.academy/" />
-    <allow-navigation href="http://coursigor.ps8.academy/" />
+    <allow-navigation href="*://coursigor.ps8.academy/*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <!--
