@@ -429,14 +429,12 @@ function handleWallClick(i1, j1, i2, j2) {
     const svg = document.querySelector('svg');
 
     if (activePlayer === PLAYER1) {
-        displayOverlay();
         newWall.setAttribute("fill", "#00FF00");
         updateVisionWall(i1, j1,i2,j2, 1);
         activePlayer = PLAYER2;
         wallLeftP1--;
 
     } else {
-        displayOverlay();
         newWall.setAttribute("fill", "#0000FF");
         updateVisionWall(i1, j1,i2,j2, -1);
         activePlayer = PLAYER1;
@@ -466,6 +464,7 @@ function handleWallClick(i1, j1, i2, j2) {
     //console.log(visionBoard.map(row => row.map(cell => cell.toString(2).padStart(16, "0")).join(" ")).join("\n"));
     //console.log(wallsNotToPlace);
     updateGrid();
+    displayOverlay();
 }
 
 
