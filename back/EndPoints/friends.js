@@ -43,13 +43,22 @@ const removeFriend = async (DBClient,userNameToDelete,userName) => {
     const db = DBClient.db('ma_base_de_donnees');
     const allFriends = db.collection('friends');
 
-    const friend =allFriends.findOne( { user1: userName, user2: userNameToDelete }, { user1: userNameToDelete, user2: userName });
-    if (friend) {
+    let friend = await allFriends.findOne( { user1: userName, user2: userNameToDelete }, { user1: userNameToDelete, user2: userName });
+    if (friend != null) {
         allFriends.deleteOne({ user1: userName, user2: userNameToDelete }, { user1: userNameToDelete, user2: userName });
         console.log (allFriends);
         return { message: 'Friend removed', data: friend };
-    } else {
-        throw new Error('Friend not found');
+    }
+    else {
+        friend = await allFriends.findOne({ user1: userNameToDelete, user2: userName }, { user1: userName, user2: userNameToDelete });
+        if (friend != null) {
+            allFriends.deleteOne({ user1: userNameToDelete, user2: userName }, { user1: userName, user2: userNameToDelete });
+            console.log (allFriends);
+            return { message: 'Friend removed', data: friend };
+        }
+        else {
+            throw new Error('Friend not found');
+        }
     }
 }
 const denyFriend = async (DBClient,UserToDeny,userName) => {

@@ -81,12 +81,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 // Appeler la fonction lors du chargement de la page
 window.addEventListener('load', checkTokenAndDisplayLinks);
+
 function connect() {
     window.location.href = 'Register/Register.html';
 }
+
 function localGame() {
     window.location.href = 'game/localGame.html';
 }
+
 function onlineGame() {
     const cookies = document.cookie.split(';');
     let cookieString = "Cookies:\n";

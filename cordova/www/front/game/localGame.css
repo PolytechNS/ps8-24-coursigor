@@ -15,7 +15,6 @@ body {
 .overlay {
     display: none;
     position: absolute;
-    background-color: rgb(37, 37, 37);
     padding: 370px;
     text-align: center;
 }
@@ -36,6 +35,8 @@ body {
     cursor: pointer;
     grid-row: 2/2;
 }
+
+
 p{
     color: yellow;
     font-size: 20px;
@@ -200,8 +201,8 @@ background: #000000;
 
 
 #gameplayExplanation p {
-    color: #6c757d;
-    font-size: 16px;
+    color: red;
+    font-size: medium;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -226,3 +227,52 @@ background: #000000;
     text-decoration: underline;
 }
 
+@media screen and (max-width: 768px) {
+    #gameplayExplanation {
+        padding: 5px;
+        
+        top: 50%;
+        left: 0%;
+        transform: translate(0%, -50%);
+    }
+
+    #gameplayExplanation p {
+        font-size: medium;
+    }
+
+    #gameplayExplanation ul li {
+        font-size: 10px;
+    }
+
+    main {
+        background: #1f1f1f;
+        margin: auto;
+        grid-column: 1;
+        grid-row: 3;
+    }
+    .container {
+        width: 100vmin;
+        height: 70vmin;
+        display: flex;
+        justify-content: center;
+    
+    }
+
+    .left-sidebar {
+        grid-row:4;
+        text-align: center;
+    }
+    .right-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        text-align: center;
+    }
+
+    
+    .left-sidebar,
+    .right-sidebar {
+        padding: 3rem;
+    }
+ 
+    
+}

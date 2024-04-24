@@ -589,3 +589,65 @@ button {
 #gameover-message {
     margin-bottom: 20px; /* Ajoute de l'espace entre le texte et le bouton */
 }
+
+
+@media screen and (max-width: 768px) {
+    #gameplayExplanation {
+        padding: 5px;
+        
+        top: 50%;
+        left: 0%;
+        transform: translate(0%, -50%);
+    }
+
+    #gameplayExplanation p {
+        font-size: medium;
+    }
+
+    #gameplayExplanation ul li {
+        font-size: 10px;
+    }
+
+    main {
+        background: #1f1f1f;
+        margin: auto;
+        grid-column: 1;
+        grid-row: 3;
+    }
+    .container {
+        width: 100vmin;
+        height: 70vmin;
+        display: flex;
+        justify-content: center;
+    
+    }
+
+    .left-sidebar {
+        grid-row:4;
+        text-align: center;
+    }
+    .right-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        text-align: center;
+    }
+
+    
+    .left-sidebar,
+    .right-sidebar {
+        padding: 3rem;
+    }
+
+    #gameover {
+        top: 50%;
+        left: 0%;
+        transform: translate(0%, -50%);
+    }
+
+    #gameover p {
+        font-size: medium;
+    }
+
+ 
+    
+}
