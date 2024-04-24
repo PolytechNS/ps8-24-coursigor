@@ -11,10 +11,10 @@ services:
   mongodb:
     image: mongo
     container_name: "mongo"
-    environment: 
-      - MONGO_INITDB_ROOT_USERNAME="${mongodbuser}"
-      - MONGO_INITDB_ROOT_PASSWORD="${mongodbpassword}"
-      
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
     volumes:
       - './dockervolume/mongodb:/data/db'
     ports:

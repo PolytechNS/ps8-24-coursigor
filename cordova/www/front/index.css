@@ -95,3 +95,10 @@ body {
 #disconnect.show {
     display: block; /* Le bouton Disconnect est affiché lorsque nécessaire */
 }
+
+@media screen and (max-aspect-ratio: 7/6) {
+    .btn {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
