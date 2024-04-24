@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login and Register</title>
+    <link rel="stylesheet" href="Register.css">
+</head>
+<body>
+<div class="container">
+    <article id="register">
+        <h1>Register</h1>
+        <input id="email" placeholder="Email">
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+        <button id="RegisterBtn">Register</button>
+        <div id="successMessage" style="color: green;"></div>
+    </article>
+
+    <article id="login">
+        <h1>Login</h1>
+        <input id="usernameLogin" placeholder="Username">
+        <input id="passwordLogin" type="password" placeholder="Password">
+        <button id="LoginBtn">Login</button>
+        <div id="successMessageLogin" style="color: green;"></div>
+
+    </article>
+</div>
+<button class="btnBack" onclick="goBackToMenu()"><img src="../Images/WhiteHome.png"></button>
+<script type="application/javascript" src="Register.js" defer></script>
+</body>
+</html>

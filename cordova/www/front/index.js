@@ -1,22 +1,3 @@
-function isCordova() {
-    // Check if Cordova is available
-    return typeof cordova !== 'undefined';
-}
-
-function handlePageLoad(event, ref) {
-    var url = event.url;
-    // Check if the URL is your app's URL or an external URL
-    if (url.indexOf('http://yourappdomain.com') === 0 || url.indexOf('https://yourappdomain.com') === 0) {
-        // Load the URL within the same WebView
-        ref.show();
-    } else {
-        // External URL, prevent default behavior (opening in system browser)
-        event.preventDefault();
-        // Load the URL within the same WebView
-        ref.loadUrl(url);
-    }
-}
-
 // Fonction pour vérifier la présence du token et activer/désactiver le bouton en conséquence
 function checkTokenAndDisplayLinks() {
     const online1v1Button = document.getElementById('online1v1Button');
@@ -24,6 +5,7 @@ function checkTokenAndDisplayLinks() {
     const disconnectButton = document.getElementById('disconnect');
     const aiGameButton = document.getElementById('aiGameButton');
     const loadAiGameButton = document.getElementById('loadAIGame');
+    const friendsButton = document.getElementById('friendsButton');
 
     if (hasJwtCookie()) {
         online1v1Button.style.display = 'inline';
@@ -31,12 +13,14 @@ function checkTokenAndDisplayLinks() {
         disconnectButton.style.display = 'inline';
         aiGameButton.style.display = 'inline';
         loadAiGameButton.style.display = 'inline';
+        friendsButton.style.display = 'inline';
     } else {
         online1v1Button.style.display = 'none';
         loginButton.style.display = 'inline';
         disconnectButton.style.display = 'none';
         aiGameButton.style.display = 'none';
         loadAiGameButton.style.display = 'none';
+        friendsButton.style.display = 'none';
     }
 }
 function redirectToLeaderboard() {
@@ -99,33 +83,11 @@ document.addEventListener('DOMContentLoaded', function () {
 window.addEventListener('load', checkTokenAndDisplayLinks);
 
 function connect() {
-    if (isCordova()) {
-        var url = 'Register/Register.html';
-        var target = '_self'; // Open in the Cordova WebView
-        var ref = cordova.InAppBrowser.open(url, target, 'location=no');
-
-        // Add event listener for link clicks
-        ref.addEventListener('loadstart', function(event) {
-            handlePageLoad(event, ref);
-        });
-    } else {
-        window.location.href = 'Register/Register.html';
-    }
+    window.location.href = 'Register/Register.html';
 }
 
 function localGame() {
-    if (isCordova()) {
-        var url = 'game/localGame.html';
-        var target = '_self'; // Open in the Cordova WebView
-        var ref = cordova.InAppBrowser.open(url, target, 'location=no');
-
-        // Add event listener for link clicks
-        ref.addEventListener('loadstart', function(event) {
-            handlePageLoad(event, ref);
-        });
-    } else {
-        window.location.href = 'game/localGame.html';
-    }
+    window.location.href = 'game/localGame.html';
 }
 
 function onlineGame() {
@@ -141,16 +103,12 @@ function onlineGame() {
 
 
     socket.on('message', (msg) => {
-        if (isCordova()) {
-            var url = 'game/onlineGame/onlineGame.html';
-            var target = '_self'; // Open in the Cordova WebView
-
-            var ref = cordova.InAppBrowser.open(url, target, 'location=no');
-        } else {
-            window.location.href = 'game/onlineGame/onlineGame.html';
-        }
+        window.location.href = 'game/onlineGame/onlineGame.html';
     });
 }
 function loadAIGame() {
     window.location.href = 'game/onlineGame/onlineGame.html';
+}
+function redirectToFriends() {
+    window.location.href = 'friends/friends.html';
 }
