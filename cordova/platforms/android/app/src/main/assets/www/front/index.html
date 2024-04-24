@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TEST</title>
+    <script src="/js/socket.io.js"></script>
+    <script src="../../platforms/android/platform_www/cordova.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>CoursIgor</h1>
+    </div>
+    <div class="main">
+        <button class="btn" onclick="localGame()">Local Game</button>
+        <div class="aiGameWrapper">
+            <button id="aiGameButton" class="btn" onclick="onlineGame()">Game Versus IA</button>
+            <button id="loadAIGame" class="btn" onclick="loadAIGame()">Load</button>
+        </div>
+        <button id="online1v1Button" class="btn" onclick="redirectToOnline1v1()">Online 1v1</button>
+        <div class="login-wrapper">
+            <button id="loginButton" class="login-button" onclick="connect()">Login</button>
+            <button id="disconnect" class="btn" onclick="disconnect()">Disconnect</button>
+        </div>
+        <button id="leaderboard" class="btn" onclick="redirectToLeaderboard()">Leaderboard</button>
+    </div>
+</div>
+</body>
+</html>
