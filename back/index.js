@@ -110,6 +110,10 @@ nsp.on('connection', (socket) => {
         console.log("emote", emote);
         online1v1.sendEmote(roomName,emote,nsp);
     });
+
+    socket.on('disconnect', () => {
+        online1v1.userLeft(socket);
+    });
 });
 
 let ai_io = io.of("/api/onlineGame")

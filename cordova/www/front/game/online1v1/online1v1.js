@@ -11,9 +11,16 @@ let eloURSS;
 window.addEventListener('beforeunload', function (event) {
     //console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
-    socket.emit("userLeft",InGame);
 
     displayElo();
+
+    // surrender();
+    socket.emit("surrender", roomName);
+    InGame= "false";
+    localStorage.setItem("InGame", InGame);
+    socket.emit("userLeft",InGame);
+
+    window.location.href = "../../index.html";
 });
 
 window.addEventListener('load', function() {
