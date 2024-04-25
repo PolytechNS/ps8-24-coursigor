@@ -66,7 +66,7 @@ h2 {
     width: 10%;
     height: auto;
     background: #ff0000;
-    max-width: 100px;
+    max-height: 100%;
 }
 .btnBack img {
     max-width: 100%;
