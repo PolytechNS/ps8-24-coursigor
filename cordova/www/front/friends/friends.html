@@ -4,51 +4,58 @@
     <title>Friends</title>
     <link rel="stylesheet" type="text/css" href="friends.css">
     <script src="friends.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <button id="btnBack" class="btnBack" onclick="goBackToMenu()"><img src="../Images/WhiteHome.png"></button>
-    <h1>Comrades</h1>
-    <h2>Here are your Comrades:</h2>
-    <div id="ComradeContainer ">
-        <table id="Comrades">
-            <thead>
-            <tr>
-                <td>usernames</td>
-                <td>defy</td>
-                <td>remove</td>
-            </tr>
-            </thead>
-            <tbody id="ComradesBody">
+    <header>
+        <button id="btnBack" class="btnBack" onclick="goBackToMenu()"><img src="../Images/WhiteHome.png"></button>
+        <h1>Comrades</h1>
+    </header>
+    <main>
+        <h2>Here are your Comrades:</h2>
+        <div id="ComradeContainer ">
+            <table id="Comrades">
+                <thead>
+                <tr>
+                    <td>usernames</td>
+                    <td>defy</td>
+                    <td>remove</td>
+                </tr>
+                </thead>
+                <tbody id="ComradesBody">
+                    
 
-            </tbody>
-        </table>
-    </div>
-    <h2>Comrades in waiting:</h2>
-    <div id="WaitingComradeContainer ">
-        <table id="ComradesWait">
-            <thead>
-            <tr>
-                <td>usernames</td>
-                <td>add</td>
-                <td>deny</td>
-            </tr>
-            </thead>
-            <tbody id="ComradesWaitBody">
+                </tbody>
+            </table>
+        </div>
+        <h2>Comrades in waiting:</h2>
+        <div id="WaitingComradeContainer ">
+            <table id="ComradesWait">
+                <thead>
+                <tr>
+                    <td>usernames</td>
+                    <td>add</td>
+                    <td>deny</td>
+                </tr>
+                </thead>
+                <tbody id="ComradesWaitBody">
 
-            </tbody>
-        </table>
+                </tbody>
+            </table>
 
-    
-    <div class="search-wrapper">
-        <h2><label for="search">Search for Comrades:</label>
-        <input type="search" id="search" data-search>
-        <div class="user-cards" data-user-cards-container></div>
-        <template data-user-template>
-            <div class="card">
-            <div class="header" data-header></div>
-            <div class="body" data-body></div>
-            </div>
-        </template>
-      </div>
+        
+        <div class="search-wrapper">
+            <h2><label for="search">Search for Comrades:</label>
+            <input type="search" id="search" data-search>
+            <div class="user-cards" data-user-cards-container></div>
+            
+            <template data-user-template>
+                <div class="card">
+                <div class="header" data-header></div>
+                <div class="body" data-body></div>
+                </div>
+            </template>
+        </div>
+    </main>
 </body>
 </html>
