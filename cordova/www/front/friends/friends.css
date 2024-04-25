@@ -66,6 +66,7 @@ h2 {
     width: 10%;
     height: auto;
     background: #ff0000;
+    max-width: 100px;
 }
 .btnBack img {
     max-width: 100%;
@@ -108,4 +109,5 @@ header image {
     height: 100%;
     min-width: 90%;
     min-height: 90%;
+
 }
