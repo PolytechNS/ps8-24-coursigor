@@ -1,6 +1,7 @@
 
 const username = localStorage["username"];
 let users = [];
+let all = [];
 
 
 function fetchFriends() {
@@ -19,7 +20,7 @@ function fetchFriends() {
             const table = document.getElementById("Comrades");
             const tablebody = document.getElementById("ComradesBody");
             console.log(data);
-
+            all.push(data);
 
 
             // Iterate over the friends and create table rows
@@ -64,7 +65,7 @@ function fetchFriendsWaiting() {
             const table = document.getElementById("ComradesWait");
             const tablebody = document.getElementById("ComradesWaitBody");
             console.log(data);
-
+            all.push(data);
 
 
             // Iterate over the friends and create table rows
@@ -257,6 +258,7 @@ function fetchUsers() {
         const userCardTemplate = document.querySelector("[data-user-template]");
         const userCardContainer = document.querySelector("[data-user-cards-container]");
         console.log(data);
+        if (!(data in all)){
         users = data.map(user => {
             const card = userCardTemplate.content.cloneNode(true).children[0]
             const header = card.querySelector("[data-header]")
@@ -266,7 +268,8 @@ function fetchUsers() {
             body.innerHTML = `<button onclick="addNewFriend('${user}')">Add</button>`
             userCardContainer.append(card)
             return { name: user, element: card }
-        });
+        });}
+        
 
     });
     
