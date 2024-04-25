@@ -4,10 +4,9 @@
 
 body {
     background: #000000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-template-rows: 15% 85%;
+    align-items: start;
     height: 100vh;
     margin: 0;
 }
@@ -36,28 +35,27 @@ body {
 
 table td, table th {
     border: 3px solid red;
-    padding: 15px;
-    padding-left: 150px;
-    padding-right: 150px;
-    font-size: 20px;
+
+    font-size: large;
     font-weight: bold;
     text-align: center; /* Centre le contenu horizontalement */
     vertical-align: middle; /* Centre le contenu verticalement */
+    font-size: medium;
 }
 
 h1 {
     color: white;
     font-size: 50px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 5%;
     font-weight: bold;
 }
 
 h2 {
     color: white;
     text-align: center;
-    margin-bottom: 20px;
-    font-size: 35px;
+    margin-bottom: 2%;
+    font-size: large;
     font-weight: bold;
 }
 
@@ -65,7 +63,7 @@ h2 {
     position: absolute;
     top: 20px;
     left: 20px;
-    width: 5%;
+    width: 10%;
     height: auto;
     background: #ff0000;
 }
@@ -78,9 +76,36 @@ table {
     border-collapse: collapse;
     margin-top: 20px;
     width: 100%;
+    overflow-x: auto;
+    width : 100%;
 }
 
 .card {
     justify-content: center;
     border: solid red;
+}
+
+main{
+    width: 100%;
+    height: 200%;
+    grid-row:2/2;
+    overflow-y: auto;
+}
+
+header {
+    position: fixed;
+    grid-row: 1/2;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 15%;
+    background-color: #ff0000;
+}
+
+header image {
+    width: 100%;
+    height: 100%;
+    min-width: 90%;
+    min-height: 90%;
 }
