@@ -309,6 +309,7 @@ function goBackToMenu() {
 
 
 socket.on('defyFriend', (data) => {
+    console.log(data);
     const popup = document.createElement("div");
     popup.classList.add("popup");
     const message = document.createElement("p");

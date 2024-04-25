@@ -5,7 +5,9 @@ const DBuri = "mongodb://root:example@172.20.0.2:27017/";
 const DBClient = new MongoClient(DBuri);
 
 defyFriend = async (socket, DBClient, defyData) => {
+    
     io.emit('defyFriend', defyData);
+    console.log('emitted defyFriend');
 }
 
 const addFriend = async (DBClient,UserToAdd,userName) => {

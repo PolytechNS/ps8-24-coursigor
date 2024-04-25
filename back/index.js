@@ -160,10 +160,11 @@ let nspFriends = io.of("/api/defyfriends");
 
 nspFriends.on('connection', (socket) => {
     socket.on('defyFriend', (defyData) => {
+        
         console.log('defyFriend: ' + defyData);
         
         friends.defyFriend(socket,DBClient, defyData);
-        
+
     });
 });
 
