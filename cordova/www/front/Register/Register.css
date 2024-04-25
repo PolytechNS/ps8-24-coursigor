@@ -51,9 +51,15 @@ button:hover {
 }
 
 body {
+    /* background image takes up full screen and does not stretch */
     background-image: url('../Images/igor.jpg');
     background-size: cover;
-    background-repeat: round;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+
+    /* if the screen is too wide duplicate the image */
+    background-repeat: repeat;
 }
 
 .btnBack {

@@ -2,13 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Fight against AI</title>
     <link rel="stylesheet" href="onlineGame.css">
     <script src="onlineGame.js" type="module"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+
+
+<div id="gameplayExplanation">
+    <button id="closeButton" onclick="closeGameExplanation()">&times;</button>
+    <h2 id="titleExplanation"> Bienvenue dans Cours Igor</h2>
+    <p>
+        Dans Quorridor, vous incarnez un joueur qui cherche à atteindre le côté opposé du plateau de jeu avant votre adversaire. Mais attention, le brouillard limite votre vision et rend la navigation plus difficile ! <br><br>
+
+        Comment jouer :<br>
+        Chaque joueur commence à un bord opposé du plateau.<br>
+        À chaque tour, vous pouvez vous déplacer ou placer un mur pour bloquer le chemin de votre adversaire.<br>
+        Utilisez stratégiquement vos murs pour ouvrir des passages pour vous-même tout en bloquant votre adversaire. Il vous permettent également de gagner de la vision<br>
+        Le premier joueur à atteindre le bord opposé gagne la partie.<br><br>
+        Le Brouillard :<br>
+        Le brouillard limite votre vision, vous empêchant de voir les cases du plateau au-delà de votre champ de vision immédiat. Planifiez soigneusement vos déplacements et utilisez votre intuition pour naviguer à travers le brouillard et atteindre la victoire !<br>
+
+        Bonne chance et amusez-vous bien !
+    </p>
+</div>
 <header>
-    <button class="button" ><img src="../images/point-dinterrogation-blanc.png"></button>
+    <button class="button" onclick="showGameplayExplanation()"><img src="../../Images/point-dinterrogation-blanc.png"></button>
     <div class="MiddleHeader">
         <h1 class="gameTitle">
             COURS IGOR
@@ -16,11 +36,19 @@
         <button id="StartGame" onclick="closeOverlay()" > Start Game </button>
 
     </div>
-    <button class="button" ><img src="../images/engrenage.png"></button>
+    <button class="button" onclick="goBackToMenu()"><img src="../../Images/WhiteHome.png">  </button>
 </header>
-<div class="left-sidebar">D
+
+<div id="gameover">
+    <div id="gameover-content">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="gameover-message"></p>
+        <button id="backToMenu" onclick="goBackToMenu()">Go back to Menu</button>
+    </div>
+</div>
+
+<div class="left-sidebar">
     <p>Murs restants pour le Joueur 1 : <span id="wallLeftP1">10</span></p>
-    Left Sidebar
 </div>
 <main class="container">
     <div class="child">
@@ -37,9 +65,7 @@
 
 <div class="right-sidebar">
     <p>Murs restants pour le Joueur 2 : <span id="wallLeftP2">10</span></p>
-    Right Sidebar
 </div>
-<footer>Footer Content — Header.com 2020</footer>
 
 <script src="/js/socket.io.js"></script>
 <script src="onlineGame.js"></script>

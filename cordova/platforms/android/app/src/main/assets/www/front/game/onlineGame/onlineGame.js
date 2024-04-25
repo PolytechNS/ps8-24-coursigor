@@ -39,6 +39,14 @@ socket.on("invalidMove", (msg) => {
     console.log(msg);
 });
 
+socket.on("gameOver", (player) => {
+    console.log("gameOver", player);
+    let p = player === 31 ? 2 : 1;
+    document.getElementById("gameover-message").textContent = "Player " + p + " won";
+    document.getElementById('gameover').style.display = "block";
+
+})
+
 
 
 
@@ -296,10 +304,17 @@ function handlePlayerClick(i, j) {
 
 
 
+function showGameplayExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "block";
+}
+function closeGameExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "none";
+}
 
 
-
-
+function goBackToMenu() {
+    window.location.href = "../../index.html";
+}
 
 
 
@@ -805,3 +820,5 @@ function checkVictoryCondition() {
 }
 
  */
+
+

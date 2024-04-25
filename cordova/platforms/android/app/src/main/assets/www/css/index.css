@@ -1,0 +1,8 @@
+body {
+    /*background image with no repetition and no deformation*/
+    background-image: url("../img/igor_background.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
