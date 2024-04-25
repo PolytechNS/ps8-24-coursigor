@@ -1,7 +1,8 @@
-
+const io = require('socket.io-client');
 const username = localStorage["username"];
 let users = [];
 let all = [];
+
 
 const socket = io("api/defyFriends");
 
