@@ -3,6 +3,9 @@ const username = localStorage["username"];
 let users = [];
 let all = [];
 
+const socket = io("api/defyFriends");
+
+
 
 function fetchFriends() {
         console.log("called");
@@ -269,7 +272,7 @@ function fetchUsers() {
             userCardContainer.append(card)
             return { name: user, element: card }
         });}
-        
+
 
     });
     
@@ -290,10 +293,31 @@ document.addEventListener("DOMContentLoaded", e => {
 
 
 function defyFriend(id) {
-    //todo : use the function to start a one on one fight with the friend
+    window.location.href = `/game/online1v1`;
+    
+    const message = username + " wants to defy " + id + " to a game!";
+    socket.emit('defyFriend', message);
 }
 
 
 function goBackToMenu() {
     window.location.href = '/';
+    
 }
+
+
+socket.on('defyFriend', (data) => {
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+    const message = document.createElement("p");
+    message.innerText = data;
+    const button = document.createElement("button");
+    button.innerText = "Play Game";
+    button.addEventListener("click", () => {
+        window.location.href = "/game/online1v1";
+    });
+    popup.appendChild(message);
+    popup.appendChild(button);
+    document.body.appendChild(popup);
+    alert(data);
+});

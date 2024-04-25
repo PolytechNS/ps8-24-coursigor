@@ -4,6 +4,10 @@ const { MongoClient } = require("mongodb");
 const DBuri = "mongodb://root:example@172.20.0.2:27017/";
 const DBClient = new MongoClient(DBuri);
 
+defyFriend = async (socket, DBClient, defyData) => {
+    io.emit('defyFriend', defyData);
+}
+
 const addFriend = async (DBClient,UserToAdd,userName) => {
         const newDemand = {
           demander: userName,
@@ -253,3 +257,4 @@ async function manageRequest(DBClient, req, res) {
 }
 
 exports.manageRequest= manageRequest;
+exports.defyFriend = defyFriend;
