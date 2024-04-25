@@ -794,14 +794,16 @@ function makePlayersLeave(roomName, nsp,socket) {
     //get players in the room
     let room = rooms.find(room => room.roomName === roomName);
     console.log("room", room);
-    let players = room.players;
-    //get which is the first in the tab
-    let player1 = players[0];
-    let player2 = players[1];
-    if(socket.id === player1){
-        sendEndOfGameP2(roomName, PLAYER2, nsp);
-    }else {
-        sendEndOfGameP1Win(roomName, PLAYER1, nsp);
+    if (room != undefined) {
+        let players = room.players;
+        //get which is the first in the tab
+        let player1 = players[0];
+        let player2 = players[1];
+        if (socket.id === player1) {
+            sendEndOfGameP2(roomName, PLAYER2, nsp);
+        } else {
+            sendEndOfGameP1Win(roomName, PLAYER1, nsp);
+        }
     }
     //nsp.to(roomName).emit('leaveGame');
 

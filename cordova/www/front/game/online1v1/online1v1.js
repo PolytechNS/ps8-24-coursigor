@@ -12,15 +12,16 @@ window.addEventListener('beforeunload', function (event) {
     //console.log("Je quitte la partie");
     InGame = localStorage.getItem("InGame");
 
-    displayElo();
+    // displayElo();
 
-    // surrender();
-    socket.emit("surrender", roomName);
-    InGame= "false";
-    localStorage.setItem("InGame", InGame);
-    socket.emit("userLeft",InGame);
 
-    window.location.href = "../../index.html";
+    if (document.getElementById("overlay").style.display === "none") {
+        // The game runs
+        surrender();
+    } else {
+        // Waits in queue
+        goBackToMenu();
+    }
 });
 
 window.addEventListener('load', function() {
