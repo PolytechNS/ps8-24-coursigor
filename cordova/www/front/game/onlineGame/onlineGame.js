@@ -296,10 +296,17 @@ function handlePlayerClick(i, j) {
 
 
 
+function showGameplayExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "block";
+}
+function closeGameExplanation() {
+    document.getElementById('gameplayExplanation').style.display = "none";
+}
 
 
-
-
+function goBackToMenu() {
+    window.location.href = "../../index.html";
+}
 
 
 
@@ -805,3 +812,5 @@ function checkVictoryCondition() {
 }
 
  */
+
+
