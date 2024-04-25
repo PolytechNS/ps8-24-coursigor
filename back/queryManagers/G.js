@@ -175,79 +175,85 @@ class AI {
     }
 
     updateBoard(gameState) {
-        return new Promise((resolve,reject)=>{
-            this.canSeeOpponent = false;
-            for (let i = 0; i < 9; i++){
-                for (let j = 0; j < 9; j++){
-                    if (gameState.board[i][j] == 1){
-                        this.visionBoard[i][j] = 1;
-                        this.ownPosition[0] = i+1;
-                        this.ownPosition[1] = j+1;
-                    }
-                    else if (gameState.board[i][j] == 2){
-                        this.visionBoard[i][j] = 2;
-                        this.opponentPosition[0] = i+1;
-                        this.opponentPosition[1] = j+1;
-                        this.canSeeOpponent = true;
-                    }
-                    else if (gameState.board[i][j] == -1){
-                        this.visionBoard[i][j] = 4;
+        try {
+            return new Promise((resolve, reject) => {
+                this.canSeeOpponent = false;
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (gameState.board[i][j] == 1) {
+                            this.visionBoard[i][j] = 1;
+                            this.ownPosition[0] = i + 1;
+                            this.ownPosition[1] = j + 1;
+                        } else if (gameState.board[i][j] == 2) {
+                            this.visionBoard[i][j] = 2;
+                            this.opponentPosition[0] = i + 1;
+                            this.opponentPosition[1] = j + 1;
+                            this.canSeeOpponent = true;
+                        } else if (gameState.board[i][j] == -1) {
+                            this.visionBoard[i][j] = 4;
+                        }
                     }
                 }
-            }
 
-            console.log("opponent walls : " + gameState.opponentWalls);
-            gameState.opponentWalls.forEach(element => {
-                console.log("element : " + element);
-                const element0 = element[0];
-                element0.toString();
-                const firstHalf = element0.substring(0, 1);
-                const secondHalf = element0.substring(1);
-                const firstHalfParsed = parseInt(firstHalf) - 1;
-                const secondHalfParsed = parseInt(secondHalf) -1 ;
-                if (element[1] == 1){
+                console.log("opponent walls : " + gameState.opponentWalls);
+                gameState.opponentWalls.forEach(element => {
+                    console.log("element : " + element);
+                    const element0 = element[0];
+                    element0.toString();
+                    const firstHalf = element0.substring(0, 1);
+                    const secondHalf = element0.substring(1);
+                    const firstHalfParsed = parseInt(firstHalf) - 1;
+                    const secondHalfParsed = parseInt(secondHalf) - 1;
+                    if (element[1] == 1) {
 
-                    this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_RIGHT;
-                    this.visionBoard[firstHalfParsed][secondHalfParsed+1] = this.visionBoard[firstHalfParsed][secondHalfParsed+1] | WALL_LEFT;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed] = this.visionBoard[firstHalfParsed+1][secondHalfParsed] | WALL_RIGHT;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] = this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] | WALL_LEFT;
+                        this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_RIGHT;
+                        this.visionBoard[firstHalfParsed][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed][secondHalfParsed + 1] | WALL_LEFT;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed] | WALL_RIGHT;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] | WALL_LEFT;
 
-                }else{
-                    this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_BOTTOM;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed] = this.visionBoard[firstHalfParsed+1][secondHalfParsed] | WALL_TOP;
-                    this.visionBoard[firstHalfParsed][secondHalfParsed+1] = this.visionBoard[firstHalfParsed][secondHalfParsed+1] | WALL_BOTTOM;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] = this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] | WALL_TOP;}
+                    } else {
+                        this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_BOTTOM;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed] | WALL_TOP;
+                        this.visionBoard[firstHalfParsed][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed][secondHalfParsed + 1] | WALL_BOTTOM;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] | WALL_TOP;
+                    }
 
+                });
+
+                console.log("own walls : " + gameState.ownWalls);
+                gameState.ownWalls.forEach(element => {
+                    console.log("element : " + element);
+
+                    const element0 = element[0];
+                    element0.toString();
+                    const firstHalf = element0.substring(0, 1);
+                    const secondHalf = element0.substring(1);
+
+                    const firstHalfParsed = parseInt(firstHalf) - 1;
+                    const secondHalfParsed = parseInt(secondHalf) - 1;
+                    if (element[1] == 1) {
+
+                        this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_RIGHT;
+                        this.visionBoard[firstHalfParsed][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed][secondHalfParsed + 1] | WALL_LEFT;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed] | WALL_RIGHT;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] | WALL_LEFT;
+
+                    } else {
+                        this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_BOTTOM;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed] | WALL_TOP;
+                        this.visionBoard[firstHalfParsed][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed][secondHalfParsed + 1] | WALL_BOTTOM;
+                        this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] = this.visionBoard[firstHalfParsed + 1][secondHalfParsed + 1] | WALL_TOP;
+                    }
+                });
+                this.whichTurn++;
+                resolve(true);
+                setTimeout(() => {
+                    resolve(true);
+                }, 50);
             });
-
-            console.log("own walls : " + gameState.ownWalls);
-            gameState.ownWalls.forEach(element => {
-                console.log("element : " + element);
-
-                const element0 = element[0];
-                element0.toString();
-                const firstHalf = element0.substring(0, 1);
-                const secondHalf = element0.substring(1);
-
-                const firstHalfParsed = parseInt(firstHalf) -1;
-                const secondHalfParsed = parseInt(secondHalf) -1;
-                if (element[1] == 1){
-
-                    this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_RIGHT;
-                    this.visionBoard[firstHalfParsed][secondHalfParsed+1] = this.visionBoard[firstHalfParsed][secondHalfParsed+1] | WALL_LEFT;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed] = this.visionBoard[firstHalfParsed+1][secondHalfParsed] | WALL_RIGHT;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] = this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] | WALL_LEFT;
-
-                }else{
-                    this.visionBoard[firstHalfParsed][secondHalfParsed] = this.visionBoard[firstHalfParsed][secondHalfParsed] | WALL_BOTTOM;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed] = this.visionBoard[firstHalfParsed+1][secondHalfParsed] | WALL_TOP;
-                    this.visionBoard[firstHalfParsed][secondHalfParsed+1] = this.visionBoard[firstHalfParsed][secondHalfParsed+1] | WALL_BOTTOM;
-                    this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] = this.visionBoard[firstHalfParsed+1][secondHalfParsed+1] | WALL_TOP;}
-            });
-            this.whichTurn++;
-            resolve(true);
-            setTimeout(() => {resolve(true);}, 50);
-        });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     whatToDo(whichPlayer, gameState) {

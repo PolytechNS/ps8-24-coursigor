@@ -266,6 +266,7 @@ function nextMove(id, move) {
         }
         return result;
     }
+    checkVictoryCondition(id, games[id].positionPlayer1, games[id].positionPlayer2);
 }
 exports.nextMove = nextMove;
 
