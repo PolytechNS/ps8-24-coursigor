@@ -1,10 +1,10 @@
-const io = require('socket.io-client');
+
 const username = localStorage["username"];
 let users = [];
 let all = [];
 
 
-const socket = io("api/defyFriends");
+var socket = io("api/defyFriends");
 
 
 
@@ -294,9 +294,10 @@ document.addEventListener("DOMContentLoaded", e => {
 
 
 function defyFriend(id) {
-    window.location.href = `/game/online1v1`;
     
     const message = username + " wants to defy " + id + " to a game!";
+    
+    window.location.href = `/game/online1v1/online1v1.html`;
     socket.emit('defyFriend', message);
 }
 
