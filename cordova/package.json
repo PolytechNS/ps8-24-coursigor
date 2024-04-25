@@ -14,6 +14,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^12.0.1",
+    "cordova-plugin-dialogs": "^2.0.2",
+    "cordova-plugin-network-information": "^3.0.0",
+    "cordova-plugin-splashscreen": "^6.0.1",
     "cordova-plugin-vibration": "^3.1.1"
   },
   "cordova": {
@@ -21,7 +24,10 @@
       "android"
     ],
     "plugins": {
-      "cordova-plugin-vibration": {}
+      "cordova-plugin-vibration": {},
+      "cordova-plugin-network-information": {},
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-splashscreen": {}
     }
   }
 }

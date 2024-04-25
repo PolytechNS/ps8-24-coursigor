@@ -5,17 +5,25 @@
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
     </author>
-    <!--
-    <content src="http://coursigor.ps8.academy/index.html" />
-    -->
     <content src="index.html" />
     <access origin="http://coursigor.ps8.academy/" />
     <allow-navigation href="*://coursigor.ps8.academy/*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-    <!--
-    <preference name="scheme" value="http" />
-    <preference name="DisableOverScroll" value="true" />
-    <preference name="WebViewBounce" value="true" />
-    -->
+
+    <preference name="android-targetSdkVersion" value="33" />
+
+    <!-- Préférences pour le splash screen -->
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="2000" /> <!-- Durée d'affichage en millisecondes -->
+
+    <platform name="android">
+
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/igor_splash.png" />
+        <preference name="AndroidWindowSplashScreenBackground" value="#777777" />
+
+        <icon src="www/img/icone.jpg" />
+
+    </platform>
+
 </widget>

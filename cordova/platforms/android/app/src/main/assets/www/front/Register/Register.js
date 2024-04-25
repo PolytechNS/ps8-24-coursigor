@@ -31,7 +31,7 @@ document.getElementById('RegisterBtn').addEventListener('click', async function(
         })
         .then(data => {
             // Traitez la réponse ici
-            document.getElementById('successMessage').textContent = 'You are now Registered!!';
+            document.getElementById('successMessage').textContent = 'Connexion réussie!';
             console.log('Data reçue:', data);
         })
         .catch(error => {
@@ -64,14 +64,14 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
         })
         .then(data => {
             if (data.error) {
-                document.getElementById('successMessageLogin').textContent = 'Problem with Username or Password';
+                document.getElementById('successMessageLogin').textContent = 'Erreur d\'identification';
 
                 console.error('Erreur lors de la connexion:', data.error);
 
                 // Gérez l'affichage ou la manipulation de l'erreur côté client
             } else {
                 window.location.href = "../index.html";
-                document.getElementById('successMessageLogin').textContent = 'You are now connected!';
+                document.getElementById('successMessageLogin').textContent = 'Connexion réussie!';
                 if (data.token) {
                     // Afficher le token dans la console (à des fins de débogage)
                     console.log('Token reçu:', data.token);
@@ -83,6 +83,7 @@ document.getElementById('LoginBtn').addEventListener('click', async function() {
                     console.log("elo",elo);
                     document.cookie = `elo=${elo}; path=/`;
                     document.cookie = `id=${id}; path=/`;
+                    localStorage.setItem('username', usernameLogin);
                 }
                 console.log('Connexion réussie:', data.message);
             }
@@ -128,3 +129,4 @@ function displayCookies() {
 function goBackToMenu() {
     window.location.href = '/';
 }
+
