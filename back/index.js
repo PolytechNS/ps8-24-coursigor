@@ -23,6 +23,7 @@ const app = http.createServer(async function (request, response) {
         });
 
         try {
+            
 
             // Ajout des en-têtes CORS manuellement
             response.setHeader('Access-Control-Allow-Origin', '*');

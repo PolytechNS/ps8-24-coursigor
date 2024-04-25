@@ -119,10 +119,7 @@ body {
     font-family: system-ui, sans-serif;
 }
 
-.left-sidebar,
-.right-sidebar {
-    padding: 1rem;
-}
+
 
 button {
     background: #000000;
@@ -162,4 +159,101 @@ button {
 .wall {
     /*transition: all 0.3s ease;*/
     transform-origin: center;
+}
+
+
+@media screen and (max-aspect-ratio: 7/6) {
+    #gameplayExplanation {
+        padding: 5px;
+        
+        top: 50%;
+        left: 0%;
+        transform: translate(0%, -50%);
+    }
+
+    #gameplayExplanation p {
+        font-size: medium;
+    }
+
+    #gameplayExplanation ul li {
+        font-size: 10px;
+    }
+
+    main {
+        background: #1f1f1f;
+        margin: auto;
+        grid-column: 1;
+        grid-row: 3;
+    }
+    .container {
+        width: 100vmin;
+        height: 70vmin;
+        display: flex;
+        justify-content: center;
+        block-size: fit-content;
+    
+    }
+
+    .left-sidebar {
+        grid-row:4;
+        text-align: center;
+        
+    }
+    .right-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+        text-align: center;
+    }
+
+    
+    #gameover {
+        top: 50%;
+        left: 0%;
+        transform: translate(0%, -50%);
+    }
+
+    #gameover p {
+        font-size: medium;
+    }
+    
+    
+    footer {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        text-align: center;
+        grid-column: 1 / 4;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+    footer > div {
+        display: flex;
+        align-items: center;
+    }
+
+    #abandonner {
+        margin-right: auto;
+    }
+
+    .footer-buttons-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .footer-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .footer-button img {
+        width: 100%;
+        height: auto;
+    }
+    
+ 
+    
 }

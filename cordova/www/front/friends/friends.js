@@ -7,7 +7,7 @@ function fetchFriends() {
         console.log("called");
         const username = localStorage["username"]
         // Fetch friends data
-        fetch(`http://localhost:8000/api/friends/confirmedFriends?username=${localStorage["username"]}`, {
+        fetch(`/api/friends/confirmedFriends?username=${localStorage["username"]}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ function fetchFriendsWaiting() {
         console.log("called");
         const username = localStorage["username"]
         // Fetch friends data
-        fetch(`http://localhost:8000/api/friends/waitingFriends?username=${localStorage["username"]}`, {
+        fetch(`/api/friends/waitingFriends?username=${localStorage["username"]}`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'
@@ -104,7 +104,7 @@ function addAskingFriend(id) {
     const adding = {"added": added,  "username": username};
     let tmp = JSON.stringify(adding);
     console.log(tmp);
-    fetch(`http://localhost:8000/api/friends/accept`, {
+    fetch(`/api/friends/accept`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ function removeFriend(id) {
     const removing = {"removed": removed,  "username": username};
     let tmp = JSON.stringify(removing);
     console.log(tmp);
-    fetch(`http://localhost:8000/api/friends/remove`, {
+    fetch(`/api/friends/remove`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ function refuseFriend(id) {
     const removing = {"removed": removed,  "username": username};
     let tmp = JSON.stringify(removing);
     console.log(tmp);
-    fetch(`http://localhost:8000/api/friends/deny`, {
+    fetch(`/api/friends/deny`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ function addNewFriend(id) {
     const adding = {"demandee": added,  "demander": username};
     let tmp = JSON.stringify(adding);
     console.log(tmp);
-    fetch(`http://localhost:8000/api/friends/add`, {
+    fetch(`/api/friends/add`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -246,7 +246,7 @@ function fetchUsers() {
     console.log("called");
     const  searchInput = document.querySelector("[data-search]") ;
     // Fetch friends data
-    fetch(`http://localhost:8000/api/friends/allUsers?username=${username}`, {
+    fetch(`/api/friends/allUsers?username=${username}`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'
